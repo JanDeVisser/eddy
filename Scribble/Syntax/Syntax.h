@@ -127,4 +127,76 @@ std::shared_ptr<T> make_node(Args&&... args)
     return ret;
 }
 
+template <class ...Args>
+inline Span merge(pSyntaxNode const& node_1, pSyntaxNode const& node_2, Args&&... args)
+{
+    if (node_1 != nullptr) {
+        return merge(node_1, std::forward<Args>(args)...);
+    } else if (node_2 != nullptr){
+        return merge(node_2, std::forward<Args>(args)...);
+    } else {
+        return merge(std::forward<Args>(args)...);
+    }
+}
+
+template <class ...Args>
+inline Span merge(pSyntaxNode const& node_1, Token const& token_2, Args&&... args)
+{
+    if (node_1 != nullptr) {
+        return merge(node_1, std::forward<Args>(args)...);
+    } else {
+        return merge(token_2, std::forward<Args>(args)...);
+    }
+}
+
+template <class ...Args>
+inline Span merge(Token const& token_1, pSyntaxNode const&, Args&&... args)
+{
+    return merge(token_1, std::forward<Args>(args)...);
+}
+
+template <class ...Args>
+inline Span merge(Token const& token_1, Token const&, Args&&... args)
+{
+    return merge(token_1, std::forward<Args>(args)...);
+}
+
+inline Span merge(pSyntaxNode const& node_1, Token const& token_2)
+{
+    if (node_1 != nullptr)
+        return node_1->location().merge(token_2.location());
+    else
+        return token_2.location();
+}
+
+inline Span merge(pSyntaxNode const& node_1, pSyntaxNode const& node_2)
+{
+    if (node_1 != nullptr) {
+        if (node_2 != nullptr) {
+            return node_1->location().merge(node_2->location());
+        } else {
+            return node_1->location();
+        }
+    } else {
+        if (node_2 != nullptr) {
+            return node_2->location();
+        } else {
+            fatal("Need at least one non-null syntaxnode to merge locations");
+        }
+    }
+}
+
+inline Span merge(Token const& token_1, Token const& token_2)
+{
+    return token_1.location().merge(token_2.location());
+}
+
+inline Span merge(Token const& token_1, pSyntaxNode const& node_2)
+{
+    if (node_2 != nullptr)
+        return token_1.location().merge(node_2->location());
+    else
+        return token_1.location();
+}
+
 }

@@ -88,7 +88,7 @@ Variable::Variable(Span location, std::string name)
 // -- BinaryExpression ------------------------------------------------------
 
 BinaryExpression::BinaryExpression(std::shared_ptr<Expression> lhs, Token op, std::shared_ptr<Expression> rhs)
-    : Expression(lhs->location().merge(rhs->location()))
+    : Expression(merge(lhs, op, rhs))
     , m_lhs(std::move(lhs))
     , m_operator(op)
     , m_rhs(std::move(rhs))
@@ -133,7 +133,7 @@ bool BinaryExpression::is_complete() const
 // -- UnaryExpression -------------------------------------------------------
 
 UnaryExpression::UnaryExpression(Token op, std::shared_ptr<Expression> operand)
-    : Expression(op.location().merge(operand->location()))
+    : Expression(merge(op, operand))
     , m_operator(op)
     , m_operand(std::move(operand))
 {

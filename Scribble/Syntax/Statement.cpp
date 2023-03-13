@@ -323,7 +323,7 @@ std::string ExpressionStatement::to_string() const
 
 bool ExpressionStatement::is_complete() const
 {
-    return (m_expression == nullptr) && m_expression->is_complete();
+    return (m_expression != nullptr) && m_expression->is_complete();
 }
 
 // -- Return ----------------------------------------------------------------
