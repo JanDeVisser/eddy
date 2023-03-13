@@ -22,6 +22,9 @@ Console::Console(Editor* editor)
     : Buffer(editor)
 {
     m_commands = &s_console_commands;
+    if (auto err_maybe = initialize_context(m_ctx); err_maybe.is_error()) {
+        fatal("Error initializing interpreter context: {}", err_maybe.error());
+    }
 }
 
 void Console::render()
@@ -33,7 +36,7 @@ void Console::render()
     size_t top_line = (lines > editor()->rows()) ? lines - editor()->rows() : 0;
 
     auto render_statement = [this](Statement const& stmt, size_t first_line) -> void {
-        PaletteIndex prompt_color = PaletteIndex::ANSIBrightBlack;
+        PaletteIndex prompt_color = PaletteIndex::ANSIWhite;
         if (stmt.node == nullptr || !stmt.node->is_complete())
             prompt_color = PaletteIndex::ANSIBrightGreen;
         else if (stmt.result.is_error())
@@ -71,11 +74,14 @@ void Console::render()
     size_t row = 0;
     size_t next_line = 0;
     for (auto const& stmt : m_statements) {
-        next_line += stmt.line + stmt.lines.size();
-        if (stmt.line + stmt.lines.size() < top_line)
+        next_line += stmt.line + stmt.lines.size() + 1;
+        if (stmt.line + stmt.lines.size() + 1 < top_line)
             continue;
         render_statement(stmt, (stmt.line >= top_line) ? 0 : top_line - stmt.line);
         row += stmt.lines.size();
+        editor()->append(DisplayToken { stmt.result.to_string(), PaletteIndex::ANSIBrightWhite });
+        editor()->newline();
+        row++;
     }
     render_statement(m_current, (next_line >= top_line) ? 0 : top_line - next_line);
     editor()->text_cursor(static_cast<int>(row + m_cursor_line), static_cast<int>(m_cursor_column + 3 - m_screen_left));
@@ -112,6 +118,7 @@ bool Console::dispatch(SDL_Keysym sym)
         if (m_cursor_column > 0) {
             statement.erase(m_cursor_column - 1, 1);
             m_cursor_column--;
+            compile(statement);
         }
         return true;
     }
@@ -186,6 +193,7 @@ void Console::wheel(int lines)
 void Console::execute()
 {
     assert(m_current.node && m_current.node->is_complete());
+    std::cout << m_current.node->to_xml() << "\n";
     auto result = interpret(m_current.node, m_ctx);
     if (result.is_error()) {
         m_current.result = result.error().to_string();

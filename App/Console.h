@@ -40,7 +40,6 @@ private:
         std::shared_ptr<Project> node { nullptr };
         Value result {};
         std::vector<Line> lines {};
-
     };
 
     void compile(std::string const&);

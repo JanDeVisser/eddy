@@ -30,6 +30,8 @@ struct StatementResult {
 };
 
 using InterpreterContext = Context<Value,StatementResult>;
+
+[[nodiscard]] ErrorOr<void, SyntaxError> initialize_context(InterpreterContext&);
 [[nodiscard]] ProcessResult interpret(std::shared_ptr<Project> const&);
 [[nodiscard]] ProcessResult interpret(std::shared_ptr<Project> const&, InterpreterContext&);
 

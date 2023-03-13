@@ -22,25 +22,43 @@ ErrorOr<void, SyntaxError> register_builtin(InterpreterContext& ctx, std::string
     return {};
 }
 
+ErrorOr<void, SyntaxError> register_command(InterpreterContext& ctx, std::string const& command, Widget& widget)
+{
+    auto cmd = widget.command(command);
+    if (!cmd)
+        return SyntaxError { {}, "Unknown command {}", command };
+    TRY_RETURN(ctx.declare(command,
+        Value { std::make_shared<CommandAdapter>(command, *cmd) } ));
+    return {};
+}
+
+ErrorOr<void, SyntaxError> initialize_context(InterpreterContext& ctx)
+{
+    TRY_RETURN(register_command(ctx, "set-fixed-width-font", Scratch::scratch()));
+    TRY_RETURN(register_builtin(ctx, "string-length",
+        [](Values const& args, InterpreterContext&) -> Value {
+            if (args.empty() || args.size() > 1)
+                return Value { ErrorCode::ArgumentCountMismatch };
+            if (args[0].type() != ValueType::Text)
+                return Value { ErrorCode::ArgumentTypeMismatch };
+            return Value { args[0].to_string().length() };
+        }));
+    return {};
+}
+
 ProcessResult interpret(std::shared_ptr<Project> const& project)
 {
     InterpreterContext ctx;
+    if (auto err_maybe = initialize_context(ctx); err_maybe.is_error()) {
+        ProcessResult ret = err_maybe.error();
+        return ret;
+    }
     return interpret(project, ctx);
 }
 
 ProcessResult interpret(std::shared_ptr<Project> const& project, InterpreterContext& ctx)
 {
     ProcessResult result;
-
-    TRY_RETURN(ctx.declare("set-fixed-width-font", Value { std::make_shared<CommandAdapter>("set-fixed-width-font", *Scratch::scratch().command("set-fixed-width-font")) } ));
-    TRY_RETURN(register_builtin(ctx, "string-length", [](Values const& args, InterpreterContext&) -> Value {
-        if (args.empty() && args.size() > 1)
-            return Value { ErrorCode::ArgumentCountMismatch };
-        if (args[0].type() != ValueType::Text)
-            return Value { ErrorCode::ArgumentTypeMismatch };
-        return Value { args[0].to_string().length() };
-    }));
-
     process(project, ctx, result);
     return result;
 }
@@ -90,7 +108,26 @@ NODE_PROCESSOR(Block)
     return res;
 }
 
-ALIAS_NODE_PROCESSOR(Module, Block);
+NODE_PROCESSOR(Module)
+{
+    std::shared_ptr<Module> mod = std::dynamic_pointer_cast<Module>(tree);
+
+    std::shared_ptr<ExpressionResult> res;
+    for (auto const& statement : mod->statements()) {
+        res = TRY_AND_CAST(ExpressionResult, statement, ctx);
+        switch ((*ctx).type) {
+        case StatementResult::StatementResultType::Return:
+            return std::make_shared<ExpressionResult>(mod->location(), (*ctx).payload);
+        case StatementResult::StatementResultType::Break:
+        case StatementResult::StatementResultType::Continue:
+            return res;
+        default:
+            break;
+        }
+    }
+    return res;
+}
+
 
 NODE_PROCESSOR(FunctionDef)
 {
@@ -134,9 +171,9 @@ NODE_PROCESSOR(BinaryExpression)
 
     switch (expr->op().code()) {
     case TokenCode::Equals: {
-        if (expr->lhs()->node_type() != SyntaxNodeType::Identifier)
-            return SyntaxError { expr->location(), ErrorCode::CannotAssignToRValue, expr->lhs() };
         auto ident = std::dynamic_pointer_cast<Identifier>(expr->lhs());
+        if (ident == nullptr)
+            return SyntaxError { expr->location(), ErrorCode::CannotAssignToRValue, expr->lhs() };
         ctx.set(ident->name(), rhs->value());
         return rhs;
     }
