@@ -90,7 +90,7 @@ private:
     std::shared_ptr<Expression> parse_expression_1(std::shared_ptr<Expression> lhs, int min_precedence);
     std::shared_ptr<Expression> parse_primary_expression();
 
-    Scribble m_lexer { true };
+    Scribble m_lexer;
     ParserContext& m_ctx;
     std::vector<std::string> m_modules;
     std::string m_current_module;
