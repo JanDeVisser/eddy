@@ -4,16 +4,16 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include <core/StringUtil.h>
+#include "obelixlibs/core/StringUtil.h"
 
-#include <Commands/ArgumentHandler.h>
-#include <Commands/CommandHandler.h>
+#include "ArgumentHandler.h"
+#include "CommandHandler.h"
 
 using namespace Obelix;
 
 namespace Scratch {
 
-CommandHandler::CommandHandler(ScheduledCommand& scheduled_command)
+CommandHandler::CommandHandler(ScheduledCommand const& scheduled_command)
     : ModalWidget(App::instance().width() / 2, App::instance().height() / 2)
     , m_owner(scheduled_command.owner)
     , m_command(scheduled_command.command)

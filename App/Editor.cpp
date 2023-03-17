@@ -134,8 +134,8 @@ void Editor::mark_current_line(int line)
         0,
         line_height()
     };
-    box(r, App::instance().color(PaletteIndex::CurrentLineFill));
-    rectangle(r, App::instance().color(PaletteIndex::CurrentLineEdge));
+    box(r, Scratch::scratch().color(PaletteIndex::CurrentLineFill));
+    rectangle(r, Scratch::scratch().color(PaletteIndex::CurrentLineEdge));
 }
 
 void Editor::text_cursor(int line, int column)
@@ -154,7 +154,7 @@ void Editor::text_cursor(int line, int column)
             1,
             line_height()
         };
-        box(r, App::instance().color(PaletteIndex::Cursor));
+        box(r, Scratch::scratch().color(PaletteIndex::Cursor));
         if (elapsed > 800)
             time_start = time_end;
     }
@@ -162,7 +162,7 @@ void Editor::text_cursor(int line, int column)
 
 void Editor::append(DisplayToken const& token)
 {
-    render_fixed(column_left(m_column), line_top(m_line), token.text, App::instance().color(token.color));
+    render_fixed(column_left(m_column), line_top(m_line), token.text, Scratch::scratch().color(token.color));
     m_column += (int)token.text.length();
 }
 

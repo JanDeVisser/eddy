@@ -102,6 +102,17 @@ public:
         m_current_buffer->on_activate();
     }
 
+    template <class BufferClass>
+    requires std::derived_from<BufferClass, Buffer>
+    BufferClass* get_buffer()
+    {
+        for (auto* buffer : buffers()) {
+            if (auto casted = dynamic_cast<BufferClass*>(buffer); casted != nullptr)
+                return casted;
+        }
+        return nullptr;
+    }
+
 private:
     std::vector<std::unique_ptr<Buffer>> m_buffers {};
     Buffer* m_current_buffer { nullptr };

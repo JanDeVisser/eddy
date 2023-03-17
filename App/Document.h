@@ -13,8 +13,8 @@
 
 #include <lexer/BasicParser.h>
 
+#include "Widget/Command.h"
 #include <App/Buffer.h>
-#include <Commands/Command.h>
 #include <Parser/CPlusPlus.h>
 #include <Widget/Widget.h>
 

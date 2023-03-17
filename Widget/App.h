@@ -13,14 +13,14 @@
 
 #include <SDL.h>
 
-#include "obelixlibs/core/Logging.h"
+#include <core/Logging.h>
 
-#include "App/EditorState.h"
-#include "Commands/Command.h"
-//#include <Scrollbar.h>
-#include "App/Key.h"
-#include "Geometry.h"
-#include "Widget.h"
+#include "App/Palette.h"
+#include "Command.h"
+#include <Widget/Geometry.h>
+#include <Widget/Key.h>
+#include <Widget/Text.h>
+#include <Widget/Widget.h>
 
 #ifndef WIDGET_BORDER_X
 #define WIDGET_BORDER_X 8
@@ -56,10 +56,12 @@
 
 namespace Scratch {
 
-extern_logging_category(scratch);
+extern_logging_category(widget);
 
 using Key=int;
 using Keycode=int32_t;
+using InputBuffer = std::basic_string<CodePoint, std::char_traits<CodePoint>, std::allocator<CodePoint>>;
+
 static_assert(sizeof(Keycode) == sizeof(SDL_Keycode), "Wrong type size.");
 
 class SDLContext;
@@ -88,10 +90,12 @@ public:
     int height() const override;
     intptr_t active() const;
     void active(intptr_t);
-    SDL_Color color(PaletteIndex color);
 
     void event_loop();
+    virtual void pre_render() { };
     void render() override;
+    virtual void post_render() { };
+    virtual void on_command(ScheduledCommand const&) { };
     bool dispatch(SDL_Keysym) override;
     void resize(Box const&) override;
     std::string input_buffer();
@@ -114,7 +118,6 @@ private:
     int m_height { 0 };
     intptr_t m_active { 0 };
 
-    Palette m_palette;
     InputBuffer m_input_characters;
 
     Vec2 m_widgetPos;

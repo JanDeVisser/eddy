@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: MIT
  */
 
+#include <sstream>
+
 #include <Scribble/Syntax/Variable.h>
 
 namespace Scratch::Scribble {
@@ -22,7 +24,12 @@ VariableDeclaration::VariableDeclaration(Span location, std::shared_ptr<Identifi
 
 std::string VariableDeclaration::attributes() const
 {
-    return format(R"(name="{}" is_const="{}")", name(), is_const());
+    std::stringstream ss;
+    ss << "name=\"";
+    if (identifier() != nullptr)
+        ss << identifier()->name();
+    ss << "\" is_const=\"" << Obelix::to_string<bool>()(is_const()) << "\"";
+    return ss.str();
 }
 
 Nodes VariableDeclaration::children() const
@@ -47,7 +54,8 @@ std::shared_ptr<Identifier> const& VariableDeclaration::identifier() const
 
 std::string const& VariableDeclaration::name() const
 {
-    return m_identifier->name();
+    static std::string s_empty;
+    return (m_identifier != nullptr) ? m_identifier->name() : s_empty;
 }
 
 bool VariableDeclaration::is_const() const

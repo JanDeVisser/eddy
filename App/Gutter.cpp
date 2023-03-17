@@ -31,7 +31,7 @@ Gutter::Gutter()
             if (line == doc->point_line())
                 color = PaletteIndex::ANSIBrightYellow;
             gutter->render_fixed(x, (int)y, Obelix::format("{>4}", line + 1),
-                App::instance().color(color));
+                Scratch::scratch().color(color));
         }
     });
 }

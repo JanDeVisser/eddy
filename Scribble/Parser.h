@@ -69,6 +69,7 @@ protected:
     Token const& replace(Token const&);
     std::optional<Token const> match(TokenCode, char const* = nullptr);
     Token const& skip(TokenCode);
+    Token const& skip_whitespace();
     TokenCode current_code();
     bool expect(TokenCode, char const* = nullptr);
     bool expect(char const*, char const* = nullptr);

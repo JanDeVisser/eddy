@@ -8,9 +8,9 @@
 
 #include <SDL.h>
 
-#include <App/Scratch.h>
-#include <Commands/Command.h>
-#include <Commands/CommandHandler.h>
+#include "CommandHandler.h"
+#include "Scratch.h"
+#include "Widget/Command.h"
 
 namespace Scratch {
 
@@ -118,8 +118,8 @@ public:
                     -4,
                     App::instance().context()->character_height() + 1
                 };
-                box(r, App::instance().color(PaletteIndex::CurrentLineFill));
-                rectangle(r, App::instance().color(PaletteIndex::CurrentLineEdge));
+                box(r, Scratch::scratch().color(PaletteIndex::CurrentLineFill));
+                rectangle(r, Scratch::scratch().color(PaletteIndex::CurrentLineEdge));
             }
             render_fixed(10, y, match.text);
             y += App::instance().context()->character_height() + 2;

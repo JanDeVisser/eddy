@@ -89,10 +89,22 @@ public:
         return *this;
     }
 
+    void tokens(std::vector<Token> tokens)
+    {
+        m_tokens = std::move(tokens);
+    }
+
+    [[nodiscard]] std::vector<Token> const& tokens() const
+    {
+        return m_tokens;
+    }
+
+
 private:
     pSyntaxNode m_result { nullptr };
     Errors m_errors {};
     Errors m_warnings {};
+    std::vector<Token> m_tokens;
 };
 
 #define TRY_AND_TRY_CAST(cls, expr, ctx)                          \

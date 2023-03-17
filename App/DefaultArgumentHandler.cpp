@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include <Commands/ArgumentHandler.h>
+#include "ArgumentHandler.h"
 
 namespace Scratch {
 
@@ -34,7 +34,7 @@ void DefaultArgumentHandler::render()
             1,
             App::instance().context()->character_height()
         };
-        box(r, App::instance().color(PaletteIndex::Cursor));
+        box(r, Scratch::scratch().color(PaletteIndex::Cursor));
         if (elapsed > 800)
             time_start = time_end;
     }

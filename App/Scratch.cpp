@@ -9,6 +9,7 @@
 
 #include <core/Logging.h>
 
+#include <App/CommandHandler.h>
 #include <App/Console.h>
 #include <App/Scratch.h>
 #include <Widget/SDLContext.h>
@@ -109,6 +110,7 @@ Config::Config(int argc, char const** argv)
 Scratch::Scratch(Config& config, SDLContext *ctx)
     : App("Scratch", ctx)
     , m_config(config)
+    , m_palette(DarkPalette())
 {
     auto icon_surface = IMG_LoadTyped_RW(SDL_RWFromFile("scratch.png", "rb"), 1, "PN");
     if(!icon_surface) {
@@ -140,6 +142,47 @@ Scratch& Scratch::scratch()
     return dynamic_cast<Scratch&>(App::instance());
 }
 
+/*
+ * Equivalent to:
+ *    uint8_t a = (c >> 24) & 0xff;
+ *    uint8_t b = (c >> 16) & 0xff;
+ *    uint8_t g = (c >> 8) & 0xff;
+ *    uint8_t r = c & 0xff;
+ *    return { r, g, b, a };
+ */
+SDL_Color Scratch::color(PaletteIndex color)
+{
+    static unsigned s_ansicolors[] = {
+        0xff000000, // ANSIBlack,
+        0xff0000cc, // ANSIRed,
+        0xff069a4e, // ANSIGreen,
+        0xff00a0c4, // ANSIYellow,
+        0xffcf9f72, // ANSIBlue,
+        0xff7b5075, // ANSIMagenta,
+        0xff9a9806, // ANSICyan,
+        0xffcfd7d3, // ANSIWhite,
+        0xff535755, // ANSIBrightBlack,
+        0xff2929ef, // ANSIBrightRed,
+        0xff34e28a, // ANSIBrightGreen,
+        0xff4fe9fc, // ANSIBrightYellow,
+        0xffffaf32, // ANSIBrightBlue,
+        0xffa87fad, // ANSIBrightMagenta,
+        0xffe2e234, // ANSIBrightCyan,
+        0xffffffff, // ANSIBrightWhite,
+    };
+    uint32_t c;
+    if (color >= PaletteIndex::ANSIBlack && color <= PaletteIndex::ANSIBrightWhite)
+        c = s_ansicolors[(size_t)color - (size_t)PaletteIndex::ANSIBlack];
+    else
+        c = m_palette[(size_t)color];
+    return *((SDL_Color*)&c);
+}
+
+void Scratch::on_command(ScheduledCommand const& cmd)
+{
+    add_modal(new CommandHandler(cmd));
+}
+
 void Scratch::run_app(int argc, char const** argv)
 {
     Config config(argc, argv);
@@ -163,7 +206,7 @@ void Scratch::run_app(int argc, char const** argv)
         } else {
             box_color = PaletteIndex::ANSIBrightRed;
         }
-        applet->box(SDL_Rect { 0, 0, 0, 0 }, App::instance().color(box_color));
+        applet->box(SDL_Rect { 0, 0, 0, 0 }, Scratch::scratch().color(box_color));
         applet->render_fixed_centered(2, "fps", SDL_Color { 0xff, 0xff, 0xff, 0xff });
     });
     app.add_status_bar_applet(7, [](WindowedWidget* applet) -> void {
@@ -179,7 +222,7 @@ void Scratch::run_app(int argc, char const** argv)
         } else {
             box_color = PaletteIndex::ANSIBrightRed;
         }
-        applet->box(SDL_Rect { 0, 0, 0, 0 }, App::instance().color(box_color));
+        applet->box(SDL_Rect { 0, 0, 0, 0 }, Scratch::scratch().color(box_color));
         applet->render_fixed_centered(2, "parse", SDL_Color { 0xff, 0xff, 0xff, 0xff });
     });
     main_area->add_component(app.m_gutter = new Gutter());
@@ -192,10 +235,4 @@ void Scratch::run_app(int argc, char const** argv)
     app.event_loop();
 }
 
-}
-
-int main(int argc, char const** argv)
-{
-    Scratch::Scratch::run_app(argc, argv);
-    return 0;
 }

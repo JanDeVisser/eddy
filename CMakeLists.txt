@@ -47,26 +47,44 @@ include_directories(
         "${SDL2_TTF_INCLUDE_DIRS}"
 )
 
-add_executable(
-        scratch
-        App/Buffer.cpp
-        App/Console.cpp
-        App/Document.cpp
-        App/EditAction.cpp
-        App/Editor.cpp
-        App/EditorState.cpp
-        App/Gutter.cpp
-        App/Key.cpp
-        App/Scratch.cpp
-        App/StatusBar.cpp
-        App/Text.cpp
-        Commands/ArgumentHandler.cpp
-        Commands/Command.cpp
-        Commands/CommandHandler.cpp
-        Commands/DefaultArgumentHandler.cpp
-        Parser/CPlusPlus.cpp
-        Parser/PlainText.cpp
-        Parser/ScratchParser.cpp
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
+)
+# For Windows: Prevent overriding the parent project's compiler/linker settings
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
+add_library(
+        Widget
+        SHARED
+        Widget/Command.cpp
+        Widget/Alert.cpp
+        Widget/App.cpp
+        Widget/Frame.cpp
+        Widget/Geometry.h
+        Widget/Key.cpp
+        Widget/Layout.cpp
+        Widget/ModalWidget.cpp
+        Widget/SDLContext.cpp
+        Widget/Text.cpp
+        Widget/Widget.cpp
+        Widget/WindowedWidget.cpp
+        Widget/WidgetContainer.cpp
+)
+
+target_link_libraries(
+        Widget
+        oblcore
+        SDL2::Main
+        SDL2::GFX
+        SDL2::Image
+        SDL2::TTF
+)
+
+add_library(
+        Scribble
+        SHARED
         Scribble/Interp/CommandAdapter.cpp
         Scribble/Interp/ExpressionResult.cpp
         Scribble/Interp/Function.cpp
@@ -82,32 +100,71 @@ add_executable(
         Scribble/Syntax/Statement.cpp
         Scribble/Syntax/Syntax.cpp
         Scribble/Syntax/Variable.cpp
-        Widget/Alert.cpp
-        Widget/App.cpp
-        Widget/Frame.cpp
-        Widget/Geometry.h
-        Widget/Layout.cpp
-        Widget/ModalWidget.cpp
-        Widget/SDLContext.cpp
-        Widget/Widget.cpp
-        Widget/WindowedWidget.cpp
-        Widget/WidgetContainer.cpp
 )
 
 target_link_libraries(
-        scratch
+        Scribble
         oblcore
         obllexer
-        SDL2::Main
-        SDL2::GFX
-        SDL2::Image
-        SDL2::TTF
+)
+
+add_library(
+        Scratch
+        App/ArgumentHandler.cpp
+        App/Buffer.cpp
+        App/CommandHandler.cpp
+        App/Console.cpp
+        App/DefaultArgumentHandler.cpp
+        App/Document.cpp
+        App/EditAction.cpp
+        App/Editor.cpp
+        App/EditorState.cpp
+        App/Gutter.cpp
+        App/Palette.h
+        App/Scratch.cpp
+        App/StatusBar.cpp
+        Parser/CPlusPlus.cpp
+        Parser/PlainText.cpp
+        Parser/ScratchParser.cpp
+        Parser/Scribble.cpp
+)
+
+add_executable(
+        scratch
+        App/main.cpp)
+
+target_link_libraries(
+        scratch
+        Scratch
+        Scribble
+        Widget
+        oblcore
+        obllexer
 )
 
 target_compile_features(scratch PUBLIC cxx_std_20)
 
-install(TARGETS scratch
+enable_testing()
+include(GoogleTest)
+
+add_executable(
+        ScribbleTest
+        Test/ScribbleTest.cpp
+)
+
+target_link_libraries(
+        ScribbleTest
+        Scratch
+        Scribble
+        Widget
+        gtest_main
+)
+
+install(TARGETS scratch # ScribbleTest
         ARCHIVE DESTINATION lib
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib
 )
+
+#add_test(NAME ScribbleTest COMMAND ScribbleTest)
+#gtest_discover_tests(ScribbleTest)

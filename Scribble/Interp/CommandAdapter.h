@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include <Commands/Command.h>
+#include "Widget/Command.h"
 #include <Scribble/Interp/Function.h>
 #include <Scribble/Interp/Value.h>
 

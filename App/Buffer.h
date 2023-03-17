@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include <numeric>
+
 #include <lexer/Token.h>
 #include <Widget/Widget.h>
 
@@ -16,6 +18,12 @@ struct Line {
 
     int start_index {0};
     std::vector<Token> tokens {};
+
+    [[nodiscard]] size_t length() const
+    {
+        return std::accumulate(tokens.cbegin(), tokens.cend(), 0u,
+            [](size_t len, Token const& token) { return len + token.string_value().length(); });
+    }
 };
 
 struct DocumentPosition {

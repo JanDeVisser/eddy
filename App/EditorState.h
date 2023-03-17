@@ -12,55 +12,10 @@
 #include <string>
 #include <vector>
 
-#include <App/Text.h>
+#include <App/Palette.h>
+#include <Widget/Text.h>
 
 namespace Scratch {
-
-enum class PaletteIndex : uint8_t {
-    Default,
-    Keyword,
-    Number,
-    String,
-    CharLiteral,
-    Punctuation,
-    Preprocessor,
-    Identifier,
-    KnownIdentifier,
-    PreprocIdentifier,
-    Comment,
-    MultiLineComment,
-    Background,
-    Cursor,
-    Selection,
-    ErrorMarker,
-    Breakpoint,
-    LineNumber,
-    CurrentLineFill,
-    CurrentLineFillInactive,
-    CurrentLineEdge,
-    LineEdited,
-    LineEditedSaved,
-    LineEditedReverted,
-    ANSIBlack,
-    ANSIRed,
-    ANSIGreen,
-    ANSIYellow,
-    ANSIBlue,
-    ANSIMagenta,
-    ANSICyan,
-    ANSIWhite,
-    ANSIBrightBlack,
-    ANSIBrightRed,
-    ANSIBrightGreen,
-    ANSIBrightYellow,
-    ANSIBrightBlue,
-    ANSIBrightMagenta,
-    ANSIBrightCyan,
-    ANSIBrightWhite,
-    Max
-};
-
-using Palette = std::array<unsigned, (size_t)PaletteIndex::Max>;
 
 struct DisplayToken {
     explicit DisplayToken(std::string_view t, PaletteIndex c = PaletteIndex::Default)
@@ -158,7 +113,6 @@ using UndoBuffer = std::vector<UndoRecord>;
 #endif
 
 using KeyStates = std::vector<uint8_t>;
-using InputBuffer = std::basic_string<CodePoint, std::char_traits<CodePoint>, std::allocator<CodePoint>>;
 
 Palette const& DarkPalette();
 Palette const& LightPalette();

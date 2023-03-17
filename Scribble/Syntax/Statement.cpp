@@ -156,7 +156,9 @@ std::string Block::to_string() const
 
 bool Block::is_complete() const
 {
-    return !m_statements.empty() && std::all_of(m_statements.begin(), m_statements.end(), [](auto const& stmt) -> bool { return stmt->is_complete(); });
+    return !m_statements.empty() && std::all_of(m_statements.begin(), m_statements.end(), [](auto const& stmt) -> bool {
+        return stmt->is_complete();
+    });
 }
 
 // -- Module ----------------------------------------------------------------

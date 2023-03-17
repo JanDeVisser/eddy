@@ -6,23 +6,13 @@
 
 #pragma once
 
-#include <deque>
-
-#include <Commands/Command.h>
-#include <Parser/ScratchParser.h>
-
-using namespace Obelix;
-using namespace Scratch::Parser;
+#include <lexer/BasicParser.h>
 
 namespace Scratch::Scribble {
 
-struct ScribbleCommands : public Commands {
-    ScribbleCommands();
-};
+using namespace Obelix;
 
-DisplayToken token_for(TokenCode, std::string_view const&);
-
-class Scribble : public ScratchParser {
+class Scribble : public BasicParser {
 public:
     constexpr static TokenCode KeywordBreak = TokenCode::Keyword0;
     constexpr static TokenCode KeywordCase = TokenCode::Keyword1;
@@ -50,16 +40,17 @@ public:
     constexpr static TokenCode KeywordTrue = TokenCode::Keyword31;
     constexpr static TokenCode KeywordFalse = TokenCode::Keyword32;
 
+    constexpr static TokenCode OutputLine = TokenCode::Keyword33;
+    constexpr static TokenCode ExecutionResult = TokenCode::Keyword34;
+
+    constexpr static TokenCode OKPrompt = TokenCode::Keyword35;
+    constexpr static TokenCode ErrorPrompt = TokenCode::Keyword36;
+    constexpr static TokenCode ContinuationPrompt = TokenCode::Keyword37;
+
     explicit Scribble(bool = false);
-    Token const& next_token() override;
-    DisplayToken colorize(TokenCode, std::string_view const&) override;
-    std::optional<ScheduledCommand> command(std::string const&) const override;
-    [[nodiscard]] std::vector<Command> commands() const override;
 
 private:
-    std::deque<Token> m_pending;
     bool m_ignore_ws { false };
-    static ScribbleCommands s_scribble_commands;
 };
 
-} // Scratch
+} // Scratch::Scribble

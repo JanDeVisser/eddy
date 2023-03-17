@@ -13,9 +13,10 @@
 namespace Scratch {
 
 struct SDLKey {
-    SDL_Keycode sym;
-    uint16_t mod;
+    SDL_Keycode sym { SDLK_UNKNOWN };
+    uint16_t mod { KMOD_NONE };
 
+    SDLKey() = default;
     SDLKey(SDL_Keycode, uint32_t);
     SDLKey(SDL_Keysym const&);
 

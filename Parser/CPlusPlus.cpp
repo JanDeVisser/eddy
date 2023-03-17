@@ -9,6 +9,7 @@
 namespace Scratch::Parser {
 
 CPlusPlusParser::CPlusPlusParser()
+    : BasicScratchParser()
 {
     lexer().add_scanner<Obelix::QStringScanner>("\"'", true);
     lexer().add_scanner<Obelix::IdentifierScanner>();

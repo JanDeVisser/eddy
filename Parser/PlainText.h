@@ -12,7 +12,7 @@
 
 namespace Scratch::Parser {
 
-class PlainTextParser : public ScratchParser {
+class PlainTextParser : public BasicScratchParser {
 public:
     PlainTextParser();
     Token const& next_token() override;

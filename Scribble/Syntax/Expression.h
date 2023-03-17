@@ -10,7 +10,7 @@
 
 namespace Scratch::Scribble {
 
-ABSTRACT_NODE_CLASS(Expression, SyntaxNode)
+NODE_CLASS(Expression, SyntaxNode)
 public:
     explicit Expression(Span = {});
 };

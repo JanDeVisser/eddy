@@ -16,44 +16,17 @@ namespace Scratch::Interp {
 using namespace Obelix;
 using namespace Scratch::Scribble;
 
-ErrorOr<void, SyntaxError> register_builtin(InterpreterContext& ctx, std::string const& name, BuiltInImpl const& impl)
+void StatementResult::log_message(std::string const& message)
 {
-    TRY_RETURN(ctx.declare(name, Value { std::make_shared<BuiltIn>(name, impl) } ));
-    return {};
-}
-
-ErrorOr<void, SyntaxError> register_command(InterpreterContext& ctx, std::string const& command, Widget& widget)
-{
-    auto cmd = widget.command(command);
-    if (!cmd)
-        return SyntaxError { {}, "Unknown command {}", command };
-    TRY_RETURN(ctx.declare(command,
-        Value { std::make_shared<CommandAdapter>(command, *cmd) } ));
-    return {};
-}
-
-ErrorOr<void, SyntaxError> initialize_context(InterpreterContext& ctx)
-{
-    TRY_RETURN(register_command(ctx, "set-fixed-width-font", Scratch::scratch()));
-    TRY_RETURN(register_builtin(ctx, "string-length",
-        [](Values const& args, InterpreterContext&) -> Value {
-            if (args.empty() || args.size() > 1)
-                return Value { ErrorCode::ArgumentCountMismatch };
-            if (args[0].type() != ValueType::Text)
-                return Value { ErrorCode::ArgumentTypeMismatch };
-            return Value { args[0].to_string().length() };
-        }));
-    return {};
-}
-
-ProcessResult interpret(std::shared_ptr<Project> const& project)
-{
-    InterpreterContext ctx;
-    if (auto err_maybe = initialize_context(ctx); err_maybe.is_error()) {
-        ProcessResult ret = err_maybe.error();
-        return ret;
+    auto messages = split(message, '\n');
+    for (auto msg_line : messages) {
+        output.emplace_back(std::make_shared<StringBuffer>(msg_line));
     }
-    return interpret(project, ctx);
+}
+
+void StatementResult::clear()
+{
+    output.clear();
 }
 
 ProcessResult interpret(std::shared_ptr<Project> const& project, InterpreterContext& ctx)

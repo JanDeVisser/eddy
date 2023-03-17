@@ -51,6 +51,8 @@ ProcessResult parse(ParserContext& ctx, std::shared_ptr<StringBuffer> buffer)
     ret = parser.parse(true);
     for (auto const& e : parser.lexer().errors())
         ret.error(e);
+    if (ret.is_error())
+        ret.tokens(parser.lexer().tokens());
     return ret;
 }
 

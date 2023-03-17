@@ -44,15 +44,20 @@ public:
     [[nodiscard]] static StatusBar* status_bar();
     static void add_status_bar_applet(int, Renderer);
     static Scratch& scratch();
+    SDL_Color color(PaletteIndex color);
 
     class ScratchCommands : public Commands {
     public:
         ScratchCommands();
     };
 
+    void on_command(ScheduledCommand const&) override;
+
 private:
     Scratch(Config& config, SDLContext *ctx);
     Config& m_config;
+    Palette m_palette;
+
     Editor* m_editor { nullptr };
     Gutter* m_gutter { nullptr };
     StatusBar* m_status_bar { nullptr };

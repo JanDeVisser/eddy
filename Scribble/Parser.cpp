@@ -68,7 +68,7 @@ std::shared_ptr<Module> Parser::parse(bool keep_tokens)
 std::shared_ptr<Statement> Parser::parse_top_level_statement()
 {
     debug(scribble, "Parser::parse_top_level_statement");
-    auto token = skip(TokenCode::Whitespace);
+    auto token = skip_whitespace();
     std::shared_ptr<Statement> ret;
     switch (token.code()) {
     case TokenCode::SemiColon:
@@ -105,7 +105,7 @@ std::shared_ptr<Statement> Parser::parse_top_level_statement()
 std::shared_ptr<Statement> Parser::parse_statement()
 {
     debug(scribble, "Parser::parse_statement");
-    auto token = skip(TokenCode::Whitespace);
+    auto token = skip_whitespace();
     std::shared_ptr<Statement> ret;
     switch (token.code()) {
     case TokenCode::SemiColon:
@@ -164,7 +164,7 @@ void Parser::parse_statements(Statements& block, bool top_level)
 
 std::shared_ptr<Block> Parser::parse_block(Statements& block)
 {
-    auto token = skip(TokenCode::Whitespace);
+    auto token = skip_whitespace();
     parse_statements(block);
     if (!m_lexer.expect(TokenCode::CloseBrace))
         m_lexer.add_error(m_lexer.peek(), "Syntax Error: Expected '}' to close block");
@@ -354,7 +354,7 @@ std::shared_ptr<VariableDeclaration> Parser::parse_variable_declaration(Token co
         return std::make_shared<VariableDeclaration>(var_token.location(), nullptr, nullptr, constant);
     auto identifier = identifier_maybe.value();
     auto var_ident = std::make_shared<Identifier>(identifier.location(), identifier.string_value());
-    if (skip(TokenCode::Whitespace).code() == TokenCode::Equals) {
+    if (skip_whitespace().code() == TokenCode::Equals) {
         lex();
         return std::make_shared<VariableDeclaration>(var_token.location(), var_ident, parse_expression(), constant);
     }
@@ -401,7 +401,7 @@ std::shared_ptr<Expression> Parser::parse_expression()
 {
     auto primary = parse_primary_expression();
     if (!primary)
-        return nullptr;
+        return std::make_shared<Expression>();
     return parse_expression_1(primary, 0);
 }
 
@@ -509,7 +509,7 @@ static OperatorDefs<TokenCode::count> operator_defs;
 
 std::shared_ptr<Expression> Parser::parse_expression_1(std::shared_ptr<Expression> lhs, int min_precedence)
 {
-    skip(TokenCode::Whitespace);
+    skip_whitespace();
     while (operator_defs.is_binary(current_code()) && operator_defs.binary_precedence(current_code()) >= min_precedence) {
         auto op = lex();
         std::shared_ptr<Expression> rhs;
@@ -518,13 +518,13 @@ std::shared_ptr<Expression> Parser::parse_expression_1(std::shared_ptr<Expressio
             switch (op.code()) {
             case TokenCode::OpenParen: {
                 Expressions expressions;
-                if (skip(TokenCode::Whitespace).code() != TokenCode::CloseParen) {
+                if (skip_whitespace().code() != TokenCode::CloseParen) {
                     while (true) {
                         auto expr = parse_expression();
                         if (expr == nullptr)
                             return nullptr;
                         expressions.push_back(expr);
-                        if (skip(TokenCode::Whitespace).code() == TokenCode::CloseParen)
+                        if (skip_whitespace().code() == TokenCode::CloseParen)
                             break;
                         if (!expect(TokenCode::Comma))
                             return nullptr;
@@ -538,7 +538,7 @@ std::shared_ptr<Expression> Parser::parse_expression_1(std::shared_ptr<Expressio
                 rhs = parse_primary_expression();
                 if (!rhs)
                     return nullptr;
-                skip(TokenCode::Whitespace);
+                skip_whitespace();
                 while ((open_bracket && (current_code() != TokenCode::CloseBracket)) || (operator_defs.binary_precedence(current_code()) > operator_defs.binary_precedence(op.code())))
                     rhs = parse_expression_1(rhs, (open_bracket) ? 0 : (operator_defs.binary_precedence(op.code()) + 1));
                 break;
@@ -552,7 +552,7 @@ std::shared_ptr<Expression> Parser::parse_expression_1(std::shared_ptr<Expressio
             rhs = parse_expression();
         }
         lhs = std::make_shared<BinaryExpression>(lhs, op, rhs);
-        skip(TokenCode::Whitespace);
+        skip_whitespace();
     }
 
     // Pull up unary expressions with lower precedence than the binary we just parsed.
@@ -589,14 +589,15 @@ std::shared_ptr<Expression> Parser::parse_primary_expression()
         expr = std::make_shared<FloatLiteral>(t);
         break;
     case TokenCode::DoubleQuotedString:
-        expr = std::make_shared<StringLiteral>(t);
+    case TokenCode::UnclosedDoubleQuotedString:
+        expr = std::make_shared<StringLiteral>(t, t.code() == TokenCode::DoubleQuotedString);
         break;
     case TokenCode::SingleQuotedString:
+    case TokenCode::UnclosedSingleQuotedString:
         if (t.value().length() != 1) {
             m_lexer.add_error(t, "Syntax Error: Single-quoted string should only hold a single character, not '{}'", t.value());
-            return nullptr;
         }
-        expr = std::make_shared<CharLiteral>(t);
+        expr = std::make_shared<CharLiteral>(t, t.code() == TokenCode::SingleQuotedString);
         break;
     case Scribble::KeywordTrue:
     case Scribble::KeywordFalse:
@@ -626,7 +627,7 @@ Token const& Parser::peek()
 
 Token const& Parser::lex()
 {
-    skip(TokenCode::Whitespace);
+    skip_whitespace();
     return m_lexer.lex();
 }
 
@@ -637,8 +638,13 @@ Token const& Parser::replace(Token const& token)
 
 std::optional<Token const> Parser::match(TokenCode code, char const* where)
 {
-    skip(TokenCode::Whitespace);
+    skip_whitespace();
     return m_lexer.match(code, where);
+}
+
+Token const& Parser::skip_whitespace()
+{
+    return m_lexer.skip(TokenCode::Whitespace, TokenCode::NewLine);
 }
 
 Token const& Parser::skip(TokenCode code)
@@ -653,13 +659,13 @@ TokenCode Parser::current_code()
 
 bool Parser::expect(TokenCode code, char const* where)
 {
-    skip(TokenCode::Whitespace);
+    skip_whitespace();
     return m_lexer.expect(code, where);
 }
 
 bool Parser::expect(char const* expected, char const* where)
 {
-    skip(TokenCode::Whitespace);
+    skip_whitespace();
     return m_lexer.expect(expected, where);
 }
 

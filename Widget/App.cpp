@@ -11,11 +11,13 @@
 #include <SDL2_gfxPrimitives.h>
 
 #include "App.h"
-#include "App/Text.h"
-#include "Commands/CommandHandler.h"
+#include "App/CommandHandler.h"
 #include "SDLContext.h"
+#include "Text.h"
 
 namespace Scratch {
+
+logging_category(scratch);
 
 App* App::s_app { nullptr };
 
@@ -28,7 +30,6 @@ App& App::instance()
 App::App(std::string name, SDLContext* ctx)
     : Layout(ContainerOrientation::Vertical)
     , m_name(std::move(name))
-    , m_palette(DarkPalette())
     , m_context(ctx)
 {
     oassert(s_app == nullptr, "App is a singleton");
@@ -105,8 +106,7 @@ void App::render()
     }
     if (m_modals.empty()) {
         if (!m_pending_commands.empty()) {
-            auto cmd = m_pending_commands.front();
-            add_modal(new CommandHandler(cmd));
+            on_command(m_pending_commands.front());
             m_pending_commands.pop_front();
         }
     } else {
@@ -114,7 +114,6 @@ void App::render()
             m->render();
         }
     }
-    SDL_RenderPresent(renderer());
 }
 
 void App::resize(Box const& outline)
@@ -154,42 +153,6 @@ intptr_t App::active() const
 void App::active(intptr_t val)
 {
     m_active = val;
-}
-
-/*
- * Equivalent to:
- *    uint8_t a = (c >> 24) & 0xff;
- *    uint8_t b = (c >> 16) & 0xff;
- *    uint8_t g = (c >> 8) & 0xff;
- *    uint8_t r = c & 0xff;
- *    return { r, g, b, a };
- */
-SDL_Color App::color(PaletteIndex color)
-{
-    static unsigned s_ansicolors[] = {
-        0xff000000, // ANSIBlack,
-        0xff0000cc, // ANSIRed,
-        0xff069a4e, // ANSIGreen,
-        0xff00a0c4, // ANSIYellow,
-        0xffcf9f72, // ANSIBlue,
-        0xff7b5075, // ANSIMagenta,
-        0xff9a9806, // ANSICyan,
-        0xffcfd7d3, // ANSIWhite,
-        0xff535755, // ANSIBrightBlack,
-        0xff2929ef, // ANSIBrightRed,
-        0xff34e28a, // ANSIBrightGreen,
-        0xff4fe9fc, // ANSIBrightYellow,
-        0xffffaf32, // ANSIBrightBlue,
-        0xffa87fad, // ANSIBrightMagenta,
-        0xffe2e234, // ANSIBrightCyan,
-        0xffffffff, // ANSIBrightWhite,
-    };
-    uint32_t c;
-    if (color >= PaletteIndex::ANSIBlack && color <= PaletteIndex::ANSIBrightWhite)
-        c = s_ansicolors[(size_t)color - (size_t)PaletteIndex::ANSIBlack];
-    else
-        c = m_palette[(size_t)color];
-    return *((SDL_Color*)&c);
 }
 
 void App::event_loop()
@@ -251,7 +214,10 @@ void App::event_loop()
             }
         }
 
+        pre_render();
         render();
+        post_render();
+        SDL_RenderPresent(renderer());
 
         auto end_render = std::chrono::steady_clock::now();
         static std::chrono::duration<double> one_frame(1.0/60.0);

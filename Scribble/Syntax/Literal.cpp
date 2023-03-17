@@ -10,33 +10,6 @@ namespace Scratch::Scribble {
 
 extern_logging_category(scribble);
 
-// -- BooleanLiteral --------------------------------------------------------
-
-BooleanLiteral::BooleanLiteral(Token token)
-    : Literal(std::move(token))
-{
-}
-
-// -- CharLiteral -----------------------------------------------------------
-
-CharLiteral::CharLiteral(Token token)
-    : Literal(std::move(token))
-{
-}
-
-// -- FloatLiteral ----------------------------------------------------------
-
-FloatLiteral::FloatLiteral(Token token)
-    : Literal(std::move(token))
-{
-}
-// -- IntLiteral ------------------------------------------------------------
-
-IntLiteral::IntLiteral(Token token)
-    : Literal(std::move(token))
-{
-}
-
 // -- Literal ---------------------------------------------------------------
 
 Literal::Literal(Token token)
@@ -60,10 +33,37 @@ std::string Literal::to_string() const
     return std::string(token().value());
 }
 
+// -- BooleanLiteral --------------------------------------------------------
+
+BooleanLiteral::BooleanLiteral(Token token)
+    : Literal(std::move(token))
+{
+}
+
+// -- CharLiteral -----------------------------------------------------------
+
+CharLiteral::CharLiteral(Token token, bool quote_closed)
+    : QuotedString(std::move(token), quote_closed)
+{
+}
+
+// -- FloatLiteral ----------------------------------------------------------
+
+FloatLiteral::FloatLiteral(Token token)
+    : Literal(std::move(token))
+{
+}
+// -- IntLiteral ------------------------------------------------------------
+
+IntLiteral::IntLiteral(Token token)
+    : Literal(std::move(token))
+{
+}
+
 // -- StringLiteral ---------------------------------------------------------
 
-StringLiteral::StringLiteral(Token token)
-    : Literal(std::move(token))
+StringLiteral::StringLiteral(Token token, bool quote_closed)
+    : QuotedString(std::move(token), quote_closed)
 {
 }
 

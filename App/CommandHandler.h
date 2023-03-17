@@ -6,14 +6,14 @@
 
 #pragma once
 
-#include <Commands/Command.h>
-#include <Widget/Widget.h>
+#include "Widget/Command.h"
+#include "Widget/Widget.h"
 
 namespace Scratch {
 
 class CommandHandler : public ModalWidget {
 public:
-    explicit CommandHandler(ScheduledCommand&);
+    explicit CommandHandler(ScheduledCommand const&);
     void render() override;
     void argument_done(std::string);
     void abort();

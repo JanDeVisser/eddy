@@ -14,12 +14,11 @@
 #include <App/Scratch.h>
 #include <Parser/CPlusPlus.h>
 #include <Parser/PlainText.h>
-#include <Scribble/Scribble.h>
+#include <Parser/Scribble.h>
 #include <Widget/App.h>
 
 using namespace Obelix;
 using namespace Scratch::Parser;
-using namespace Scratch::Scribble;
 
 namespace Scratch {
 
@@ -32,7 +31,7 @@ FileType s_filetypes[] = {
          return new CPlusPlusParser();
      } },
     { { ".scratch" }, "text/x-scratch", []() -> ScratchParser* {
-         return new class Scribble();
+         return new class ScribbleParser();
      } },
 };
 
@@ -256,7 +255,7 @@ bool Document::empty() const
 
 size_t Document::parsed() const
 {
-    return !m_parser->tokens().empty();
+    return !m_parser->parsed();
 }
 
 void Document::split_line()
@@ -814,7 +813,7 @@ void Document::render()
                     block_width * App::instance().context()->character_width(),
                     editor()->line_height()
                 };
-                editor()->box(r, App::instance().color(PaletteIndex::Selection));
+                editor()->box(r, Scratch::scratch().color(PaletteIndex::Selection));
             }
         }
 
@@ -937,11 +936,6 @@ void Document::handle_text_input()
 Token const& Document::lex()
 {
     return m_parser->next_token();
-}
-
-void Document::rewind()
-{
-    m_parser->rewind();
 }
 
 std::optional<ScheduledCommand> Document::command(std::string const& name) const

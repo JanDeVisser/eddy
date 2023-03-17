@@ -9,6 +9,7 @@
 namespace Scratch::Parser {
 
 PlainTextParser::PlainTextParser()
+    : BasicScratchParser()
 {
     lexer().add_scanner("plaintext", [](Tokenizer& tokenizer) {
         switch (int ch = tokenizer.peek()) {

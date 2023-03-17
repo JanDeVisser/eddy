@@ -15,7 +15,7 @@ using namespace Obelix;
 
 namespace Scratch::Parser {
 
-class CPlusPlusParser : public ScratchParser {
+class CPlusPlusParser : public BasicScratchParser {
 public:
     constexpr static TokenCode KeywordAuto = TokenCode::Keyword0;
     constexpr static TokenCode KeywordBreak = TokenCode::Keyword1;
