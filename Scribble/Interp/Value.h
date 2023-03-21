@@ -27,7 +27,7 @@ using namespace std::literals;
 using namespace Obelix;
 
 template<typename T>
-concept Boolean = std::is_same_v<std::remove_cvref<T>, bool>;
+concept Boolean = std::is_same_v<std::remove_cvref_t<T>, bool>;
 
 template<typename T>
 concept Integer = (std::is_integral_v<T> && !Boolean<T>);
