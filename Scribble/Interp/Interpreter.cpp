@@ -65,7 +65,7 @@ NODE_PROCESSOR(Block)
     std::shared_ptr<Block> block = std::dynamic_pointer_cast<Block>(tree);
 
     std::shared_ptr<ExpressionResult> res;
-    InterpreterContext block_ctx(ctx);
+    auto& block_ctx = make_subcontext(ctx);
     for (auto const& statement : block->statements()) {
         res = TRY_AND_CAST(ExpressionResult, statement, block_ctx);
         switch ((*block_ctx).type) {
