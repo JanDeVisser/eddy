@@ -115,6 +115,10 @@ std::shared_ptr<Statement> Parser::parse_statement()
         Statements statements;
         return parse_block(statements);
     }
+    case Scribble::KeywordCmd:
+    case Scribble::KeywordFunc:
+    case Scribble::KeywordIntrinsic:
+        return parse_function_definition(lex());
     case Scribble::KeywordImport:
         return parse_import_statement(lex());
     case Scribble::KeywordIf:
@@ -155,7 +159,8 @@ std::shared_ptr<Statement> Parser::parse_statement()
 void Parser::parse_statements(Statements& block, bool top_level)
 {
     while (true) {
-        auto statement = (top_level) ? parse_top_level_statement() : parse_statement();
+//        auto statement = (top_level) ? parse_top_level_statement() : parse_statement();
+        auto statement = parse_statement();
         if (!statement)
             break;
         block.push_back(statement);
@@ -226,6 +231,7 @@ std::shared_ptr<IfStatement> Parser::parse_if_statement(Token const& if_token)
         return std::make_shared<IfStatement>(if_token.location(), condition, nullptr, Branches {}, nullptr);
     Branches branches;
     while (true) {
+        skip_whitespace();
         switch (current_code()) {
         case Scribble::KeywordElif: {
             auto elif_token = lex();
@@ -310,13 +316,9 @@ std::shared_ptr<SwitchStatement> Parser::parse_switch_statement(Token const& swi
 
 std::shared_ptr<WhileStatement> Parser::parse_while_statement(Token const& while_token)
 {
-    if (!m_lexer.expect(TokenCode::OpenParen, " in 'while' statement"))
-        return std::make_shared<WhileStatement>(while_token.location(), nullptr, nullptr);
     auto condition = parse_expression();
     if (!condition)
         return std::make_shared<WhileStatement>(while_token.location(), nullptr, nullptr);
-    if (!expect(TokenCode::CloseParen, " in 'while' statement"))
-        return std::make_shared<WhileStatement>(while_token.location(), condition, nullptr);
     auto stmt = parse_statement();
     if (!stmt)
         return std::make_shared<WhileStatement>(while_token.location(), condition, nullptr);
