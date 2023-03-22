@@ -109,6 +109,7 @@ public:
     [[nodiscard]] bool is_type_compatible_with(ValueType) const;
     [[nodiscard]] bool is_null() const;
     [[nodiscard]] bool is_int() const;
+    [[nodiscard]] bool is_bool() const;
     [[nodiscard]] bool is_string() const;
     [[nodiscard]] bool is_error() const;
     [[nodiscard]] bool is_function() const;
@@ -224,7 +225,12 @@ public:
     [[nodiscard]] Value shift_right(Value const&) const;
     [[nodiscard]] Value bitwise_or(Value const&) const;
     [[nodiscard]] Value bitwise_and(Value const&) const;
+    [[nodiscard]] Value bitwise_xor(Value const&) const;
     [[nodiscard]] Value bitwise_not() const;
+
+    [[nodiscard]] Value logical_or(Value const&) const;
+    [[nodiscard]] Value logical_and(Value const&) const;
+    [[nodiscard]] Value logical_not() const;
 
 private:
     using ValueImplType = std::variant<std::string, int64_t, uint64_t, double, bool, ErrorCode, pFunction>;

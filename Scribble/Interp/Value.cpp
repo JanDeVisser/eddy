@@ -178,6 +178,11 @@ bool Value::is_int() const
     return m_value.has_value() && (std::holds_alternative<int64_t>(m_value.value()) || std::holds_alternative<uint64_t>(m_value.value()));
 }
 
+bool Value::is_bool() const
+{
+    return m_value.has_value() && std::holds_alternative<bool>(m_value.value());
+}
+
 bool Value::is_string() const
 {
     return m_value.has_value() && std::holds_alternative<std::string>(m_value.value());
@@ -577,6 +582,16 @@ Value Value::bitwise_and(Value const& other) const
     });
 }
 
+Value Value::bitwise_xor(Value const& other) const
+{
+    if (!is_int() || !other.is_int())
+        return Value { ErrorCode::ArgumentTypeMismatch };
+
+    return perform_integer_operation(*this, other, [](auto lhs, auto rhs) {
+        return Value { lhs ^ rhs };
+    });
+}
+
 Value Value::bitwise_not() const
 {
     if (!is_int())
@@ -585,6 +600,35 @@ Value Value::bitwise_not() const
     return downsize_integer(*this, [](auto value, auto) {
         return Value { ~value };
     });
+}
+
+Value Value::logical_or(Value const& other) const
+{
+    auto b = to_bool();
+    auto other_bool = other.to_bool();
+    if (!b || !other_bool)
+        return Value { ErrorCode::ArgumentTypeMismatch };
+
+    return Value { *b || *other_bool };
+}
+
+Value Value::logical_and(Value const& other) const
+{
+    auto b = to_bool();
+    auto other_bool = other.to_bool();
+    if (!b || !other_bool)
+        return Value { ErrorCode::ArgumentTypeMismatch };
+
+    return Value { *b && *other_bool };
+}
+
+Value Value::logical_not() const
+{
+    auto b = to_bool();
+    if (!b)
+        return Value { ErrorCode::ArgumentTypeMismatch };
+
+    return Value { !(*b) };
 }
 
 }

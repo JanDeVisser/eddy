@@ -135,6 +135,65 @@ NODE_PROCESSOR(VariableDeclaration)
     return expr;
 }
 
+NODE_PROCESSOR(UnaryExpression)
+{
+    auto expr = std::dynamic_pointer_cast<UnaryExpression>(tree);
+    auto operand = TRY_AND_CAST(ExpressionResult, expr->operand(), ctx);
+
+    switch (expr->op().code()) {
+    case TokenCode::Plus: {
+        return operand;
+    }
+    case TokenCode::Minus: {
+        auto res = operand->value().negate();
+        if (res.is_error())
+            return SyntaxError { expr->location(), *res.to_error() };
+        return std::make_shared<ExpressionResult>(expr->location(), res);
+    }
+    case TokenCode::Tilde: {
+        auto res = operand->value().bitwise_not();
+        if (res.is_error())
+            return SyntaxError { expr->location(), *res.to_error() };
+        return std::make_shared<ExpressionResult>(expr->location(), res);
+    }
+    case TokenCode::ExclamationPoint: {
+        auto res = operand->value().logical_not();
+        if (res.is_error())
+            return SyntaxError { expr->location(), *res.to_error() };
+        return std::make_shared<ExpressionResult>(expr->location(), res);
+    }
+    default:
+        return SyntaxError { expr->location(), "Unrecognized unary operator '{}'", expr->op() };
+    }
+}
+
+template <typename Callback>
+static ErrorOrNode calculate(pExpressionResult const& lhs, pExpressionResult const& rhs, ContextType& ctx, Callback const& callback)
+{
+    assert(rhs != nullptr);
+    Value res = callback(lhs->value(), rhs->value());
+    if (res.is_error())
+        return SyntaxError { lhs->location(), *res.to_error() };
+    return std::make_shared<ExpressionResult>(lhs->location(), res);
+}
+
+template <typename Callback>
+static ErrorOrNode calculateAndAssign(pExpression const& lhs, pExpressionResult const& rhs, ContextType& ctx, Callback const& callback)
+{
+    assert(rhs != nullptr);
+    auto ident = std::dynamic_pointer_cast<Identifier>(lhs);
+    if (ident == nullptr)
+        return SyntaxError { lhs->location(), ErrorCode::CannotAssignToRValue, lhs };
+    auto value_maybe = ctx.get(ident->name());
+    if (!value_maybe.has_value())
+        return std::make_shared<ExpressionResult>(ident->location(), Value { ErrorCode::UndeclaredVariable });
+    Value res = callback(value_maybe.value(), rhs->value());
+    if (res.is_error())
+        return SyntaxError { lhs->location(), *res.to_error() };
+    ctx.set(ident->name(), res);
+    return rhs;
+}
+
 NODE_PROCESSOR(BinaryExpression)
 {
     auto expr = std::dynamic_pointer_cast<BinaryExpression>(tree);
@@ -149,6 +208,56 @@ NODE_PROCESSOR(BinaryExpression)
             return SyntaxError { expr->location(), ErrorCode::CannotAssignToRValue, expr->lhs() };
         ctx.set(ident->name(), rhs->value());
         return rhs;
+    }
+
+    case Scribble::KeywordIncEquals: {
+        return calculateAndAssign(expr->lhs(), rhs, ctx,
+            [](Value const& l, Value const& r) { return l.add(r); });
+    }
+
+    case Scribble::KeywordDecEquals: {
+        return calculateAndAssign(expr->lhs(), rhs, ctx,
+            [](Value const& l, Value const& r) { return l.subtract(r); });
+    }
+
+    case Scribble::KeywordMultEquals: {
+        return calculateAndAssign(expr->lhs(), rhs, ctx,
+            [](Value const& l, Value const& r) { return l.multiply(r); });
+    }
+
+    case Scribble::KeywordDivEquals: {
+        return calculateAndAssign(expr->lhs(), rhs, ctx,
+            [](Value const& l, Value const& r) { return l.multiply(r); });
+    }
+
+    case Scribble::KeywordModEquals: {
+        return calculateAndAssign(expr->lhs(), rhs, ctx,
+            [](Value const& l, Value const& r) { return l.modulo(r); });
+    }
+
+    case Scribble::KeywordBitwiseOrEquals: {
+        return calculateAndAssign(expr->lhs(), rhs, ctx,
+            [](Value const& l, Value const& r) { return l.bitwise_or(r); });
+    }
+
+    case Scribble::KeywordBitwiseAndEquals: {
+        return calculateAndAssign(expr->lhs(), rhs, ctx,
+            [](Value const& l, Value const& r) { return l.bitwise_and(r); });
+    }
+
+    case Scribble::KeywordBitwiseXorEquals: {
+        return calculateAndAssign(expr->lhs(), rhs, ctx,
+            [](Value const& l, Value const& r) { return l.bitwise_xor(r); });
+    }
+
+    case Scribble::KeywordShlEquals: {
+        return calculateAndAssign(expr->lhs(), rhs, ctx,
+            [](Value const& l, Value const& r) { return l.shift_left(r); });
+    }
+
+    case Scribble::KeywordShrEquals: {
+        return calculateAndAssign(expr->lhs(), rhs, ctx,
+            [](Value const& l, Value const& r) { return l.shift_right(r); });
     }
 
     case TokenCode::OpenParen: {
@@ -167,38 +276,51 @@ NODE_PROCESSOR(BinaryExpression)
     }
 
     case TokenCode::Plus: {
-        auto res = lhs->value().add(rhs->value());
-        if (res.is_error())
-            return SyntaxError { expr->location(), *res.to_error() };
-        return std::make_shared<ExpressionResult>(expr->location(), res);
+        return calculate(lhs, rhs, ctx, [](Value const& lhs, Value const& rhs) { return lhs.add(rhs); });
     };
 
     case TokenCode::Minus: {
-        auto res = lhs->value().subtract(rhs->value());
-        if (res.is_error())
-            return SyntaxError { expr->location(), *res.to_error() };
-        return std::make_shared<ExpressionResult>(expr->location(), res);
+        return calculate(lhs, rhs, ctx, [](Value const& lhs, Value const& rhs) { return lhs.subtract(rhs); });
     };
 
     case TokenCode::Asterisk: {
-        auto res = lhs->value().multiply(rhs->value());
-        if (res.is_error())
-            return SyntaxError { expr->location(), *res.to_error() };
-        return std::make_shared<ExpressionResult>(expr->location(), res);
+        return calculate(lhs, rhs, ctx, [](Value const& lhs, Value const& rhs) { return lhs.multiply(rhs); });
     };
 
     case TokenCode::Slash: {
-        auto res = lhs->value().divide(rhs->value());
-        if (res.is_error())
-            return SyntaxError { expr->location(), *res.to_error() };
-        return std::make_shared<ExpressionResult>(expr->location(), res);
+        return calculate(lhs, rhs, ctx, [](Value const& lhs, Value const& rhs) { return lhs.divide(rhs); });
     };
 
     case TokenCode::Percent: {
-        auto res = lhs->value().modulo(rhs->value());
-        if (res.is_error())
-            return SyntaxError { expr->location(), *res.to_error() };
-        return std::make_shared<ExpressionResult>(expr->location(), res);
+        return calculate(lhs, rhs, ctx, [](Value const& lhs, Value const& rhs) { return lhs.modulo(rhs); });
+    };
+
+    case TokenCode::LogicalOr: {
+        return calculate(lhs, rhs, ctx, [](Value const& lhs, Value const& rhs) { return lhs.logical_or(rhs); });
+    };
+
+    case TokenCode::LogicalAnd: {
+        return calculate(lhs, rhs, ctx, [](Value const& lhs, Value const& rhs) { return lhs.logical_and(rhs); });
+    };
+
+    case TokenCode::Pipe: {
+        return calculate(lhs, rhs, ctx, [](Value const& lhs, Value const& rhs) { return lhs.bitwise_or(rhs); });
+    };
+
+    case TokenCode::Ampersand: {
+        return calculate(lhs, rhs, ctx, [](Value const& lhs, Value const& rhs) { return lhs.bitwise_and(rhs); });
+    };
+
+    case TokenCode::Hat: {
+        return calculate(lhs, rhs, ctx, [](Value const& lhs, Value const& rhs) { return lhs.bitwise_xor(rhs); });
+    };
+
+    case TokenCode::ShiftLeft: {
+        return calculate(lhs, rhs, ctx, [](Value const& lhs, Value const& rhs) { return lhs.shift_left(rhs); });
+    };
+
+    case TokenCode::ShiftRight: {
+        return calculate(lhs, rhs, ctx, [](Value const& lhs, Value const& rhs) { return lhs.shift_right(rhs); });
     };
 
     case TokenCode::EqualsTo: {
@@ -238,7 +360,7 @@ NODE_PROCESSOR(BinaryExpression)
     }
 
     default:
-        return SyntaxError { expr->location(), ErrorCode::InternalError, format("Unimplemented operator {}", expr->op().value()) };
+        return SyntaxError { expr->location(), "Unrecognized binary operator '{}'", expr->op() };
     }
 }
 
@@ -347,7 +469,7 @@ NODE_PROCESSOR(ForStatement)
     auto range_expr = TRY_AND_CAST(ExpressionResultList, for_stmt->range(), ctx);
     auto current = *(range_expr->values()[0].to_int<long>());
     auto upper_bound = *(range_expr->values()[1].to_int<long>());
-    InterpreterContext for_ctx(ctx);
+    InterpreterContext& for_ctx = make_subcontext(ctx);
     TRY_RETURN(for_ctx.declare(for_stmt->variable()->name(), Value(current)));
     while (current < upper_bound) {
         for_ctx.set(for_stmt->variable()->name(), Value(current));
