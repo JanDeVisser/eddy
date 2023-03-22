@@ -255,7 +255,7 @@ bool Document::empty() const
 
 size_t Document::parsed() const
 {
-    return !m_parser->parsed();
+    return m_parser->parsed();
 }
 
 void Document::split_line()
