@@ -329,19 +329,15 @@ std::shared_ptr<ForStatement> Parser::parse_for_statement(Token const& for_token
 {
     pStatement stmt;
 
-    if (!expect(TokenCode::OpenParen, " in 'for' statement"))
-        return std::make_shared<ForStatement>(for_token.location(), nullptr, nullptr, nullptr);
     auto variable = match(TokenCode::Identifier, " in 'for' statement");
     if (!variable)
         return std::make_shared<ForStatement>(for_token.location(), nullptr, nullptr, nullptr);
     auto variable_node = std::make_shared<Variable>(variable.value().location(), (*variable).string_value());
-    if (!expect("in", " in 'for' statement"))
+    if (!expect(Scribble::KeywordIn, " in 'for' statement"))
         return std::make_shared<ForStatement>(for_token.location(), variable_node, nullptr, nullptr);
     auto expr = parse_expression();
     if (!expr)
         return std::make_shared<ForStatement>(for_token.location(), variable_node, nullptr, nullptr);
-    if (!expect(TokenCode::CloseParen, " in 'for' statement"))
-        return std::make_shared<ForStatement>(for_token.location(), variable_node, expr, nullptr);
     stmt = parse_statement();
     if (!stmt)
         return std::make_shared<ForStatement>(for_token.location(), variable_node, expr, nullptr);
