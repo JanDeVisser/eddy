@@ -11,7 +11,7 @@
 #include <App/Gutter.h>
 #include <App/StatusBar.h>
 
-namespace Scratch {
+namespace scratch {
 
 struct Config {
 public:

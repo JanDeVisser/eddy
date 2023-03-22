@@ -6,7 +6,7 @@
 
 #include <Parser/PlainText.h>
 
-namespace Scratch::Parser {
+namespace scratch::parser {
 
 PlainTextParser::PlainTextParser()
     : BasicScratchParser()

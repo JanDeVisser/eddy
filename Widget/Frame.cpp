@@ -6,7 +6,7 @@
 
 #include "Widget.h"
 
-namespace Scratch {
+namespace scratch {
 
 Frame::Frame(FrameStyle frame_style, int margin, WindowedWidget* contents, SizePolicy policy, int size)
     : WindowedWidget(policy, size)

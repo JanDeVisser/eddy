@@ -10,7 +10,7 @@
 #include <App/Buffer.h>
 #include <Scribble/Interp/Interpreter.h>
 
-namespace Scratch {
+namespace scratch {
 
 struct ConsoleCommands : public Commands {
     ConsoleCommands();

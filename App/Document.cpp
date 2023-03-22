@@ -18,9 +18,9 @@
 #include <Widget/App.h>
 
 using namespace Obelix;
-using namespace Scratch::Parser;
+using namespace scratch::parser;
 
-namespace Scratch {
+namespace scratch {
 
 FileType s_filetypes[] = {
     // Plain Text parser must be in slot 0! Do not sort down!

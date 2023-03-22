@@ -7,7 +7,8 @@
 #include <Scribble/Interp/Function.h>
 #include <Scribble/Processor.h>
 
-namespace Scratch::Interp {
+namespace scratch::interp {
+
 Function::Function(std::string name)
     : m_name(name)
 {

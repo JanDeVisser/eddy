@@ -10,7 +10,7 @@
 
 using namespace Obelix;
 
-namespace Scratch {
+namespace scratch {
 
 StatusBar::StatusBar()
     : Layout(ContainerOrientation::Horizontal, SizePolicy::Calculated, App::instance().context()->character_height() + 12)

@@ -10,10 +10,10 @@
 #include <Scribble/Interp/Interpreter.h>
 #include <Widget/Alert.h>
 
-namespace Scratch::Parser {
+namespace scratch::parser {
 
-using namespace Scratch::Interp;
-using namespace Scratch::Scribble;
+using namespace scratch::interp;
+using namespace scratch::scribble;
 
 ScribbleCommands::ScribbleCommands()
 {
@@ -34,7 +34,7 @@ ScribbleCommands::ScribbleCommands()
                     doc->insert("\n// " + result.error().to_string());
                     return;
                 }
-                auto r = std::dynamic_pointer_cast<Interp::ExpressionResult>(result.value());
+                auto r = std::dynamic_pointer_cast<interp::ExpressionResult>(result.value());
                 doc->bottom(false);
                 doc->insert("\n// " + r->value().to_string());
             } },
@@ -92,21 +92,21 @@ DisplayToken ScribbleParser::token_for(TokenCode code, std::string_view const& t
         case TokenCode::UnclosedSingleQuotedString:
             color = PaletteIndex::CharLiteral;
             break;
-        case ::Scratch::Scribble::Scribble::KeywordTrue:
-        case ::Scratch::Scribble::Scribble::KeywordFalse:
+        case Scribble::KeywordTrue:
+        case Scribble::KeywordFalse:
         case TokenCode::Integer:
         case TokenCode::Float:
             color = PaletteIndex::Number;
             break;
-        case ::Scratch::Scribble::Scribble::OKPrompt:
+        case Scribble::OKPrompt:
             color = PaletteIndex::ANSIBrightGreen;
             ret.text = "*> ";
             break;
-        case ::Scratch::Scribble::Scribble::ErrorPrompt:
+        case Scribble::ErrorPrompt:
             color = PaletteIndex::ANSIBrightRed;
             ret.text = "*> ";
             break;
-        case ::Scratch::Scribble::Scribble::ContinuationPrompt:
+        case Scribble::ContinuationPrompt:
             color = PaletteIndex::Default;
             ret.text = "-> ";
             break;

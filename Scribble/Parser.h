@@ -19,7 +19,7 @@
 
 using namespace Obelix;
 
-namespace Scratch::Scribble {
+namespace scratch::scribble {
 
 struct ParserContext {
     std::set<std::string> modules;

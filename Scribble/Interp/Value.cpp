@@ -10,7 +10,7 @@
 #include <Scribble/Interp/Value.h>
 #include <Scribble/Interp/Function.h>
 
-namespace Scratch::Interp {
+namespace scratch::interp {
 
 using namespace Obelix;
 

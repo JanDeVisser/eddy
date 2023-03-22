@@ -9,7 +9,7 @@
 
 #include "Key.h"
 
-namespace Scratch {
+namespace scratch {
 
 static uint32_t normalize_mod(uint32_t mod)
 {

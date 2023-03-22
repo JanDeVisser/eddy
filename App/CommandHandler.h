@@ -9,7 +9,7 @@
 #include "Widget/Command.h"
 #include "Widget/Widget.h"
 
-namespace Scratch {
+namespace scratch {
 
 class CommandHandler : public ModalWidget {
 public:

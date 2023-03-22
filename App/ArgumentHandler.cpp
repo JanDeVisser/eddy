@@ -6,7 +6,7 @@
 
 #include "ArgumentHandler.h"
 
-namespace Scratch {
+namespace scratch {
 
 ArgumentHandler::ArgumentHandler(CommandHandler* handler, CommandParameter const& parameter, int height)
     : ModalWidget((int)(App::instance().width() * 0.66), height)

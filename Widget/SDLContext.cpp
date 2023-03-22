@@ -14,7 +14,7 @@
 
 using namespace Obelix;
 
-namespace Scratch {
+namespace scratch {
 
 SDLContext::SDLInit::SDLInit()
 {

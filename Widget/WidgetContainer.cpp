@@ -7,7 +7,7 @@
 #include "App.h"
 #include <Widget/Widget.h>
 
-namespace Scratch {
+namespace scratch {
 
 WidgetContainer::WidgetContainer(ContainerOrientation orientation)
     : m_orientation(orientation)

@@ -6,7 +6,7 @@
 
 #include <Scribble/Interp/ExpressionResult.h>
 
-namespace Scratch::Interp {
+namespace scratch::interp {
 
 using namespace Obelix;
 

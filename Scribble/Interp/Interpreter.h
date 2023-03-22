@@ -11,7 +11,7 @@
 #include <Scribble/Processor.h>
 #include <Scribble/Syntax/Statement.h>
 
-namespace Scratch::Interp {
+namespace scratch::interp {
 
 using namespace Obelix;
 

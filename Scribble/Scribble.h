@@ -8,7 +8,7 @@
 
 #include <lexer/BasicParser.h>
 
-namespace Scratch::Scribble {
+namespace scratch::scribble {
 
 using namespace Obelix;
 

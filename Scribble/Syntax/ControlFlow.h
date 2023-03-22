@@ -10,7 +10,7 @@
 #include <Scribble/Syntax/Expression.h>
 #include <Scribble/Syntax/Statement.h>
 
-namespace Scratch::Scribble {
+namespace scratch::scribble {
 
 NODE_CLASS(Break, Statement)
 public:

@@ -12,7 +12,7 @@
 #include <App/EditorState.h>
 #include <Widget/Widget.h>
 
-namespace Scratch {
+namespace scratch {
 
 struct Clipper {
 public:

@@ -10,7 +10,7 @@
 
 #include <SDL.h>
 
-namespace Scratch {
+namespace scratch {
 
 struct SDLKey {
     SDL_Keycode sym { SDLK_UNKNOWN };

@@ -11,7 +11,7 @@
 #include <lexer/Token.h>
 #include <Widget/Widget.h>
 
-namespace Scratch {
+namespace scratch {
 
 struct Line {
     Line() = default;

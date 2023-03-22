@@ -8,7 +8,7 @@
 
 #include "Text.h"
 
-namespace Scratch {
+namespace scratch {
 
 bool isPrintable(int cp)
 {

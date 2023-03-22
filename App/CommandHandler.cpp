@@ -11,7 +11,7 @@
 
 using namespace Obelix;
 
-namespace Scratch {
+namespace scratch {
 
 CommandHandler::CommandHandler(ScheduledCommand const& scheduled_command)
     : ModalWidget(App::instance().width() / 2, App::instance().height() / 2)

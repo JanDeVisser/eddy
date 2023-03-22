@@ -10,7 +10,7 @@
 #include <Scribble/Interp/Function.h>
 #include <Scribble/Interp/Value.h>
 
-namespace Scratch::Interp {
+namespace scratch::interp {
 
 class CommandAdapter : public Function {
 public:

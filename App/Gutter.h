@@ -7,7 +7,7 @@
 
 #include <Widget/Widget.h>
 
-namespace Scratch {
+namespace scratch {
 
 class Gutter : public WindowedWidget {
 public:

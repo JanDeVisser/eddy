@@ -7,7 +7,7 @@
 #include "Widget/App.h"
 #include <App/EditorState.h>
 
-namespace Scratch {
+namespace scratch {
 
 Glyph::Glyph(Char ch, PaletteIndex idx)
     : character(ch)

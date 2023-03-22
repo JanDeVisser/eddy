@@ -9,7 +9,7 @@
 #include <Geometry.h>
 #include <Widget.h>
 
-namespace Scratch {
+namespace scratch {
 
 enum class ScrollDirection {
     Horizontal,

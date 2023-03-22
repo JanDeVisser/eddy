@@ -13,7 +13,7 @@
 
 using namespace Obelix;
 
-namespace Scratch {
+namespace scratch {
 
 class Widget;
 

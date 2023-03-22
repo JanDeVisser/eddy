@@ -21,7 +21,7 @@
 
 #include <Scribble/Syntax/Syntax.h>
 
-namespace Scratch::Interp {
+namespace scratch::interp {
 
 using namespace std::literals;
 using namespace Obelix;
@@ -245,7 +245,7 @@ using Values = std::vector<Value>;
 
 namespace Obelix {
 
-using namespace Scratch::Interp;
+using namespace scratch::interp;
 
 template<>
 struct to_string<Value const&> {

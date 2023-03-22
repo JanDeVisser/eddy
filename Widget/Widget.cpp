@@ -8,7 +8,7 @@
 #include "SDLContext.h"
 #include <Widget/Widget.h>
 
-namespace Scratch {
+namespace scratch {
 
 void Widget::render()
 {

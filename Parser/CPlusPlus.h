@@ -13,7 +13,7 @@
 
 using namespace Obelix;
 
-namespace Scratch::Parser {
+namespace scratch::parser {
 
 class CPlusPlusParser : public BasicScratchParser {
 public:

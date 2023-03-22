@@ -6,7 +6,7 @@
 
 #include <Parser/ScratchParser.h>
 
-namespace Scratch::Parser {
+namespace scratch::parser {
 
 std::vector<Command> ScratchParser::commands() const
 {

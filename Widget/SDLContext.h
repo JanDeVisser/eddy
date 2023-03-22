@@ -19,7 +19,7 @@
 
 using namespace Obelix;
 
-namespace Scratch {
+namespace scratch {
 
 extern_logging_category(scratch);
 

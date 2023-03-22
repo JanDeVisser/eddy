@@ -13,7 +13,7 @@
 #include <Scribble/Syntax/Syntax.h>
 #include <Scribble/Parser.h>
 
-namespace Scratch::Scribble {
+namespace scratch::scribble {
 
 using namespace Obelix;
 

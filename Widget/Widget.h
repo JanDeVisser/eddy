@@ -15,7 +15,7 @@
 #include <App/Forward.h>
 #include <Widget/Geometry.h>
 
-namespace Scratch {
+namespace scratch {
 
 enum class TextAlignment {
     Left,

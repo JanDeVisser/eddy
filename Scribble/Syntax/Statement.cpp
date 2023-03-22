@@ -6,7 +6,7 @@
 
 #include <Scribble/Syntax/Statement.h>
 
-namespace Scratch::Scribble {
+namespace scratch::scribble {
 
 extern_logging_category(scribble);
 

@@ -10,7 +10,7 @@
 #include <App/EditorState.h>
 #include <Parser/ScratchParser.h>
 
-namespace Scratch::Parser {
+namespace scratch::parser {
 
 class PlainTextParser : public BasicScratchParser {
 public:

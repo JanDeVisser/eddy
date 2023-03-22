@@ -6,7 +6,7 @@
 
 #include <App/Document.h>
 
-namespace Scratch {
+namespace scratch {
 
 void EditAction::undo(Document& doc) const
 {

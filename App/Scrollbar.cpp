@@ -7,7 +7,7 @@
 #include "Widget/App.h"
 #include <Scrollbar.h>
 
-namespace Scratch {
+namespace scratch {
 
 ScrollBar::ScrollBar(Widget* scrolls, ScrollDirection direction)
     : m_scrolls(scrolls)

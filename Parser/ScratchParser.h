@@ -12,7 +12,7 @@
 
 using namespace Obelix;
 
-namespace Scratch::Parser {
+namespace scratch::parser {
 
 class ScratchParser {
 public:

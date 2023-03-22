@@ -22,7 +22,7 @@
 #define WINDOW_HEIGHT 768
 #endif
 
-namespace Scratch {
+namespace scratch {
 
 using namespace Obelix;
 

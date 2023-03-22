@@ -15,7 +15,7 @@
 #include "SDLContext.h"
 #include "Text.h"
 
-namespace Scratch {
+namespace scratch {
 
 logging_category(scratch);
 

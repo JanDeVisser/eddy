@@ -9,7 +9,7 @@
 #include <Scribble/Syntax/Syntax.h>
 #include <Scribble/Syntax/Expression.h>
 
-namespace Scratch::Scribble {
+namespace scratch::scribble {
 
 ABSTRACT_NODE_CLASS(Statement, SyntaxNode)
 public:

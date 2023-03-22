@@ -7,7 +7,7 @@
 #include <App/Scratch.h>
 #include <Scribble/Interp/CommandAdapter.h>
 
-namespace Scratch::Interp {
+namespace scratch::interp {
 
 CommandAdapter::CommandAdapter(std::string function, ScheduledCommand const& command)
     : Function(std::move(function))

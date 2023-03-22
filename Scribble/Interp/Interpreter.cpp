@@ -11,10 +11,10 @@
 #include <Scribble/Interp/Function.h>
 #include <Scribble/Scribble.h>
 
-namespace Scratch::Interp {
+namespace scratch::interp {
 
 using namespace Obelix;
-using namespace Scratch::Scribble;
+using namespace scratch::scribble;
 
 void StatementResult::log_message(std::string const& message)
 {
@@ -38,9 +38,9 @@ ProcessResult interpret(std::shared_ptr<Project> const& project, InterpreterCont
 
 }
 
-namespace Scratch::Scribble {
+namespace scratch::scribble {
 
-using namespace Scratch::Interp;
+using namespace scratch::interp;
 
 INIT_NODE_PROCESSOR(InterpreterContext)
 

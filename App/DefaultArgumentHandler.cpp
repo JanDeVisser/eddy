@@ -6,7 +6,7 @@
 
 #include "ArgumentHandler.h"
 
-namespace Scratch {
+namespace scratch {
 
 DefaultArgumentHandler::DefaultArgumentHandler(CommandHandler* handler, CommandParameter const& parameter)
     : ArgumentHandler(handler, parameter, 2 * (App::instance().context()->character_height() + 4) + 12)

@@ -14,7 +14,7 @@
 #include <App/Editor.h>
 #include <App/Scratch.h>
 
-namespace Scratch {
+namespace scratch {
 
 extern_logging_category(scratch);
 

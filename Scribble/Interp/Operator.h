@@ -10,7 +10,7 @@
 
 #include <core/Logging.h>
 
-namespace Scratch::Interp {
+namespace scratch::interp {
 
 using namespace std::literals;
 using namespace Obelix;

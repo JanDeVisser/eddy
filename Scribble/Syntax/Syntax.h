@@ -16,7 +16,7 @@
 
 #include <Scribble/Syntax/SyntaxNodeType.h>
 
-namespace Scratch::Scribble {
+namespace scratch::scribble {
 
 using namespace Obelix;
 

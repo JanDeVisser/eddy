@@ -7,7 +7,7 @@
 #include <App/Buffer.h>
 #include <App/Editor.h>
 
-namespace Scratch {
+namespace scratch {
 
 Buffer::Buffer(Editor* editor)
     : m_editor(editor)

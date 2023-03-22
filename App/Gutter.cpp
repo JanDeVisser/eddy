@@ -10,7 +10,7 @@
 #include <App/Gutter.h>
 #include <App/Scratch.h>
 
-namespace Scratch {
+namespace scratch {
 
 Gutter::Gutter()
     : WindowedWidget(SizePolicy::Characters, 10)

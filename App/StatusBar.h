@@ -8,7 +8,7 @@
 
 #include <Widget/App.h>
 
-namespace Scratch {
+namespace scratch {
 
 class StatusBar : public Layout {
 public:

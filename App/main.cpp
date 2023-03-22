@@ -8,6 +8,6 @@
 
 int main(int argc, char const** argv)
 {
-    Scratch::Scratch::run_app(argc, argv);
+    scratch::Scratch::run_app(argc, argv);
     return 0;
 }

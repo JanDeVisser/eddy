@@ -7,7 +7,7 @@
 #include "App.h"
 #include <Widget/Widget.h>
 
-namespace Scratch {
+namespace scratch {
 
 ModalWidget::ModalWidget(int w, int h)
     : m_width(w)

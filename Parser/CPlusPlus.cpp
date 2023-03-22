@@ -6,7 +6,7 @@
 
 #include <Parser/CPlusPlus.h>
 
-namespace Scratch::Parser {
+namespace scratch::parser {
 
 CPlusPlusParser::CPlusPlusParser()
     : BasicScratchParser()

@@ -12,7 +12,7 @@
 #include "Scratch.h"
 #include "Widget/Command.h"
 
-namespace Scratch {
+namespace scratch {
 
 class ArgumentHandler : public ModalWidget {
 protected:

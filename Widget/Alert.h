@@ -8,7 +8,7 @@
 
 #include <Widget/Widget.h>
 
-namespace Scratch {
+namespace scratch {
 
 class Alert : public ModalWidget {
 public:

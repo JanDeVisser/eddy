@@ -16,7 +16,7 @@
 #include <core/Logging.h>
 #include <lexer/Token.h>
 
-namespace Scratch::Scribble {
+namespace scratch::scribble {
 
 using namespace Obelix;
 

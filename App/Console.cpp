@@ -14,9 +14,9 @@
 #include <Scribble/Interp/CommandAdapter.h>
 #include <Scribble/Syntax/Literal.h>
 
-namespace Scratch {
+namespace scratch {
 
-using namespace ::Scratch::Scribble;
+using namespace scratch::scribble;
 
 ErrorOr<void, SyntaxError> register_command(InterpreterContext& ctx, std::string const& command, Widget& widget)
 {
@@ -60,16 +60,16 @@ void ConsoleStatement::compile(std::string const& statement)
     lines.back().start_index = 0;
     auto length = 0u;
     if (text->buffer().empty()) {
-        lines.back().tokens.emplace_back(Span {}, ::Scratch::Scribble::Scribble::OKPrompt, "*> ");
+        lines.back().tokens.emplace_back(Span {}, Scribble::OKPrompt, "*> ");
         return;
     }
     auto project_maybe = compile_project("**Console**", text);
-    TokenCode prompt = ::Scratch::Scribble::Scribble::ErrorPrompt;
+    TokenCode prompt = Scribble::ErrorPrompt;
     if (project_maybe.has_value()) {
         auto project = std::dynamic_pointer_cast<Project>(project_maybe.value());
         node = project;
         if (project->is_complete()) {
-            prompt = ::Scratch::Scribble::Scribble::OKPrompt;
+            prompt = Scribble::OKPrompt;
         }
     }
     lines.back().tokens.emplace_back(Span {}, prompt, "*> ");
@@ -81,9 +81,9 @@ void ConsoleStatement::compile(std::string const& statement)
         case TokenCode::NewLine:
             length += 1;
             lines.emplace_back();
-            prompt = ::Scratch::Scribble::Scribble::ContinuationPrompt;
+            prompt = Scribble::ContinuationPrompt;
             lines.back().start_index = static_cast<int>(length);
-            lines.back().tokens.emplace_back(Span {}, ::Scratch::Scribble::Scribble::ContinuationPrompt, "-> ");
+            lines.back().tokens.emplace_back(Span {}, Scribble::ContinuationPrompt, "-> ");
             break;
         default:
             lines.back().tokens.push_back(token);
@@ -110,14 +110,14 @@ void ConsoleStatement::execute(InterpreterContext& ctx)
             output.emplace_back(output_line);
             lines.emplace_back();
             lines.back().start_index = -1;
-            lines.back().tokens.emplace_back(Span {}, ::Scratch::Scribble::Scribble::OutputLine, output_line->str());
+            lines.back().tokens.emplace_back(Span {}, Scribble::OutputLine, output_line->str());
         }
-        auto r = std::dynamic_pointer_cast<Interp::ExpressionResult>(interpret_result.value());
+        auto r = std::dynamic_pointer_cast<interp::ExpressionResult>(interpret_result.value());
         result = r->value();
         if (!r->value().is_null()) {
             lines.emplace_back();
             lines.back().start_index = -1;
-            lines.back().tokens.emplace_back(Span {}, ::Scratch::Scribble::Scribble::ExecutionResult, r->value().to_string());
+            lines.back().tokens.emplace_back(Span {}, Scribble::ExecutionResult, r->value().to_string());
         }
     }
 }
@@ -136,7 +136,7 @@ Console::Console(Editor* editor)
         fatal("Error initializing interpreter context: {}", err_maybe.error());
     }
     m_current.lines.emplace_back();
-    m_current.lines.back().tokens.emplace_back(Span {}, ::Scratch::Scribble::Scribble::OKPrompt, "*> ");
+    m_current.lines.back().tokens.emplace_back(Span {}, Scribble::OKPrompt, "*> ");
 }
 
 void Console::render()
@@ -161,7 +161,7 @@ void Console::render()
                 } else if (len + t.length() > m_screen_left + columns()) {
                     t = t.substr(0, m_screen_left + columns() - len);
                 }
-                editor()->append(::Scratch::Parser::ScribbleParser::token_for(token.code(), t));
+                editor()->append(scratch::parser::ScribbleParser::token_for(token.code(), t));
                 len += token.value().length();
                 if (len >= m_screen_left + editor()->columns())
                     break;
@@ -307,7 +307,7 @@ void Console::execute()
     m_statements.push_back(m_current);
     m_current = {};
     m_current.lines.emplace_back();
-    m_current.lines.back().tokens.emplace_back(Span {}, ::Scratch::Scribble::Scribble::OKPrompt, "*> ");
+    m_current.lines.back().tokens.emplace_back(Span {}, Scribble::OKPrompt, "*> ");
     m_cursor_line = 0;
     m_cursor_column = 0;
     m_cursor = 0;

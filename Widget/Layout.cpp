@@ -7,7 +7,7 @@
 #include "Command.h"
 #include <Widget/Widget.h>
 
-namespace Scratch {
+namespace scratch {
 
 Layout::Layout(ContainerOrientation orientation, SizePolicy policy, int size)
     : WindowedWidget(policy, size)

@@ -8,7 +8,7 @@
 
 #include <string>
 
-namespace Scratch {
+namespace scratch {
 
 using CodePoint=unsigned short;
 using Char=unsigned int;

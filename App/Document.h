@@ -18,7 +18,7 @@
 #include <Parser/CPlusPlus.h>
 #include <Widget/Widget.h>
 
-namespace Scratch {
+namespace scratch {
 
 namespace fs=std::filesystem;
 
@@ -27,7 +27,7 @@ using namespace Obelix;
 struct FileType {
     std::vector<std::string> extensions;
     std::string mimetype;
-    std::function<Parser::ScratchParser*()> parser_builder;
+    std::function<parser::ScratchParser*()> parser_builder;
 };
 
 enum class EditActionType {
@@ -53,7 +53,7 @@ public:
 
     void undo(Document&) const;
     void redo(Document&) const;
-    std::optional<EditAction> merge(EditAction const&) const;
+    [[nodiscard]] std::optional<EditAction> merge(EditAction const&) const;
 private:
     EditAction(EditActionType, int, std::string);
     EditAction(EditActionType, int, int);
@@ -166,7 +166,7 @@ private:
     fs::path m_path {};
     bool m_dirty { false };
     FileType m_filetype;
-    std::unique_ptr<Parser::ScratchParser> m_parser;
+    std::unique_ptr<parser::ScratchParser> m_parser;
 
     std::string m_text;
     bool m_changed { false };

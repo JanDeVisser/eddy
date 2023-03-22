@@ -11,10 +11,10 @@
 #include <Parser/ScratchParser.h>
 #include <Scribble/Scribble.h>
 
-namespace Scratch::Parser {
+namespace scratch::parser {
 
 using namespace Obelix;
-using namespace Scratch::Scribble;
+using namespace scratch::scribble;
 
 struct ScribbleCommands : public Commands {
     ScribbleCommands();
@@ -34,8 +34,8 @@ public:
 
     static DisplayToken token_for(TokenCode, std::string_view const&);
 private:
-    ::Scratch::Scribble::Scribble m_scribble { false };
+    Scribble m_scribble { false };
     static ScribbleCommands s_scribble_commands;
 };
 
-} // Scratch
+}

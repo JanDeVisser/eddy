@@ -15,7 +15,7 @@
 #include <App/Palette.h>
 #include <Widget/Text.h>
 
-namespace Scratch {
+namespace scratch {
 
 struct DisplayToken {
     explicit DisplayToken(std::string_view t, PaletteIndex c = PaletteIndex::Default)

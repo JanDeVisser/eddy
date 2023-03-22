@@ -7,7 +7,7 @@
 #include <Scribble/Scribble.h>
 #include <Scribble/Syntax/Statement.h>
 
-namespace Scratch::Scribble {
+namespace scratch::scribble {
 
 Scribble::Scribble(bool ignore_ws)
     : BasicParser()

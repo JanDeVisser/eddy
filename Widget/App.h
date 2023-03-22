@@ -54,7 +54,7 @@
 #define countof(A) (sizeof(A) / sizeof(*(A)))
 #endif /* countof */
 
-namespace Scratch {
+namespace scratch {
 
 extern_logging_category(widget);
 

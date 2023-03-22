@@ -16,7 +16,7 @@
 namespace scratch::test {
 
 using namespace testing;
-using namespace Scratch::Interp;
+using namespace scratch::interp;
 
 class ScribbleTest : public Test {
 protected:

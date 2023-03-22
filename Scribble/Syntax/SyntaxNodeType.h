@@ -11,7 +11,7 @@
 
 using namespace Obelix;
 
-namespace Scratch::Scribble {
+namespace scratch::scribble {
 
 #define ENUMERATE_SYNTAXNODETYPES(S)    \
     S(SyntaxNode)                       \
@@ -100,7 +100,7 @@ constexpr char const* SyntaxNodeType_name(SyntaxNodeType type)
 
 namespace Obelix {
 
-using namespace Scratch::Scribble;
+using namespace scratch::scribble;
 
 template<>
 struct to_string<SyntaxNodeType> {

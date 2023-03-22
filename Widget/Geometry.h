@@ -13,7 +13,7 @@
 
 #include <core/Logging.h>
 
-namespace Scratch {
+namespace scratch {
 
 template<typename T>
 T clamp(T v, T lo, T hi)

@@ -17,7 +17,7 @@
 #include "App/Forward.h"
 #include "Widget/Key.h"
 
-namespace Scratch {
+namespace scratch {
 
 namespace fs=std::filesystem;
 

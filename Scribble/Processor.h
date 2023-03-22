@@ -21,7 +21,7 @@
 #include <Scribble/Syntax/Syntax.h>
 #include <Scribble/Syntax/Variable.h>
 
-namespace Scratch::Scribble {
+namespace scratch::scribble {
 
 extern_logging_category(scribble);
 
