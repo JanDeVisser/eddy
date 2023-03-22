@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include "Command.h"
+#include <Widget/Command.h>
 #include <Widget/Widget.h>
 
 namespace scratch {

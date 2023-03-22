@@ -5,7 +5,6 @@
  */
 
 #include <Scribble/Scribble.h>
-#include <Scribble/Syntax/Statement.h>
 
 namespace scratch::scribble {
 

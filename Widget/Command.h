@@ -14,8 +14,8 @@
 
 #include <SDL.h>
 
-#include "App/Forward.h"
-#include "Widget/Key.h"
+#include <App/Forward.h>
+#include <Widget/Key.h>
 
 namespace scratch {
 

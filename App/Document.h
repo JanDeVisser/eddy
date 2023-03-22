@@ -13,9 +13,9 @@
 
 #include <lexer/BasicParser.h>
 
-#include "Widget/Command.h"
 #include <App/Buffer.h>
 #include <Parser/CPlusPlus.h>
+#include <Widget/Command.h>
 #include <Widget/Widget.h>
 
 namespace scratch {

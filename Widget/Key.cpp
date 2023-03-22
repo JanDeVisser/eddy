@@ -7,7 +7,7 @@
 #include <map>
 #include <sstream>
 
-#include "Key.h"
+#include <Widget/Key.h>
 
 namespace scratch {
 

@@ -10,7 +10,7 @@
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 
-#include "SDLContext.h"
+#include <Widget/SDLContext.h>
 
 using namespace Obelix;
 

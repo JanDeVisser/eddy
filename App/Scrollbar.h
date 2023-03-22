@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include <Geometry.h>
-#include <Widget.h>
+#include <Widget/Geometry.h>
+#include <Widget/Widget.h>
 
 namespace scratch {
 

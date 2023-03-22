@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include <App/Scratch.h>
-#include <Scribble/Interp/CommandAdapter.h>
 #include <Scribble/Interp/Interpreter.h>
 #include <Scribble/Interp/Value.h>
 #include <Scribble/Interp/Function.h>

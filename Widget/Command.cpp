@@ -4,12 +4,11 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include "obelixlibs/core/Format.h"
-#include "obelixlibs/core/StringUtil.h"
+#include <core/StringUtil.h>
 
-#include "App/Scratch.h"
-#include "Widget/Command.h"
-#include "Widget/SDLContext.h"
+#include <App/Scratch.h>
+#include <Widget/Command.h>
+#include <Widget/SDLContext.h>
 
 using namespace Obelix;
 

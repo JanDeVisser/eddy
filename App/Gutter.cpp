@@ -6,7 +6,6 @@
 
 #include <core/Format.h>
 
-#include "Widget/SDLContext.h"
 #include <App/Gutter.h>
 #include <App/Scratch.h>
 

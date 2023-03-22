@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include "ArgumentHandler.h"
+#include <App/ArgumentHandler.h>
 
 namespace scratch {
 

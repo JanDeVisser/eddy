@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include "Widget/App.h"
-#include <Scrollbar.h>
+#include <App/Scrollbar.h>
+#include <Widget/App.h>
 
 namespace scratch {
 

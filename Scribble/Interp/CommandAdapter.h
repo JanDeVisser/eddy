@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include "Widget/Command.h"
 #include <Scribble/Interp/Function.h>
 #include <Scribble/Interp/Value.h>
+#include <Widget/Command.h>
 
 namespace scratch::interp {
 

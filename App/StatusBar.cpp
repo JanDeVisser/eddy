@@ -4,9 +4,8 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include "Widget/SDLContext.h"
-#include <App/Editor.h>
 #include <App/StatusBar.h>
+#include <Widget/SDLContext.h>
 
 using namespace Obelix;
 

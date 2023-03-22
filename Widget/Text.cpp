@@ -6,7 +6,7 @@
 
 #include <cctype>
 
-#include "Text.h"
+#include <Widget/Text.h>
 
 namespace scratch {
 

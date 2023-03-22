@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "Widget/Command.h"
+#include <Widget/Command.h>
 #include <App/EditorState.h>
 #include <lexer/BasicParser.h>
 

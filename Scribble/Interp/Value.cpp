@@ -6,7 +6,6 @@
 
 #include <core/Checked.h>
 
-#include <Scribble/Interp/Operator.h>
 #include <Scribble/Interp/Value.h>
 #include <Scribble/Interp/Function.h>
 

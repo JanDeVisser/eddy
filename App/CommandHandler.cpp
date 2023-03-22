@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include "obelixlibs/core/StringUtil.h"
+#include <core/StringUtil.h>
 
-#include "ArgumentHandler.h"
-#include "CommandHandler.h"
+#include <App/ArgumentHandler.h>
+#include <App/CommandHandler.h>
 
 using namespace Obelix;
 

@@ -15,8 +15,8 @@
 
 #include <core/Logging.h>
 
-#include "App/Palette.h"
-#include "Command.h"
+#include <App/Palette.h>
+#include <Widget/Command.h>
 #include <Widget/Geometry.h>
 #include <Widget/Key.h>
 #include <Widget/Text.h>

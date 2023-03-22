@@ -8,9 +8,9 @@
 
 #include <SDL.h>
 
-#include "CommandHandler.h"
-#include "Scratch.h"
-#include "Widget/Command.h"
+#include <App/CommandHandler.h>
+#include <App/Scratch.h>
+#include <Widget/Command.h>
 
 namespace scratch {
 

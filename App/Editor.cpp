@@ -9,8 +9,8 @@
 
 #include <SDL2_gfxPrimitives.h>
 
-#include "Widget/App.h"
-#include "Widget/SDLContext.h"
+#include <Widget/App.h>
+#include <Widget/SDLContext.h>
 #include <App/Editor.h>
 #include <App/Scratch.h>
 

@@ -6,10 +6,10 @@
 
 #pragma once
 
-#include "Widget/App.h"
 #include <App/Editor.h>
 #include <App/Gutter.h>
 #include <App/StatusBar.h>
+#include <Widget/App.h>
 
 namespace scratch {
 

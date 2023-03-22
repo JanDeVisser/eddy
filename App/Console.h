@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include "Widget/Command.h"
 #include <App/Buffer.h>
 #include <Scribble/Interp/Interpreter.h>
+#include <Widget/Command.h>
 
 namespace scratch {
 

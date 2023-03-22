@@ -13,9 +13,9 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 
-#include "obelixlibs/core/Logging.h"
+#include <core/Logging.h>
 
-#include "Geometry.h"
+#include <Widget/Geometry.h>
 
 using namespace Obelix;
 

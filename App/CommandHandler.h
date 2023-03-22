@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "Widget/Command.h"
-#include "Widget/Widget.h"
+#include <Widget/Command.h>
+#include <Widget/Widget.h>
 
 namespace scratch {
 
