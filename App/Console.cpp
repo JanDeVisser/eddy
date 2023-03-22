@@ -18,12 +18,6 @@ namespace Scratch {
 
 using namespace ::Scratch::Scribble;
 
-ErrorOr<void, SyntaxError> register_builtin(InterpreterContext& ctx, std::string const& name, BuiltInImpl const& impl)
-{
-    TRY_RETURN(ctx.declare(name, Value { std::make_shared<BuiltIn>(name, impl) } ));
-    return {};
-}
-
 ErrorOr<void, SyntaxError> register_command(InterpreterContext& ctx, std::string const& command, Widget& widget)
 {
     auto cmd = widget.command(command);
@@ -137,9 +131,6 @@ ConsoleCommands Console::s_console_commands;
 Console::Console(Editor* editor)
     : Buffer(editor)
 {
-    if (auto error_maybe = initialize_context(m_ctx); error_maybe.is_error()) {
-        fatal("Could not initialize scripting interpreter context: {}", error_maybe.error());
-    }
     m_commands = &s_console_commands;
     if (auto err_maybe = initialize_context(m_ctx); err_maybe.is_error()) {
         fatal("Error initializing interpreter context: {}", err_maybe.error());

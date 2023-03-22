@@ -35,14 +35,29 @@ private:
     pFunctionDef m_function;
 };
 
-using BuiltInImpl = std::function<Value(Values, InterpreterContext&)>;
-
+template <typename BuiltInImpl>
 class BuiltIn : public Function {
 public:
-    BuiltIn(std::string, BuiltInImpl const&);
-    [[nodiscard]] Value execute(std::vector<Value> const&, InterpreterContext&) const override;
+    BuiltIn(std::string name, BuiltInImpl const& impl)
+        : Function(std::move(name))
+        , m_impl(impl)
+    {
+    }
+
+    Value execute(std::vector<Value> const& args, InterpreterContext& ctx) const override
+    {
+        return m_impl(args, ctx);
+    }
+
 private:
     BuiltInImpl const& m_impl;
 };
+
+template <typename BuiltInImpl>
+inline ErrorOr<void, SyntaxError> register_builtin(InterpreterContext& ctx, std::string const& name, BuiltInImpl const& impl)
+{
+    TRY_RETURN(ctx.declare(name, Value { std::make_shared<BuiltIn<BuiltInImpl>>(name, impl) } ));
+    return {};
+}
 
 }

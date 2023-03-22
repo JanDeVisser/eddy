@@ -53,15 +53,4 @@ pFunctionDef const& ScribbleFunction::function() const
     return m_function;
 }
 
-BuiltIn::BuiltIn(std::string name, BuiltInImpl const& impl)
-    : Function(std::move(name))
-    , m_impl(impl)
-{
-}
-
-Value BuiltIn::execute(std::vector<Value> const& args, InterpreterContext& ctx) const
-{
-    return m_impl(args, ctx);
-}
-
 }
