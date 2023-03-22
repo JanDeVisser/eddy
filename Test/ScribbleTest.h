@@ -10,6 +10,8 @@
 
 #include <App/Console.h>
 #include <Scribble/Interp/Interpreter.h>
+#include <Scribble/Interp/Function.h>
+#include <Scribble/Interp/Value.h>
 
 namespace scratch::test {
 

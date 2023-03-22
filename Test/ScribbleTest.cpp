@@ -3,6 +3,7 @@
  *
  * SPDX-License-Identifier: MIT
  */
+
 #include <Test/ScribbleTest.h>
 
 namespace scratch::test {
@@ -79,6 +80,94 @@ TEST_F(ScribbleTest, While)
     stmt.execute(m_ctx);
     EXPECT_EQ(stmt.result.type(), ValueType::Integer);
     EXPECT_EQ(stmt.result.to_int<int>(), 47);
+}
+
+TEST_F(ScribbleTest, For)
+{
+    Scratch::ConsoleStatement stmt;
+    stmt.compile("var x = 2 for y in 0..10 { x = x + y } x");
+    EXPECT_NE(stmt.node, nullptr);
+    stmt.execute(m_ctx);
+    EXPECT_EQ(stmt.result.type(), ValueType::Integer);
+    EXPECT_EQ(stmt.result.to_int<int>(), 47);
+}
+
+TEST_F(ScribbleTest, Precedence)
+{
+    Scratch::ConsoleStatement stmt;
+    stmt.compile("5*4+2");
+    EXPECT_NE(stmt.node, nullptr);
+    stmt.execute(m_ctx);
+    EXPECT_EQ(stmt.result.type(), ValueType::Integer);
+    EXPECT_EQ(stmt.result.to_int<int>(), 22);
+
+    stmt.compile("5+4*2");
+    EXPECT_NE(stmt.node, nullptr);
+    stmt.execute(m_ctx);
+    EXPECT_EQ(stmt.result.type(), ValueType::Integer);
+    EXPECT_EQ(stmt.result.to_int<int>(), 13);
+
+    stmt.compile("(5+4)*2");
+    EXPECT_NE(stmt.node, nullptr);
+    stmt.execute(m_ctx);
+    EXPECT_EQ(stmt.result.type(), ValueType::Integer);
+    EXPECT_EQ(stmt.result.to_int<int>(), 18);
+
+    stmt.compile("5*(4+2)");
+    EXPECT_NE(stmt.node, nullptr);
+    stmt.execute(m_ctx);
+    EXPECT_EQ(stmt.result.type(), ValueType::Integer);
+    EXPECT_EQ(stmt.result.to_int<int>(), 30);
+
+    stmt.compile("(5*4)+2");
+    EXPECT_NE(stmt.node, nullptr);
+    stmt.execute(m_ctx);
+    EXPECT_EQ(stmt.result.type(), ValueType::Integer);
+    EXPECT_EQ(stmt.result.to_int<int>(), 22);
+
+    stmt.compile("5*4+2*6");
+    EXPECT_NE(stmt.node, nullptr);
+    stmt.execute(m_ctx);
+    EXPECT_EQ(stmt.result.type(), ValueType::Integer);
+    EXPECT_EQ(stmt.result.to_int<int>(), 32);
+
+    stmt.compile("5*(4+2)*6");
+    EXPECT_NE(stmt.node, nullptr);
+    stmt.execute(m_ctx);
+    EXPECT_EQ(stmt.result.type(), ValueType::Integer);
+    EXPECT_EQ(stmt.result.to_int<int>(), 180);
+}
+
+TEST_F(ScribbleTest, BuiltInNoArgs)
+{
+    auto err = register_builtin(m_ctx, "builtin_function",
+            [](Scratch::Interp::Values const&, InterpreterContext&) {
+                return Value { 69 };
+            }
+        );
+    EXPECT_FALSE(err.is_error());
+    Scratch::ConsoleStatement stmt;
+    stmt.compile("builtin_function()");
+    EXPECT_NE(stmt.node, nullptr);
+    stmt.execute(m_ctx);
+    EXPECT_EQ(stmt.result.type(), ValueType::Integer);
+    EXPECT_EQ(stmt.result.to_int<int>(), 69);
+}
+
+TEST_F(ScribbleTest, BuiltInArgs)
+{
+    auto err = register_builtin(m_ctx, "builtin_function",
+            [](Scratch::Interp::Values const& values, InterpreterContext&) {
+                return Value { *(values[0].to_int<int>()) + *(values[1].to_int<int>()) };
+            }
+        );
+    EXPECT_FALSE(err.is_error());
+    Scratch::ConsoleStatement stmt;
+    stmt.compile("builtin_function(12, 37)");
+    EXPECT_NE(stmt.node, nullptr);
+    stmt.execute(m_ctx);
+    EXPECT_EQ(stmt.result.type(), ValueType::Integer);
+    EXPECT_EQ(stmt.result.to_int<int>(), 49);
 }
 
 } // scratch::test
