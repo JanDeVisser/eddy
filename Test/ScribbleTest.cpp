@@ -60,6 +60,10 @@ TEST_F(ScribbleTest, FuncCall)
     EXPECT_NE(stmt.node, nullptr);
     stmt.execute(m_ctx);
     EXPECT_EQ(stmt.result, Value { 8 });
+    stmt.compile("func test-me(x, y) { return x + y }  test-me(3, 5)");
+    EXPECT_NE(stmt.node, nullptr);
+    stmt.execute(m_ctx);
+    EXPECT_EQ(stmt.result, Value { 8 });
 }
 
 TEST_F(ScribbleTest, If)
@@ -154,7 +158,7 @@ TEST_F(ScribbleTest, BuiltInNoArgs)
     EXPECT_EQ(stmt.result.to_int<int>(), 69);
 }
 
-TEST_F(ScribbleTest, BuiltInArgs)
+TEST_F(ScribbleTest, BuiltInWithArgs)
 {
     auto err = register_builtin(m_ctx, "builtin_function",
             [](scratch::interp::Values const& values, InterpreterContext&) {

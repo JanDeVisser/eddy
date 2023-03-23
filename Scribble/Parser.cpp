@@ -192,7 +192,7 @@ std::shared_ptr<Statement> Parser::parse_function_definition(Token const& func_t
     Identifiers params {};
     auto done = current_code() == TokenCode::CloseParen;
     while (!done) {
-        auto param_name_maybe = m_lexer.match(TokenCode::Identifier);
+        auto param_name_maybe = match(TokenCode::Identifier);
         if (!param_name_maybe.has_value()) {
             m_lexer.add_error(peek(), "Expected parameter name, got '{}'");
             return std::make_shared<FunctionDef>(func_token.location(), func_decl, nullptr);
