@@ -83,6 +83,20 @@ target_link_libraries(
 )
 
 add_library(
+        LSP
+        SHARED
+        LSP/JSON.cpp
+        LSP/LSP.cpp
+        LSP/Message.cpp
+)
+
+target_link_libraries(
+        LSP
+        oblcore
+        obllexer
+)
+
+add_library(
         Scribble
         SHARED
         Scribble/Interp/CommandAdapter.cpp
@@ -131,7 +145,7 @@ add_library(
 
 add_executable(
         scratch
-        App/main.cpp)
+        App/main.cpp LSP/LSP.cpp LSP/LSP.h)
 
 target_link_libraries(
         scratch
@@ -160,11 +174,26 @@ target_link_libraries(
         gtest_main
 )
 
+add_test(NAME ScribbleTest COMMAND ScribbleTest)
+gtest_discover_tests(ScribbleTest)
+
+add_executable(
+        LSPTest
+        Test/JSONTest.cpp
+        Test/LSPTest.cpp
+)
+
+target_link_libraries(
+        LSPTest
+        LSP
+        gtest_main
+)
+
+add_test(NAME LSPTest COMMAND LSPTest)
+gtest_discover_tests(LSPTest)
+
 install(TARGETS scratch # ScribbleTest
         ARCHIVE DESTINATION lib
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib
 )
-
-#add_test(NAME ScribbleTest COMMAND ScribbleTest)
-#gtest_discover_tests(ScribbleTest)
