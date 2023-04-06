@@ -7,7 +7,7 @@
 #include "JSON.h"
 #include "lexer/Lexer.h"
 
-namespace Obelix {
+namespace scratch::lsp {
 
 [[nodiscard]] std::string JSONValue::to_string() const
 {
@@ -18,6 +18,8 @@ namespace Obelix {
         return std::get<std::string>(m_value);
     case JSONType::Integer:
         return std::to_string(std::get<int64_t>(m_value));
+    case JSONType::Boolean:
+        return std::get<bool>(m_value) ? "true" : "false";
     case JSONType::Double:
         return std::to_string(std::get<double>(m_value));
     case JSONType::Array: {
@@ -30,7 +32,7 @@ namespace Obelix {
             if (!first)
                 ret += ", ";
             first = false;
-            ret += v.encode();
+            ret += v.serialize();
         }
         return ret + " ]";
     }
@@ -44,19 +46,20 @@ namespace Obelix {
             if (!first)
                 ret += ", ";
             first = false;
-            ret += "\"" + v.first + "\": " + v.second.encode();
+            ret += "\"" + v.first + "\": " + v.second.serialize();
         }
         return ret + " }";
     }
     }
 }
 
-[[nodiscard]] std::string JSONValue::encode(bool pretty, int indent_width, int indent) const
+[[nodiscard]] std::string JSONValue::serialize(bool pretty, int indent_width, int indent) const
 {
     switch (type()) {
     case JSONType::Null:
     case JSONType::Integer:
     case JSONType::Double:
+    case JSONType::Boolean:
         return to_string();
     case JSONType::String:
         return "\"" + to_string() + "\"";
@@ -76,7 +79,7 @@ namespace Obelix {
                 ret += ' ';
             }
             first = false;
-            ret += v.encode(pretty, indent_width, indent + indent_width);
+            ret += v.serialize(pretty, indent_width, indent + indent_width);
         }
         if (pretty) {
             ret += "\n";
@@ -102,7 +105,7 @@ namespace Obelix {
             } else {
                 ret += ' ';
             }
-            ret += "\"" + v.first + "\": " + v.second.encode();
+            ret += "\"" + v.first + "\": " + v.second.serialize();
         }
         if (pretty) {
             ret += "\n";
@@ -115,7 +118,7 @@ namespace Obelix {
     }
 }
 
-ErrorOr<JSONValue,JSONValue::ParseError> JSONValue::decode(std::string const& str)
+ErrorOr<JSONValue,JSONValue::ParseError> JSONValue::deserialize(std::string const& str)
 {
     JSONValue current;
     std::vector<JSONValue> state {};
@@ -125,12 +128,21 @@ ErrorOr<JSONValue,JSONValue::ParseError> JSONValue::decode(std::string const& st
     lexer.add_scanner<Obelix::QStringScanner>("\"'", false);
     lexer.add_scanner<Obelix::NumberScanner>(Obelix::NumberScanner::Config { true, true, true, false, true });
     lexer.add_scanner<Obelix::WhitespaceScanner>();
-    lexer.add_scanner<Obelix::KeywordScanner>(TokenCode::Keyword0, "null");
+    lexer.add_scanner<Obelix::KeywordScanner>(
+        TokenCode::Keyword0, "null",
+        TokenCode::Keyword1, "true",
+        TokenCode::Keyword2, "false");
     for (auto const& token : lexer.tokenize()) {
         bool handled { false };
         current = {};
         switch (token.code()) {
         case TokenCode::Keyword0:
+            break;
+        case TokenCode::Keyword1:
+            current = JSONValue(true);
+            break;
+        case TokenCode::Keyword2:
+            current = JSONValue(false);
             break;
         case TokenCode::UnclosedDoubleQuotedString:
             return ParseError::Error;
@@ -165,7 +177,7 @@ ErrorOr<JSONValue,JSONValue::ParseError> JSONValue::decode(std::string const& st
             state.pop_back();
             break;
         case TokenCode::Comma:
-            if (state.empty() || !state.back().is_object())
+            if (state.empty() || (!state.back().is_object() && !state.back().is_array()))
                 return ParseError::Error;
             handled = true;
             break;

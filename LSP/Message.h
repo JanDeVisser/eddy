@@ -16,6 +16,18 @@ namespace scratch::lsp {
 using namespace Obelix;
 using namespace std::literals;
 
+using URI=std::string;
+using DocumentUri=URI;
+using string=std::string;
+using boolean=bool;
+using integer=int32_t;
+using uinteger=uint32_t;
+using decimal=double;
+
+using LSPAny = JSONValue;
+using LSPObject = JSONValue;
+using LSPArray = JSONValue;
+
 extern int s_next_request_id;
 
 enum class ErrorCode {
@@ -109,50 +121,59 @@ enum class ErrorCode {
     lspReservedErrorRangeEnd = -32800,
 };
 
-class MessageParameter {
+class DecodeError {
 public:
-    [[nodiscard]] virtual JSONValue to_json() const = 0;
+    explicit DecodeError(std::string message)
+        : m_message(std::move(message))
+    {
+    }
+
+    explicit DecodeError(char const *msg)
+        : m_message(msg)
+    {
+    }
+
+    template <typename ...Args>
+    explicit DecodeError(char const *msg, Args&&... args)
+    {
+        m_message = format(msg, std::forward<Args>(args)...);
+    }
+
+    [[nodiscard]] std::string const& message() const { return m_message; }
+
+private:
+    std::string m_message;
 };
 
 class Void {
 public:
     Void() = default;
+
+    static ErrorOr<Void,JSONDecodeError> decode_json(JSONValue const& obj)
+    {
+        if (!obj.is_null())
+            return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+        return Void();
+    }
 };
+using null=Void;
 
-template <typename Object>
-inline JSONValue to_json(Object const& obj)
-{
-    return {};
-}
-
-template <typename Parameter>
-requires std::derived_from<Parameter,MessageParameter>
-inline JSONValue to_json(Parameter const& obj)
-{
-    return (&obj)->to_json();
-}
-
-template <>
-inline JSONValue to_json(std::string const& obj)
+template<>
+inline JSONValue to_json(Void const&)
 {
     return {};
 }
 
 template <typename Object>
-inline std::string method_name(Object const&)
+inline std::string method_name()
 {
     fatal("No method name defined for object class '{}'", typeid(Object).name());
-}
-
-template <>
-inline std::string method_name(std::string const& obj)
-{
-    return obj;
 }
 
 template <class Parameter>
 class Message {
 public:
+    using ParameterClass = Parameter;
     Message<Parameter>() = default;
     explicit Message(Parameter parameter)
         : m_parameter(std::move(parameter))
@@ -161,7 +182,7 @@ public:
 
     [[nodiscard]] Parameter const& parameter() const { return m_parameter; }
 
-private:
+protected:
     Parameter m_parameter {};
 };
 
@@ -177,9 +198,79 @@ JSONValue to_json(MessageClass const& obj)
     return msg;
 }
 
-template <class Parameter=std::string>
+class ResponseError {
+public:
+    ResponseError() = default;
+    ResponseError(ErrorCode code, std::string message, JSONValue data = {})
+        : code(static_cast<int>(code))
+        , message(std::move(message))
+        , data(std::move(data))
+    {
+    }
+
+    ResponseError(int code, std::string message, JSONValue data = {})
+        : code(code)
+        , message(std::move(message))
+        , data(std::move(data))
+    {
+    }
+
+    template <typename ...Args>
+    ResponseError(ErrorCode code, char const *msg, Args&&... args)
+        : code(static_cast<int>(code))
+    {
+        message = format(msg, std::forward<Args>(args)...);
+    }
+
+    int code { 0 };
+    std::string message {};
+    JSONValue data {};
+
+private:
+};
+
+template<>
+ErrorOr<void, JSONDecodeError> decode_value(JSONValue const& value, ResponseError& target)
+{
+    if (!value.is_object())
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "ResponseError" };
+    TRY_RETURN(decode<int>(value, "code", target.code));
+    TRY_RETURN(decode<std::string>(value, "message", target.message));
+    return {};
+}
+
+template <class Result>
+class Response : public Message<Result> {
+public:
+    [[nodiscard]] int id() const { return m_id; }
+    [[nodiscard]] bool is_error() const { return m_error.has_value(); }
+    [[nodiscard]] Result const& result() const { return Message<Result>::parameter(); }
+    [[nodiscard]] ResponseError error() const { return *m_error; }
+
+    static ErrorOr<Response,JSONDecodeError> decode_json(JSONValue const& obj)
+    {
+        Response result;
+        TRY_RETURN(decode(obj, "id", result.m_id));
+        TRY_RETURN(decode(obj, "error", result.m_error));
+        if (!obj["result"].is_null()) {
+            TRY_RETURN(decode<Result>(obj, "result", result.m_parameter));
+        } else if (!result.m_error) {
+            return JSONDecodeError { JSONDecodeError::Code::MissingValue, "result or error" };
+        }
+        return result;
+    }
+
+private:
+    Response() = default;
+    int m_id {0};
+    std::optional<ResponseError> m_error {};
+};
+
+template <class Parameter, class Result>
 class Request : public Message<Parameter> {
 public:
+    using ResultClass = Result;
+
     explicit Request(Parameter parameter)
         : Message<Parameter>(std::move(parameter))
         , m_id(get_next_id())
@@ -206,128 +297,63 @@ private:
     int m_id;
 };
 
-template <class Parameter>
-inline JSONValue to_json(Request<Parameter> const& obj)
+template <class Parameter, class Result>
+inline JSONValue to_json(Request<Parameter,Result> const& obj)
 {
-    auto msg = to_json<Message<Parameter>>(obj);
-    msg.set("id", JSONValue(obj.id()));
-    msg.set("method", method_name<Parameter>(obj.parameter()));
-    return msg;
+    auto ret = to_json<Message<Parameter>>(obj);
+    ret.set("id", obj.id());
+    return ret;
 }
 
-class DecodeError {
-public:
-    explicit DecodeError(std::string message)
-        : m_message(std::move(message))
-    {
-    }
-
-    explicit DecodeError(char const *msg)
-        : m_message(msg)
-    {
-    }
-
-    template <typename ...Args>
-    explicit DecodeError(char const *msg, Args&&... args)
-    {
-        m_message = format(msg, std::forward<Args>(args)...);
-    }
-
-    [[nodiscard]] std::string const& message() const { return m_message; }
-
-private:
-    std::string m_message;
-};
-
-template <class Result>
-ErrorOr<Result,DecodeError> decode(JSONValue const&)
+template <class RequestClass>
+inline ErrorOr<Response<typename RequestClass::ResultClass>, JSONDecodeError> decode_response(JSONValue const&)
 {
-    return DecodeError { "Please implement decode for Result class '{}'", typeid(Result).name() };
+    fatal("Specialize decode_response<{}>()", typeid(RequestClass).name());
 }
 
-ErrorOr<Void,DecodeError> decode(JSONValue const& obj)
+template <class RequestClass>
+ErrorOr<Response<typename RequestClass::ResultClass>, JSONDecodeError> send_request(LSP& endpoint, typename RequestClass::ParameterClass params)
 {
-    if (!obj.is_null())
-        return DecodeError { "Cannot decode json value '{}' to Void", obj.encode() };
-    return Void {};
+    RequestClass req { std::move(params) };
+    auto err_maybe = endpoint.send(to_json<RequestClass>(req));
+    if (err_maybe.is_error())
+        return JSONDecodeError { JSONDecodeError::Code::ProtocolError, err_maybe.error().to_string() };
+    auto response_maybe = endpoint.receive();
+    if (response_maybe.is_error())
+        return JSONDecodeError { JSONDecodeError::Code::ProtocolError, response_maybe.error().to_string() };
+    auto response = response_maybe.value();
+
+    auto result = TRY(decode_response<RequestClass>(response));
+    if (result.id() != req.id()) {
+        return JSONDecodeError { JSONDecodeError::Code::UnexpectedValue, "id" };
+    }
+    return result;
 }
 
-class ResponseError {
-public:
-    ResponseError() = default;
-    ResponseError(ErrorCode code, std::string message, JSONValue data = {})
-        : m_code(static_cast<int>(code))
-        , m_message(std::move(message))
-        , m_data(std::move(data))
-    {
-    }
-
-    ResponseError(int code, std::string message, JSONValue data = {})
-        : m_code(code)
-        , m_message(std::move(message))
-        , m_data(std::move(data))
-    {
-    }
-
-    template <typename ...Args>
-    ResponseError(ErrorCode code, char const *msg, Args&&... args)
-        : m_code(static_cast<int>(code))
-    {
-        m_message = format(msg, std::forward<Args>(args)...);
-    }
-
-    [[nodiscard]] int code() const { return m_code; }
-    [[nodiscard]] std::string const& message() const { return m_message; }
-    [[nodiscard]] JSONValue const& data() const { return m_data; }
-
-private:
-    int m_code { 0 };
-    std::string m_message {};
-    JSONValue m_data {};
-};
-
-template<>
-ErrorOr<ResponseError,DecodeError> decode(JSONValue const& msg)
+template <class RequestClass>
+ErrorOr<Response<typename RequestClass::ResultClass>, JSONDecodeError> send_request(LSP& endpoint)
 {
-    auto code = msg["code"];
-    if (!code.is_integer())
-        fatal("Received ResponseError without code: {}", msg.encode());
-    auto message = msg["message"];
-    if (!message.is_string())
-        fatal("Received ResponseError without message: {}", msg.encode());
-    return ResponseError { *(code.to_int<int>()), message.to_string(), msg["data"] };
+    RequestClass req;
+    auto err_maybe = endpoint.send(to_json<RequestClass>(req));
+    if (err_maybe.is_error())
+        return JSONDecodeError { JSONDecodeError::Code::ProtocolError, err_maybe.error().to_string() };
+    auto response_maybe = endpoint.receive();
+    if (response_maybe.is_error())
+        return JSONDecodeError { JSONDecodeError::Code::ProtocolError, response_maybe.error().to_string() };
+    auto response = response_maybe.value();
+
+    auto result = TRY(decode_response<RequestClass>(response));
+    if (result.id() != req.id()) {
+        return JSONDecodeError { JSONDecodeError::Code::UnexpectedValue, "id" };
+    }
+    return result;
 }
-
-template <class Result>
-class Response : public Message<Result> {
-public:
-    Response(int id, Result result)
-        : Message<Result>()
-        , m_id(id)
-    {
-    }
-    Response(int id, ResponseError error)
-        : Message<Result>()
-        , m_id(id)
-        , m_error(std::move(error))
-    {
-    }
-
-    [[nodiscard]] int id() const { return m_id; }
-    [[nodiscard]] bool is_error() const { return m_error.has_value(); }
-    [[nodiscard]] Result const& result() const { return Message<Result>::parameter(); }
-    [[nodiscard]] ResponseError error() const { return *m_error; }
-
-private:
-    int m_id;
-    std::optional<ResponseError> m_error {};
-};
 
 template <class Parameter=std::string>
 class Notification : public Message<Parameter> {
 public:
-    explicit Notification(Parameter parameter)
-        : Message<Parameter>(std::move(parameter))
+    explicit Notification(Parameter params)
+        : Message<Parameter>(std::move(params))
     {
     }
     Notification() = default;
@@ -337,48 +363,28 @@ template <class Parameter>
 inline JSONValue to_json(Notification<Parameter> const& obj)
 {
     auto msg = to_json<Message<Parameter>>(obj);
-    msg.set("method", method_name<Parameter>(obj.parameter()));
+    msg.set("method", method_name<Notification<Parameter>>());
     return msg;
 }
 
-template <class Parameter, class Result>
-ErrorOr<Response<Result>, SystemError> send_request(LSP& endpoint, Parameter parameter)
+template <class NotificationClass>
+ErrorOr<void, JSONDecodeError> send_notification(LSP& endpoint, typename NotificationClass::ParameterClass params)
 {
-    Request<Parameter> msg { std::move(parameter) };
-    TRY_RETURN(endpoint.send(to_json(msg)));
-    auto response = TRY(endpoint.receive());
-
-    if (!response.has("id")) {
-        return Response<Result> { -1, { ErrorCode::ParseError, "Received response without id: {}", response.encode() } };
-    }
-    auto id_value = response["id"];
-    if (!id_value.is_integer()) {
-        return Response<Result> { -1, { ErrorCode::ParseError, "Received response with of wrong type: {}", id_value.to_string() } };
-    }
-    auto id = *id_value.to_int<int>();
-    if (id != msg.id()) {
-        return Response<Result> { id, { ErrorCode::InternalError, "Received request for id '{}' but expected '{}'", id, msg.id() } };
-    }
-    if (!response["result"].is_null()) {
-        auto result = decode<Result>(response["result"]);
-        if (result.is_error())
-            return Response<Result> { id, { ErrorCode::ParseError, result.error().message() } };
-        return Response<Result> { id, result.value() };
-    }
-    if (!response["error"].is_null()) {
-        auto response_error = decode<ResponseError>(response["error"]);
-        if (response_error.is_error())
-            return Response<Result> { id, { ErrorCode::ParseError, response_error.error().message() } };
-        return Response<Result> { id, response_error.value() };
-    }
-    return Response<Result> { id, { ErrorCode::ParseError, "Response for request '{}' has neither result nor error" } };
+    NotificationClass notification { std::move(params) };
+    auto ret_maybe = endpoint.send(to_json<NotificationClass>(notification));
+    if (ret_maybe.is_error())
+        return JSONDecodeError { JSONDecodeError::Code::ProtocolError, ret_maybe.error().to_string() };
+    return {};
 }
 
-template <class Parameter>
-ErrorOr<void, SystemError> send_notification(LSP& endpoint, Parameter parameter)
+template <class NotificationClass>
+ErrorOr<void, JSONDecodeError> send_notification(LSP& endpoint)
 {
-    Notification<Parameter> msg { std::move(parameter) };
-    return endpoint.send(to_json(msg));
+    NotificationClass notification;
+    auto ret_maybe = endpoint.send(to_json<NotificationClass>(notification));
+    if (ret_maybe.is_error())
+        return JSONDecodeError { JSONDecodeError::Code::ProtocolError, ret_maybe.error().to_string() };
+    return {};
 }
 
 }

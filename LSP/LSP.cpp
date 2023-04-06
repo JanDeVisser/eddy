@@ -46,7 +46,7 @@ ErrorOr<void, SystemError> LSP::shutdown()
 
 ErrorOr<void, SystemError> LSP::send(JSONValue const& value)
 {
-    std::string json = value.encode();
+    std::string json = value.serialize();
     std::string message = format(
     R"(Content-Length: {}
 Content-Type: application/vscode-jsonrpc; charset=utf-8
@@ -89,7 +89,7 @@ ErrorOr<JSONValue, SystemError> LSP::receive()
             json += "\n";
         json += line;
     }
-    auto value_maybe = JSONValue::decode(json);
+    auto value_maybe = JSONValue::deserialize(json);
     if (!value_maybe.has_value())
         return SystemError { ErrorCode::SyntaxError, "Unparseable message" };
     return *value_maybe;
