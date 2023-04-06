@@ -7,7 +7,7 @@
 #include "../LSP/JSON.h"
 #include <gtest/gtest.h>
 
-using namespace Obelix;
+using namespace scratch::lsp;
 
 TEST(JSONTest, CreateNull)
 {
@@ -61,18 +61,27 @@ TEST(JSONTest, EncodeObject)
 {
     JSONValue value = JSONValue::object();
     value.set("foo", JSONValue(42));
-    auto s = value.encode();
+    auto s = value.serialize();
     EXPECT_EQ(s, "{ \"foo\": 42 }");
 }
 
 TEST(JSONTest, DecodeObject)
 {
     std::string s { "{ \"foo\": 42 }" };
-    auto result = JSONValue::decode(s);
+    auto result = JSONValue::deserialize(s);
     EXPECT_FALSE(result.is_error());
     auto value = *result;
     EXPECT_EQ(value.type(), JSONType::Object);
     EXPECT_EQ(value.size(), 1);
     EXPECT_EQ(value["foo"].type(), JSONType::Integer);
     EXPECT_EQ(value["foo"].to_int<int>(), 42);
+}
+
+TEST(JSONTest, DecodeIntoVariant)
+{
+    JSONValue value = JSONValue(42);
+    std::variant<float,int,bool> variant;
+    auto err_maybe = decode_value(value, variant);
+    EXPECT_FALSE(err_maybe.is_error());
+    EXPECT_EQ(std::get<int>(variant), 42);
 }
