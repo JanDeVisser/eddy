@@ -394,37 +394,39 @@ inline JSONValue to_json(std::map<std::string, Value> const& value)
 }
 
 template <typename T>
-inline void set(JSONValue& obj, std::string const& key, T value)
+inline JSONValue to_json(std::optional<T> const& value)
 {
-    assert(obj.is_object());
-    obj.set(key, to_json<T>(value));
-}
-
-template <typename T>
-inline void set(JSONValue& obj, std::string const& key, std::optional<T> value)
-{
-    assert(obj.is_object());
     if (value)
-        obj.set(key, to_json<T>(*value));
+        return to_json(*value);
+    return {};
 }
 
 template <int N,typename ...Ts>
-inline void set(JSONValue& obj, std::string const& key, std::variant<Ts...> value)
+inline JSONValue to_json(std::variant<Ts...> const& value)
 {
-    assert(obj.is_object());
     if (N == value.index()) {
-        set(obj, key, to_json(std::get<N, Ts...>(value)));
-        return;
+        return to_json(std::get<N, Ts...>(value));
     }
     if constexpr (N < (sizeof...(Ts)-1)) {
-        set<N + 1, Ts...>(obj, key, value);
+        return to_json<N + 1, Ts...>(value);
     }
 }
 
-template <typename ...Ts>
-inline void set(JSONValue& obj, std::string const& key, std::variant<Ts...> value)
+template <typename T>
+inline void set(JSONValue& obj, std::string const& key, T const& value)
 {
-    set<0,Ts...>(obj, key, value);
+    assert(obj.is_object());
+    obj.set(key, to_json(value));
+}
+
+template <typename T>
+inline void set(JSONValue& obj, std::string const& key, std::optional<T> const& value)
+{
+    assert(obj.is_object());
+    if (value.has_value()) {
+        auto const& v = value.value();
+        set(obj, key, v);
+    }
 }
 
 template <typename T>
