@@ -145,7 +145,8 @@ add_library(
 
 add_executable(
         scratch
-        App/main.cpp LSP/LSP.cpp LSP/LSP.h)
+        App/main.cpp
+)
 
 target_link_libraries(
         scratch
