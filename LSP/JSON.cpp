@@ -4,10 +4,13 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include "JSON.h"
-#include "lexer/Lexer.h"
+#include <lexer/Lexer.h>
+
+#include <LSP/JSON.h>
 
 namespace scratch::lsp {
+
+using namespace std::literals;
 
 [[nodiscard]] std::string JSONValue::to_string() const
 {
@@ -61,8 +64,13 @@ namespace scratch::lsp {
     case JSONType::Double:
     case JSONType::Boolean:
         return to_string();
-    case JSONType::String:
-        return "\"" + to_string() + "\"";
+    case JSONType::String: {
+        auto s = to_string();
+        replace_all(s, "\r"sv, "\\r"sv);
+        replace_all(s, "\n"sv, "\\n"sv);
+        replace_all(s, "\t"sv, "\\t"sv);
+        return "\"" + s + "\"";
+    }
     case JSONType::Array: {
         auto const& array = std::get<Array>(m_value);
         if (array.empty())
@@ -146,9 +154,14 @@ ErrorOr<JSONValue,JSONValue::ParseError> JSONValue::deserialize(std::string cons
             break;
         case TokenCode::UnclosedDoubleQuotedString:
             return ParseError::Error;
-        case TokenCode::DoubleQuotedString:
-            current = JSONValue(token.string_value());
+        case TokenCode::DoubleQuotedString: {
+            auto s = token.string_value();
+            replace_all(s, "\\r"sv, "\r"sv);
+            replace_all(s, "\\n"sv, "\n"sv);
+            replace_all(s, "\\t"sv, "\t"sv);
+            current = JSONValue(s);
             break;
+        }
         case TokenCode::Integer:
         case TokenCode::HexNumber:
             current = JSONValue(token.to_long().value());
