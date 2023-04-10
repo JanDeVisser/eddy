@@ -19,7 +19,24 @@ LSP& LSP::the()
     if (!s_lsp.m_process.running()) {
         if (auto err = s_lsp.m_process.background(); err.is_error())
             fatal("Could not start LSP client: {}", err.error().to_string());
-        s_lsp.process().err().expect();
+        std::thread thread { []() {
+            while (s_lsp.running()) {
+                auto msg_maybe = s_lsp.receive();
+                if (msg_maybe.is_error()) {
+                    std::cout << msg_maybe.error().to_string();
+                    continue;
+                }
+                auto const& msg = msg_maybe.value();
+                if (msg.has("id")) {
+                    auto id = *(msg["id"].to_int<int>());
+                    auto promise = s_lsp.promise_for(id);
+                    if (promise != nullptr) {
+                        promise->set_value(msg);
+                    }
+                }
+            }
+        } };
+        thread.detach();
     }
     return s_lsp;
 }
@@ -52,7 +69,7 @@ ErrorOr<void, SystemError> LSP::send(JSONValue const& value)
 Content-Type: application/vscode-jsonrpc; charset=utf-8
 
 {}
-)", json.length(), json);
+)", json.length() + 1, json);
     TRY_RETURN(m_process.write(message));
     return {};
 }
@@ -94,6 +111,5 @@ ErrorOr<JSONValue, SystemError> LSP::receive()
         return SystemError { ErrorCode::SyntaxError, "Unparseable message" };
     return *value_maybe;
 }
-
 
 }

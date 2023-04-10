@@ -3,13 +3,15 @@
  *
  * SPDX-License-Identifier: MIT
  */
+
 #pragma once
+
+#include <future>
 
 #include <core/Error.h>
 #include <core/Logging.h>
 
 #include <LSP/JSON.h>
-#include <LSP/LSP.h>
 
 namespace scratch::lsp {
 
@@ -29,97 +31,6 @@ using LSPObject = JSONValue;
 using LSPArray = JSONValue;
 
 extern int s_next_request_id;
-
-enum class ErrorCode {
-    ParseError = -32700,
-    InvalidRequest = -32600,
-    MethodNotFound = -32601,
-    InvalidParams = -32602,
-    InternalError = -32603,
-
-    /**
-     * This is the start range of JSON-RPC reserved error codes.
-     * It doesn't denote a real error code. No LSP error codes should
-     * be defined between the start and end range. For backwards
-     * compatibility the `ServerNotInitialized` and the `UnknownErrorCode`
-     * are left in the range.
-     *
-     * @since 3.16.0
-     */
-    jsonrpcReservedErrorRangeStart = -32099,
-    /** @deprecated use jsonrpcReservedErrorRangeStart */
-    serverErrorStart = jsonrpcReservedErrorRangeStart,
-
-    /**
-     * Error code indicating that a server received a notification or
-     * request before the server has received the `initialize` request.
-     */
-    ServerNotInitialized = -32002,
-    UnknownErrorCode = -32001,
-
-    /**
-     * This is the end range of JSON-RPC reserved error codes.
-     * It doesn't denote a real error code.
-     *
-     * @since 3.16.0
-     */
-    jsonrpcReservedErrorRangeEnd = -32000,
-    /** @deprecated use jsonrpcReservedErrorRangeEnd */
-    serverErrorEnd = jsonrpcReservedErrorRangeEnd,
-
-    /**
-     * This is the start range of LSP reserved error codes.
-     * It doesn't denote a real error code.
-     *
-     * @since 3.16.0
-     */
-    lspReservedErrorRangeStart = -32899,
-
-    /**
-     * A request failed but it was syntactically correct, e.g the
-     * method name was known and the parameters were valid. The error
-     * message should contain human readable information about why
-     * the request failed.
-     *
-     * @since 3.17.0
-     */
-    RequestFailed = -32803,
-
-    /**
-     * The server cancelled the request. This error code should
-     * only be used for requests that explicitly support being
-     * server cancellable.
-     *
-     * @since 3.17.0
-     */
-    ServerCancelled = -32802,
-
-    /**
-     * The server detected that the content of a document got
-     * modified outside normal conditions. A server should
-     * NOT send this error code if it detects a content change
-     * in it unprocessed messages. The result even computed
-     * on an older state might still be useful for the client.
-     *
-     * If a client decides that a result is not of any use anymore
-     * the client should cancel the request.
-     */
-    ContentModified = -32801,
-
-    /**
-     * The client has canceled a request and a server as detected
-     * the cancel.
-     */
-    RequestCancelled = -32800,
-
-    /**
-     * This is the end range of LSP reserved error codes.
-     * It doesn't denote a real error code.
-     *
-     * @since 3.16.0
-     */
-    lspReservedErrorRangeEnd = -32800,
-};
 
 class DecodeError {
 public:
@@ -161,6 +72,14 @@ using null=Void;
 template<>
 inline JSONValue to_json(Void const&)
 {
+    return {};
+}
+
+template<>
+inline ErrorOr<void, JSONDecodeError> decode_value(JSONValue const& value, Void& target)
+{
+    if (!value.is_null())
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "Void" };
     return {};
 }
 
@@ -230,7 +149,7 @@ private:
 };
 
 template<>
-ErrorOr<void, JSONDecodeError> decode_value(JSONValue const& value, ResponseError& target)
+inline ErrorOr<void, JSONDecodeError> decode_value(JSONValue const& value, ResponseError& target)
 {
     if (!value.is_object())
         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "ResponseError" };
@@ -311,44 +230,6 @@ inline ErrorOr<Response<typename RequestClass::ResultClass>, JSONDecodeError> de
     fatal("Specialize decode_response<{}>()", typeid(RequestClass).name());
 }
 
-template <class RequestClass>
-ErrorOr<Response<typename RequestClass::ResultClass>, JSONDecodeError> send_request(LSP& endpoint, typename RequestClass::ParameterClass params)
-{
-    RequestClass req { std::move(params) };
-    auto err_maybe = endpoint.send(to_json<RequestClass>(req));
-    if (err_maybe.is_error())
-        return JSONDecodeError { JSONDecodeError::Code::ProtocolError, err_maybe.error().to_string() };
-    auto response_maybe = endpoint.receive();
-    if (response_maybe.is_error())
-        return JSONDecodeError { JSONDecodeError::Code::ProtocolError, response_maybe.error().to_string() };
-    auto response = response_maybe.value();
-
-    auto result = TRY(decode_response<RequestClass>(response));
-    if (result.id() != req.id()) {
-        return JSONDecodeError { JSONDecodeError::Code::UnexpectedValue, "id" };
-    }
-    return result;
-}
-
-template <class RequestClass>
-ErrorOr<Response<typename RequestClass::ResultClass>, JSONDecodeError> send_request(LSP& endpoint)
-{
-    RequestClass req;
-    auto err_maybe = endpoint.send(to_json<RequestClass>(req));
-    if (err_maybe.is_error())
-        return JSONDecodeError { JSONDecodeError::Code::ProtocolError, err_maybe.error().to_string() };
-    auto response_maybe = endpoint.receive();
-    if (response_maybe.is_error())
-        return JSONDecodeError { JSONDecodeError::Code::ProtocolError, response_maybe.error().to_string() };
-    auto response = response_maybe.value();
-
-    auto result = TRY(decode_response<RequestClass>(response));
-    if (result.id() != req.id()) {
-        return JSONDecodeError { JSONDecodeError::Code::UnexpectedValue, "id" };
-    }
-    return result;
-}
-
 template <class Parameter=std::string>
 class Notification : public Message<Parameter> {
 public:
@@ -365,26 +246,6 @@ inline JSONValue to_json(Notification<Parameter> const& obj)
     auto msg = to_json<Message<Parameter>>(obj);
     msg.set("method", method_name<Notification<Parameter>>());
     return msg;
-}
-
-template <class NotificationClass>
-ErrorOr<void, JSONDecodeError> send_notification(LSP& endpoint, typename NotificationClass::ParameterClass params)
-{
-    NotificationClass notification { std::move(params) };
-    auto ret_maybe = endpoint.send(to_json<NotificationClass>(notification));
-    if (ret_maybe.is_error())
-        return JSONDecodeError { JSONDecodeError::Code::ProtocolError, ret_maybe.error().to_string() };
-    return {};
-}
-
-template <class NotificationClass>
-ErrorOr<void, JSONDecodeError> send_notification(LSP& endpoint)
-{
-    NotificationClass notification;
-    auto ret_maybe = endpoint.send(to_json<NotificationClass>(notification));
-    if (ret_maybe.is_error())
-        return JSONDecodeError { JSONDecodeError::Code::ProtocolError, ret_maybe.error().to_string() };
-    return {};
 }
 
 }

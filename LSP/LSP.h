@@ -6,10 +6,13 @@
 
 #pragma once
 
+#include <future>
+
 #include <core/Error.h>
 #include <core/Process.h>
 
 #include <LSP/JSON.h>
+#include <LSP/Message.h>
 
 namespace scratch::lsp {
 
@@ -26,10 +29,97 @@ public:
     ErrorOr<void, SystemError> send(JSONValue const& value);
     ErrorOr<JSONValue, SystemError> receive();
 
+    template <class RequestClass>
+    ErrorOr<Response<typename RequestClass::ResultClass>, JSONDecodeError> send_request(typename RequestClass::ParameterClass params)
+    {
+        RequestClass req { std::move(params) };
+        return send_request(req);
+    }
+
+    template <class RequestClass>
+    ErrorOr<Response<typename RequestClass::ResultClass>, JSONDecodeError> send_request()
+    {
+        RequestClass req;
+        return send_request(req);
+    }
+
+    template <class NotificationClass>
+    ErrorOr<void, JSONDecodeError> send_notification(typename NotificationClass::ParameterClass params)
+    {
+        NotificationClass notification { std::move(params) };
+        return send_notification(notification);
+    }
+
+    template <class NotificationClass>
+    ErrorOr<void, JSONDecodeError> send_notification()
+    {
+        NotificationClass notification;
+        return send_notification(notification);
+    }
+
+    std::promise<JSONValue>* promise_for(int id)
+    {
+        std::unique_lock const lock(m_promises_guard);
+        if (m_promises.contains(id)) {
+            return m_promises.at(id);
+        }
+        return nullptr;
+    }
+
+    void register_promise(int id, std::promise<JSONValue>* promise)
+    {
+        std::unique_lock const lock(m_promises_guard);
+        m_promises[id] = promise;
+    }
+
+    void drop_promise(int id)
+    {
+        std::unique_lock const lock(m_promises_guard);
+        if (m_promises.contains(id)) {
+            m_promises.erase(id);
+        }
+    }
+
 private:
     LSP();
     static LSP s_lsp;
     Process m_process;
+    std::mutex m_promises_guard;
+    std::map<int,std::promise<JSONValue>*> m_promises;
+    std::mutex m_outbox_guard;
+    std::deque<JSONValue> m_outbox;
+    std::condition_variable m_outbox_condition;
+
+    template <class RequestClass>
+    ErrorOr<Response<typename RequestClass::ResultClass>, JSONDecodeError> send_request(RequestClass const& request)
+    {
+        std::promise<JSONValue> promise;
+        auto future { promise.get_future() };
+
+        register_promise(request.id(), &promise);
+        auto err_maybe = send(to_json<RequestClass>(request));
+        if (err_maybe.is_error())
+            return JSONDecodeError { JSONDecodeError::Code::ProtocolError, err_maybe.error().to_string() };
+        future.wait();
+        drop_promise(request.id());
+        auto response = future.get();
+
+        auto result = TRY(decode_response<RequestClass>(response));
+        if (result.id() != request.id()) {
+            return JSONDecodeError { JSONDecodeError::Code::UnexpectedValue, "id" };
+        }
+        return result;
+    }
+
+    template <class NotificationClass>
+    ErrorOr<void, JSONDecodeError> send_notification(NotificationClass const& notification)
+    {
+        auto ret_maybe = send(to_json<NotificationClass>(notification));
+        if (ret_maybe.is_error())
+            return JSONDecodeError { JSONDecodeError::Code::ProtocolError, ret_maybe.error().to_string() };
+        return {};
+    }
+
 };
 
 }
