@@ -85,3 +85,49 @@ TEST(JSONTest, DecodeIntoVariant)
     EXPECT_FALSE(err_maybe.is_error());
     EXPECT_EQ(std::get<int>(variant), 42);
 }
+
+TEST(JSONTest, EncodeOptional)
+{
+    std::optional<int> optional { 42 };
+    JSONValue obj = JSONValue::object();
+    set(obj, "optional", optional);
+    ASSERT_TRUE(obj.has("optional"));
+    auto value = *(obj.get("optional"));
+    ASSERT_EQ(value.type(), JSONType::Integer);
+    EXPECT_EQ(*value.to_int<int>(), 42);
+}
+
+TEST(JSONTest, EncodeVariant)
+{
+    std::variant<int, bool> variant { 42 };
+    JSONValue obj = JSONValue::object();
+    set(obj, "variant", variant);
+    ASSERT_TRUE(obj.has("variant"));
+    auto value = *(obj.get("variant"));
+    ASSERT_EQ(value.type(), JSONType::Integer);
+    EXPECT_EQ(*value.to_int<int>(), 42);
+}
+
+TEST(JSONTest, EncodeOptionalVector)
+{
+    std::optional<std::vector<int>> optional { { 42 } };
+    JSONValue obj = JSONValue::object();
+    set(obj, "optional", optional);
+    ASSERT_TRUE(obj.has("optional"));
+    auto value = *(obj.get("optional"));
+    ASSERT_EQ(value.type(), JSONType::Array);
+    auto elem = *(value.get(0));
+    EXPECT_EQ(*elem.to_int<int>(), 42);
+}
+
+TEST(JSONTest, EncodeOptionalVariantVectorInt)
+{
+    std::optional<std::variant<std::vector<int>, int>> optional { std::vector<int> { 42 } };
+    JSONValue obj = JSONValue::object();
+    set(obj, "optional", optional);
+    ASSERT_TRUE(obj.has("optional"));
+    auto value = *(obj.get("optional"));
+    ASSERT_EQ(value.type(), JSONType::Array);
+    auto elem = *(value.get(0));
+    EXPECT_EQ(*elem.to_int<int>(), 42);
+}
