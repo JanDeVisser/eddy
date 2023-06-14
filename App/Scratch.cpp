@@ -209,25 +209,9 @@ void Scratch::run_app(int argc, char const** argv)
         applet->box(SDL_Rect { 0, 0, 0, 0 }, Scratch::scratch().color(box_color));
         applet->render_fixed_centered(2, "fps", SDL_Color { 0xff, 0xff, 0xff, 0xff });
     });
-    app.add_status_bar_applet(7, [](WindowedWidget* applet) -> void {
-        PaletteIndex box_color;
-        auto *doc = Scratch::scratch().editor()->document();
-        if (doc == nullptr)
-            return;
-        auto t = doc->last_parse_time();
-        if (t < 10) {
-            box_color = PaletteIndex::ANSIGreen;
-        } else if (t < 20) {
-            box_color = PaletteIndex::ANSIYellow;
-        } else {
-            box_color = PaletteIndex::ANSIBrightRed;
-        }
-        applet->box(SDL_Rect { 0, 0, 0, 0 }, Scratch::scratch().color(box_color));
-        applet->render_fixed_centered(2, "parse", SDL_Color { 0xff, 0xff, 0xff, 0xff });
-    });
     main_area->add_component(app.m_gutter = new Gutter());
     main_area->add_component(app.m_editor = new Editor());
-    app.m_editor->add_buffer<Console>();
+//    app.m_editor->add_buffer<Console>();
     app.m_editor->add_buffer<Document>();
     if (!app.m_config.filename.empty())
         app.m_editor->open_file(app.m_config.filename);

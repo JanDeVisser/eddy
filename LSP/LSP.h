@@ -7,12 +7,14 @@
 #pragma once
 
 #include <future>
+#include <set>
 
 #include <core/Error.h>
 #include <core/Process.h>
 
 #include <LSP/JSON.h>
 #include <LSP/Message.h>
+#include <LSP/LSPMessages.h>
 
 namespace scratch::lsp {
 
@@ -28,6 +30,26 @@ public:
     ErrorOr<void, SystemError> shutdown();
     ErrorOr<void, SystemError> send(JSONValue const& value);
     ErrorOr<JSONValue, SystemError> receive();
+    [[nodiscard]] ServerCapabilities const& server_capabilities() { return m_serverCapabilities; }
+    [[nodiscard]] std::string const& server_name() { return m_serverName; }
+    [[nodiscard]] std::string const& server_version() { return m_serverVersion; }
+
+    [[nodiscard]] std::set<SemanticTokenModifiers> token_type_modifiers(int modifiers)
+    {
+        std::set<SemanticTokenModifiers> ret;
+        for (auto ix = 0u; ix < m_token_type_modifiers.size(); ++ix) {
+            if (modifiers & (1 << ix))
+                ret.insert(m_token_type_modifiers[ix]);
+        }
+        return ret;
+    }
+
+    [[nodiscard]] SemanticTokenTypes token_type(int type)
+    {
+        if ((type >= 0) && (type < m_token_type_legend.size()))
+            return m_token_type_legend[type];
+        return SemanticTokenTypes::Variable;
+    }
 
     template <class RequestClass>
     ErrorOr<Response<typename RequestClass::ResultClass>, JSONDecodeError> send_request(typename RequestClass::ParameterClass params)
@@ -83,12 +105,18 @@ public:
 private:
     LSP();
     static LSP s_lsp;
+    ServerCapabilities m_serverCapabilities;
+    std::string m_serverName;
+    std::string m_serverVersion;
+    std::optional<SemanticTokensLegend> m_semanticTokenLegend {};
+    std::vector<SemanticTokenTypes> m_token_type_legend;
+    std::vector<SemanticTokenModifiers> m_token_type_modifiers;
+
     Process m_process;
     std::mutex m_promises_guard;
     std::map<int,std::promise<JSONValue>*> m_promises;
-    std::mutex m_outbox_guard;
-    std::deque<JSONValue> m_outbox;
-    std::condition_variable m_outbox_condition;
+
+    void initialize();
 
     template <class RequestClass>
     ErrorOr<Response<typename RequestClass::ResultClass>, JSONDecodeError> send_request(RequestClass const& request)

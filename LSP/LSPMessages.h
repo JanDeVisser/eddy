@@ -79,34 +79,43 @@ inline JSONValue to_json(SemanticTokenTypes const& obj)
     return { string_view(obj) };
 }
 
+
+inline std::optional<SemanticTokenTypes> SemanticTokenTypes_from_string(std::string const& s)
+{
+    if (s == "namespace") return SemanticTokenTypes::Namespace;
+    if (s == "type") return SemanticTokenTypes::Type;
+    if (s == "class") return SemanticTokenTypes::Class;
+    if (s == "enum") return SemanticTokenTypes::Enum;
+    if (s == "interface") return SemanticTokenTypes::Interface;
+    if (s == "struct") return SemanticTokenTypes::Struct;
+    if (s == "typeParameter") return SemanticTokenTypes::Typeparameter;
+    if (s == "parameter") return SemanticTokenTypes::Parameter;
+    if (s == "variable") return SemanticTokenTypes::Variable;
+    if (s == "property") return SemanticTokenTypes::Property;
+    if (s == "enumMember") return SemanticTokenTypes::Enummember;
+    if (s == "event") return SemanticTokenTypes::Event;
+    if (s == "function") return SemanticTokenTypes::Function;
+    if (s == "method") return SemanticTokenTypes::Method;
+    if (s == "macro") return SemanticTokenTypes::Macro;
+    if (s == "keyword") return SemanticTokenTypes::Keyword;
+    if (s == "modifier") return SemanticTokenTypes::Modifier;
+    if (s == "comment") return SemanticTokenTypes::Comment;
+    if (s == "string") return SemanticTokenTypes::String;
+    if (s == "number") return SemanticTokenTypes::Number;
+    if (s == "regexp") return SemanticTokenTypes::Regexp;
+    if (s == "operator") return SemanticTokenTypes::Operator;
+    if (s == "decorator") return SemanticTokenTypes::Decorator;
+    return {};
+}
+
 template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, SemanticTokenTypes& target)
 {
     if (!value.is_string())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
-    if (value.to_string() == "namespace") target = SemanticTokenTypes::Namespace;
-    if (value.to_string() == "type") target = SemanticTokenTypes::Type;
-    if (value.to_string() == "class") target = SemanticTokenTypes::Class;
-    if (value.to_string() == "enum") target = SemanticTokenTypes::Enum;
-    if (value.to_string() == "interface") target = SemanticTokenTypes::Interface;
-    if (value.to_string() == "struct") target = SemanticTokenTypes::Struct;
-    if (value.to_string() == "typeParameter") target = SemanticTokenTypes::Typeparameter;
-    if (value.to_string() == "parameter") target = SemanticTokenTypes::Parameter;
-    if (value.to_string() == "variable") target = SemanticTokenTypes::Variable;
-    if (value.to_string() == "property") target = SemanticTokenTypes::Property;
-    if (value.to_string() == "enumMember") target = SemanticTokenTypes::Enummember;
-    if (value.to_string() == "event") target = SemanticTokenTypes::Event;
-    if (value.to_string() == "function") target = SemanticTokenTypes::Function;
-    if (value.to_string() == "method") target = SemanticTokenTypes::Method;
-    if (value.to_string() == "macro") target = SemanticTokenTypes::Macro;
-    if (value.to_string() == "keyword") target = SemanticTokenTypes::Keyword;
-    if (value.to_string() == "modifier") target = SemanticTokenTypes::Modifier;
-    if (value.to_string() == "comment") target = SemanticTokenTypes::Comment;
-    if (value.to_string() == "string") target = SemanticTokenTypes::String;
-    if (value.to_string() == "number") target = SemanticTokenTypes::Number;
-    if (value.to_string() == "regexp") target = SemanticTokenTypes::Regexp;
-    if (value.to_string() == "operator") target = SemanticTokenTypes::Operator;
-    if (value.to_string() == "decorator") target = SemanticTokenTypes::Decorator;
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+    auto s = SemanticTokenTypes_from_string(value.to_string());
+    if (s)
+        target = *s;
     return {};
 }
 
@@ -146,21 +155,30 @@ inline JSONValue to_json(SemanticTokenModifiers const& obj)
     return { string_view(obj) };
 }
 
+
+inline std::optional<SemanticTokenModifiers> SemanticTokenModifiers_from_string(std::string const& s)
+{
+    if (s == "declaration") return SemanticTokenModifiers::Declaration;
+    if (s == "definition") return SemanticTokenModifiers::Definition;
+    if (s == "readonly") return SemanticTokenModifiers::Readonly;
+    if (s == "static") return SemanticTokenModifiers::Static;
+    if (s == "deprecated") return SemanticTokenModifiers::Deprecated;
+    if (s == "abstract") return SemanticTokenModifiers::Abstract;
+    if (s == "async") return SemanticTokenModifiers::Async;
+    if (s == "modification") return SemanticTokenModifiers::Modification;
+    if (s == "documentation") return SemanticTokenModifiers::Documentation;
+    if (s == "defaultLibrary") return SemanticTokenModifiers::Defaultlibrary;
+    return {};
+}
+
 template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, SemanticTokenModifiers& target)
 {
     if (!value.is_string())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
-    if (value.to_string() == "declaration") target = SemanticTokenModifiers::Declaration;
-    if (value.to_string() == "definition") target = SemanticTokenModifiers::Definition;
-    if (value.to_string() == "readonly") target = SemanticTokenModifiers::Readonly;
-    if (value.to_string() == "static") target = SemanticTokenModifiers::Static;
-    if (value.to_string() == "deprecated") target = SemanticTokenModifiers::Deprecated;
-    if (value.to_string() == "abstract") target = SemanticTokenModifiers::Abstract;
-    if (value.to_string() == "async") target = SemanticTokenModifiers::Async;
-    if (value.to_string() == "modification") target = SemanticTokenModifiers::Modification;
-    if (value.to_string() == "documentation") target = SemanticTokenModifiers::Documentation;
-    if (value.to_string() == "defaultLibrary") target = SemanticTokenModifiers::Defaultlibrary;
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+    auto s = SemanticTokenModifiers_from_string(value.to_string());
+    if (s)
+        target = *s;
     return {};
 }
 
@@ -184,13 +202,22 @@ inline JSONValue to_json(DocumentDiagnosticReportKind const& obj)
     return { string_view(obj) };
 }
 
+
+inline std::optional<DocumentDiagnosticReportKind> DocumentDiagnosticReportKind_from_string(std::string const& s)
+{
+    if (s == "full") return DocumentDiagnosticReportKind::Full;
+    if (s == "unchanged") return DocumentDiagnosticReportKind::Unchanged;
+    return {};
+}
+
 template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, DocumentDiagnosticReportKind& target)
 {
     if (!value.is_string())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
-    if (value.to_string() == "full") target = DocumentDiagnosticReportKind::Full;
-    if (value.to_string() == "unchanged") target = DocumentDiagnosticReportKind::Unchanged;
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+    auto s = DocumentDiagnosticReportKind_from_string(value.to_string());
+    if (s)
+        target = *s;
     return {};
 }
 
@@ -214,7 +241,7 @@ template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, ErrorCodes& target)
 {
     if (!value.is_integer())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
     target = static_cast<ErrorCodes>(*(value.to_int<integer>()));
     return {};
 }
@@ -236,7 +263,7 @@ template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, LSPErrorCodes& target)
 {
     if (!value.is_integer())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
     target = static_cast<LSPErrorCodes>(*(value.to_int<integer>()));
     return {};
 }
@@ -263,14 +290,23 @@ inline JSONValue to_json(FoldingRangeKind const& obj)
     return { string_view(obj) };
 }
 
+
+inline std::optional<FoldingRangeKind> FoldingRangeKind_from_string(std::string const& s)
+{
+    if (s == "comment") return FoldingRangeKind::Comment;
+    if (s == "imports") return FoldingRangeKind::Imports;
+    if (s == "region") return FoldingRangeKind::Region;
+    return {};
+}
+
 template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, FoldingRangeKind& target)
 {
     if (!value.is_string())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
-    if (value.to_string() == "comment") target = FoldingRangeKind::Comment;
-    if (value.to_string() == "imports") target = FoldingRangeKind::Imports;
-    if (value.to_string() == "region") target = FoldingRangeKind::Region;
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+    auto s = FoldingRangeKind_from_string(value.to_string());
+    if (s)
+        target = *s;
     return {};
 }
 
@@ -313,7 +349,7 @@ template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, SymbolKind& target)
 {
     if (!value.is_integer())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
     target = static_cast<SymbolKind>(*(value.to_int<uinteger>()));
     return {};
 }
@@ -332,7 +368,7 @@ template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, SymbolTag& target)
 {
     if (!value.is_integer())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
     target = static_cast<SymbolTag>(*(value.to_int<uinteger>()));
     return {};
 }
@@ -363,16 +399,25 @@ inline JSONValue to_json(UniquenessLevel const& obj)
     return { string_view(obj) };
 }
 
+
+inline std::optional<UniquenessLevel> UniquenessLevel_from_string(std::string const& s)
+{
+    if (s == "document") return UniquenessLevel::Document;
+    if (s == "project") return UniquenessLevel::Project;
+    if (s == "group") return UniquenessLevel::Group;
+    if (s == "scheme") return UniquenessLevel::Scheme;
+    if (s == "global") return UniquenessLevel::Global;
+    return {};
+}
+
 template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, UniquenessLevel& target)
 {
     if (!value.is_string())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
-    if (value.to_string() == "document") target = UniquenessLevel::Document;
-    if (value.to_string() == "project") target = UniquenessLevel::Project;
-    if (value.to_string() == "group") target = UniquenessLevel::Group;
-    if (value.to_string() == "scheme") target = UniquenessLevel::Scheme;
-    if (value.to_string() == "global") target = UniquenessLevel::Global;
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+    auto s = UniquenessLevel_from_string(value.to_string());
+    if (s)
+        target = *s;
     return {};
 }
 
@@ -398,14 +443,23 @@ inline JSONValue to_json(MonikerKind const& obj)
     return { string_view(obj) };
 }
 
+
+inline std::optional<MonikerKind> MonikerKind_from_string(std::string const& s)
+{
+    if (s == "import") return MonikerKind::Import;
+    if (s == "export") return MonikerKind::Export;
+    if (s == "local") return MonikerKind::Local;
+    return {};
+}
+
 template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, MonikerKind& target)
 {
     if (!value.is_string())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
-    if (value.to_string() == "import") target = MonikerKind::Import;
-    if (value.to_string() == "export") target = MonikerKind::Export;
-    if (value.to_string() == "local") target = MonikerKind::Local;
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+    auto s = MonikerKind_from_string(value.to_string());
+    if (s)
+        target = *s;
     return {};
 }
 
@@ -424,7 +478,7 @@ template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, InlayHintKind& target)
 {
     if (!value.is_integer())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
     target = static_cast<InlayHintKind>(*(value.to_int<uinteger>()));
     return {};
 }
@@ -446,7 +500,7 @@ template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, MessageType& target)
 {
     if (!value.is_integer())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
     target = static_cast<MessageType>(*(value.to_int<uinteger>()));
     return {};
 }
@@ -467,7 +521,7 @@ template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, TextDocumentSyncKind& target)
 {
     if (!value.is_integer())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
     target = static_cast<TextDocumentSyncKind>(*(value.to_int<uinteger>()));
     return {};
 }
@@ -488,7 +542,7 @@ template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, TextDocumentSaveReason& target)
 {
     if (!value.is_integer())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
     target = static_cast<TextDocumentSaveReason>(*(value.to_int<uinteger>()));
     return {};
 }
@@ -531,7 +585,7 @@ template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, CompletionItemKind& target)
 {
     if (!value.is_integer())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
     target = static_cast<CompletionItemKind>(*(value.to_int<uinteger>()));
     return {};
 }
@@ -550,7 +604,7 @@ template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, CompletionItemTag& target)
 {
     if (!value.is_integer())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
     target = static_cast<CompletionItemTag>(*(value.to_int<uinteger>()));
     return {};
 }
@@ -570,7 +624,7 @@ template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, InsertTextFormat& target)
 {
     if (!value.is_integer())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
     target = static_cast<InsertTextFormat>(*(value.to_int<uinteger>()));
     return {};
 }
@@ -590,7 +644,7 @@ template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, InsertTextMode& target)
 {
     if (!value.is_integer())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
     target = static_cast<InsertTextMode>(*(value.to_int<uinteger>()));
     return {};
 }
@@ -611,7 +665,7 @@ template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, DocumentHighlightKind& target)
 {
     if (!value.is_integer())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
     target = static_cast<DocumentHighlightKind>(*(value.to_int<uinteger>()));
     return {};
 }
@@ -650,20 +704,29 @@ inline JSONValue to_json(CodeActionKind const& obj)
     return { string_view(obj) };
 }
 
+
+inline std::optional<CodeActionKind> CodeActionKind_from_string(std::string const& s)
+{
+    if (s == "") return CodeActionKind::Empty;
+    if (s == "quickfix") return CodeActionKind::Quickfix;
+    if (s == "refactor") return CodeActionKind::Refactor;
+    if (s == "refactor.extract") return CodeActionKind::Refactorextract;
+    if (s == "refactor.inline") return CodeActionKind::Refactorinline;
+    if (s == "refactor.rewrite") return CodeActionKind::Refactorrewrite;
+    if (s == "source") return CodeActionKind::Source;
+    if (s == "source.organizeImports") return CodeActionKind::Sourceorganizeimports;
+    if (s == "source.fixAll") return CodeActionKind::Sourcefixall;
+    return {};
+}
+
 template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, CodeActionKind& target)
 {
     if (!value.is_string())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
-    if (value.to_string() == "") target = CodeActionKind::Empty;
-    if (value.to_string() == "quickfix") target = CodeActionKind::Quickfix;
-    if (value.to_string() == "refactor") target = CodeActionKind::Refactor;
-    if (value.to_string() == "refactor.extract") target = CodeActionKind::Refactorextract;
-    if (value.to_string() == "refactor.inline") target = CodeActionKind::Refactorinline;
-    if (value.to_string() == "refactor.rewrite") target = CodeActionKind::Refactorrewrite;
-    if (value.to_string() == "source") target = CodeActionKind::Source;
-    if (value.to_string() == "source.organizeImports") target = CodeActionKind::Sourceorganizeimports;
-    if (value.to_string() == "source.fixAll") target = CodeActionKind::Sourcefixall;
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+    auto s = CodeActionKind_from_string(value.to_string());
+    if (s)
+        target = *s;
     return {};
 }
 
@@ -689,14 +752,23 @@ inline JSONValue to_json(TraceValues const& obj)
     return { string_view(obj) };
 }
 
+
+inline std::optional<TraceValues> TraceValues_from_string(std::string const& s)
+{
+    if (s == "off") return TraceValues::Off;
+    if (s == "messages") return TraceValues::Messages;
+    if (s == "verbose") return TraceValues::Verbose;
+    return {};
+}
+
 template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, TraceValues& target)
 {
     if (!value.is_string())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
-    if (value.to_string() == "off") target = TraceValues::Off;
-    if (value.to_string() == "messages") target = TraceValues::Messages;
-    if (value.to_string() == "verbose") target = TraceValues::Verbose;
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+    auto s = TraceValues_from_string(value.to_string());
+    if (s)
+        target = *s;
     return {};
 }
 
@@ -720,13 +792,22 @@ inline JSONValue to_json(MarkupKind const& obj)
     return { string_view(obj) };
 }
 
+
+inline std::optional<MarkupKind> MarkupKind_from_string(std::string const& s)
+{
+    if (s == "plaintext") return MarkupKind::Plaintext;
+    if (s == "markdown") return MarkupKind::Markdown;
+    return {};
+}
+
 template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, MarkupKind& target)
 {
     if (!value.is_string())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
-    if (value.to_string() == "plaintext") target = MarkupKind::Plaintext;
-    if (value.to_string() == "markdown") target = MarkupKind::Markdown;
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+    auto s = MarkupKind_from_string(value.to_string());
+    if (s)
+        target = *s;
     return {};
 }
 
@@ -752,14 +833,23 @@ inline JSONValue to_json(PositionEncodingKind const& obj)
     return { string_view(obj) };
 }
 
+
+inline std::optional<PositionEncodingKind> PositionEncodingKind_from_string(std::string const& s)
+{
+    if (s == "utf-8") return PositionEncodingKind::Utf8;
+    if (s == "utf-16") return PositionEncodingKind::Utf16;
+    if (s == "utf-32") return PositionEncodingKind::Utf32;
+    return {};
+}
+
 template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, PositionEncodingKind& target)
 {
     if (!value.is_string())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
-    if (value.to_string() == "utf-8") target = PositionEncodingKind::Utf8;
-    if (value.to_string() == "utf-16") target = PositionEncodingKind::Utf16;
-    if (value.to_string() == "utf-32") target = PositionEncodingKind::Utf32;
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+    auto s = PositionEncodingKind_from_string(value.to_string());
+    if (s)
+        target = *s;
     return {};
 }
 
@@ -779,7 +869,7 @@ template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, FileChangeType& target)
 {
     if (!value.is_integer())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
     target = static_cast<FileChangeType>(*(value.to_int<uinteger>()));
     return {};
 }
@@ -800,7 +890,7 @@ template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, WatchKind& target)
 {
     if (!value.is_integer())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
     target = static_cast<WatchKind>(*(value.to_int<uinteger>()));
     return {};
 }
@@ -822,7 +912,7 @@ template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, DiagnosticSeverity& target)
 {
     if (!value.is_integer())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
     target = static_cast<DiagnosticSeverity>(*(value.to_int<uinteger>()));
     return {};
 }
@@ -842,7 +932,7 @@ template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, DiagnosticTag& target)
 {
     if (!value.is_integer())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
     target = static_cast<DiagnosticTag>(*(value.to_int<uinteger>()));
     return {};
 }
@@ -863,7 +953,7 @@ template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, CompletionTriggerKind& target)
 {
     if (!value.is_integer())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
     target = static_cast<CompletionTriggerKind>(*(value.to_int<uinteger>()));
     return {};
 }
@@ -884,7 +974,7 @@ template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, SignatureHelpTriggerKind& target)
 {
     if (!value.is_integer())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
     target = static_cast<SignatureHelpTriggerKind>(*(value.to_int<uinteger>()));
     return {};
 }
@@ -904,7 +994,7 @@ template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, CodeActionTriggerKind& target)
 {
     if (!value.is_integer())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
     target = static_cast<CodeActionTriggerKind>(*(value.to_int<uinteger>()));
     return {};
 }
@@ -929,13 +1019,22 @@ inline JSONValue to_json(FileOperationPatternKind const& obj)
     return { string_view(obj) };
 }
 
+
+inline std::optional<FileOperationPatternKind> FileOperationPatternKind_from_string(std::string const& s)
+{
+    if (s == "file") return FileOperationPatternKind::File;
+    if (s == "folder") return FileOperationPatternKind::Folder;
+    return {};
+}
+
 template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, FileOperationPatternKind& target)
 {
     if (!value.is_string())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
-    if (value.to_string() == "file") target = FileOperationPatternKind::File;
-    if (value.to_string() == "folder") target = FileOperationPatternKind::Folder;
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+    auto s = FileOperationPatternKind_from_string(value.to_string());
+    if (s)
+        target = *s;
     return {};
 }
 
@@ -954,7 +1053,7 @@ template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, NotebookCellKind& target)
 {
     if (!value.is_integer())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
     target = static_cast<NotebookCellKind>(*(value.to_int<uinteger>()));
     return {};
 }
@@ -981,14 +1080,23 @@ inline JSONValue to_json(ResourceOperationKind const& obj)
     return { string_view(obj) };
 }
 
+
+inline std::optional<ResourceOperationKind> ResourceOperationKind_from_string(std::string const& s)
+{
+    if (s == "create") return ResourceOperationKind::Create;
+    if (s == "rename") return ResourceOperationKind::Rename;
+    if (s == "delete") return ResourceOperationKind::Delete;
+    return {};
+}
+
 template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, ResourceOperationKind& target)
 {
     if (!value.is_string())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
-    if (value.to_string() == "create") target = ResourceOperationKind::Create;
-    if (value.to_string() == "rename") target = ResourceOperationKind::Rename;
-    if (value.to_string() == "delete") target = ResourceOperationKind::Delete;
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+    auto s = ResourceOperationKind_from_string(value.to_string());
+    if (s)
+        target = *s;
     return {};
 }
 
@@ -1016,15 +1124,24 @@ inline JSONValue to_json(FailureHandlingKind const& obj)
     return { string_view(obj) };
 }
 
+
+inline std::optional<FailureHandlingKind> FailureHandlingKind_from_string(std::string const& s)
+{
+    if (s == "abort") return FailureHandlingKind::Abort;
+    if (s == "transactional") return FailureHandlingKind::Transactional;
+    if (s == "textOnlyTransactional") return FailureHandlingKind::Textonlytransactional;
+    if (s == "undo") return FailureHandlingKind::Undo;
+    return {};
+}
+
 template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, FailureHandlingKind& target)
 {
     if (!value.is_string())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
-    if (value.to_string() == "abort") target = FailureHandlingKind::Abort;
-    if (value.to_string() == "transactional") target = FailureHandlingKind::Transactional;
-    if (value.to_string() == "textOnlyTransactional") target = FailureHandlingKind::Textonlytransactional;
-    if (value.to_string() == "undo") target = FailureHandlingKind::Undo;
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+    auto s = FailureHandlingKind_from_string(value.to_string());
+    if (s)
+        target = *s;
     return {};
 }
 
@@ -1042,7 +1159,7 @@ template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, PrepareSupportDefaultBehavior& target)
 {
     if (!value.is_integer())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
     target = static_cast<PrepareSupportDefaultBehavior>(*(value.to_int<uinteger>()));
     return {};
 }
@@ -1065,12 +1182,21 @@ inline JSONValue to_json(TokenFormat const& obj)
     return { string_view(obj) };
 }
 
+
+inline std::optional<TokenFormat> TokenFormat_from_string(std::string const& s)
+{
+    if (s == "relative") return TokenFormat::Relative;
+    return {};
+}
+
 template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, TokenFormat& target)
 {
     if (!value.is_string())
-         return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
-    if (value.to_string() == "relative") target = TokenFormat::Relative;
+        return JSONDecodeError { JSONDecodeError::Code::TypeMismatch, "" };
+    auto s = TokenFormat_from_string(value.to_string());
+    if (s)
+        target = *s;
     return {};
 }
 
@@ -1102,8 +1228,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Positi
 }
 
 struct Range {
-    Position start ;
-    Position end ;
+    Position start;
+    Position end;
 };
 
 template<>
@@ -1127,8 +1253,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Range&
 }
 
 struct Location {
-    DocumentUri uri ;
-    Range range ;
+    DocumentUri uri;
+    Range range;
 };
 
 template<>
@@ -1153,10 +1279,10 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Locati
 
 using Definition = std::variant<Location, std::vector<Location>>;
 struct LocationLink {
-    std::optional<Range> originSelectionRange  {};
-    DocumentUri targetUri ;
-    Range targetRange ;
-    Range targetSelectionRange ;
+    std::optional<Range> originSelectionRange {};
+    DocumentUri targetUri;
+    Range targetRange;
+    Range targetSelectionRange;
 };
 
 template<>
@@ -1187,8 +1313,8 @@ using DefinitionLink = LocationLink;
 using Declaration = std::variant<Location, std::vector<Location>>;
 using DeclarationLink = LocationLink;
 struct InlineValueText {
-    Range range ;
-    string text ;
+    Range range;
+    string text;
 };
 
 template<>
@@ -1212,8 +1338,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Inline
 }
 
 struct InlineValueVariableLookup {
-    Range range ;
-    std::optional<string> variableName  {};
+    Range range;
+    std::optional<string> variableName {};
     boolean caseSensitiveLookup { false };
 };
 
@@ -1240,8 +1366,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Inline
 }
 
 struct InlineValueEvaluatableExpression {
-    Range range ;
-    std::optional<string> expression  {};
+    Range range;
+    std::optional<string> expression {};
 };
 
 template<>
@@ -1266,7 +1392,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Inline
 
 using InlineValue = std::variant<InlineValueText, InlineValueVariableLookup, InlineValueEvaluatableExpression>;
 struct CodeDescription {
-    URI href ;
+    URI href;
 };
 
 template<>
@@ -1288,8 +1414,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, CodeDe
 }
 
 struct DiagnosticRelatedInformation {
-    Location location ;
-    string message ;
+    Location location;
+    string message;
 };
 
 template<>
@@ -1313,15 +1439,15 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Diagno
 }
 
 struct Diagnostic {
-    Range range ;
-    std::optional<DiagnosticSeverity> severity  {};
-    std::optional<std::variant<integer, string>> code  {};
-    std::optional<CodeDescription> codeDescription  {};
-    std::optional<string> source  {};
-    string message ;
-    std::optional<std::vector<DiagnosticTag>> tags  {};
-    std::optional<std::vector<DiagnosticRelatedInformation>> relatedInformation  {};
-    std::optional<LSPAny> data  {};
+    Range range;
+    std::optional<DiagnosticSeverity> severity {};
+    std::optional<std::variant<integer, string>> code {};
+    std::optional<CodeDescription> codeDescription {};
+    std::optional<string> source {};
+    string message;
+    std::optional<std::vector<DiagnosticTag>> tags {};
+    std::optional<std::vector<DiagnosticRelatedInformation>> relatedInformation {};
+    std::optional<LSPAny> data {};
 };
 
 template<>
@@ -1359,9 +1485,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Diagno
 }
 
 struct FullDocumentDiagnosticReport {
-    std::string kind  { "full" };
-    std::optional<string> resultId  {};
-    std::vector<Diagnostic> items  {};
+    std::string kind { "full" };
+    std::optional<string> resultId {};
+    std::vector<Diagnostic> items {};
 };
 
 template<>
@@ -1387,8 +1513,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, FullDo
 }
 
 struct UnchangedDocumentDiagnosticReport {
-    std::string kind  { "unchanged" };
-    string resultId ;
+    std::string kind { "unchanged" };
+    string resultId;
 };
 
 template<>
@@ -1412,7 +1538,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Unchan
 }
 
 struct RelatedFullDocumentDiagnosticReport : public FullDocumentDiagnosticReport {
-    std::optional<std::map<DocumentUri, std::variant<FullDocumentDiagnosticReport, UnchangedDocumentDiagnosticReport>>> relatedDocuments  {};
+    std::optional<std::map<DocumentUri, std::variant<FullDocumentDiagnosticReport, UnchangedDocumentDiagnosticReport>>> relatedDocuments {};
 };
 
 template<>
@@ -1438,7 +1564,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Relate
 }
 
 struct RelatedUnchangedDocumentDiagnosticReport : public UnchangedDocumentDiagnosticReport {
-    std::optional<std::map<DocumentUri, std::variant<FullDocumentDiagnosticReport, UnchangedDocumentDiagnosticReport>>> relatedDocuments  {};
+    std::optional<std::map<DocumentUri, std::variant<FullDocumentDiagnosticReport, UnchangedDocumentDiagnosticReport>>> relatedDocuments {};
 };
 
 template<>
@@ -1464,8 +1590,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Relate
 
 using DocumentDiagnosticReport = std::variant<RelatedFullDocumentDiagnosticReport, RelatedUnchangedDocumentDiagnosticReport>;
 struct anon_0 {
-    Range range ;
-    string placeholder ;
+    Range range;
+    string placeholder;
 };
 
 template<>
@@ -1512,9 +1638,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_1
 
 using PrepareRenameResult = std::variant<Range, anon_0, anon_1>;
 struct anon_2 {
-    string language ;
-    std::optional<string> scheme  {};
-    std::optional<string> pattern  {};
+    string language;
+    std::optional<string> scheme {};
+    std::optional<string> pattern {};
 };
 
 template<>
@@ -1540,9 +1666,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_2
 }
 
 struct anon_3 {
-    std::optional<string> language  {};
-    string scheme ;
-    std::optional<string> pattern  {};
+    std::optional<string> language {};
+    string scheme;
+    std::optional<string> pattern {};
 };
 
 template<>
@@ -1568,9 +1694,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_3
 }
 
 struct anon_4 {
-    std::optional<string> language  {};
-    std::optional<string> scheme  {};
-    string pattern ;
+    std::optional<string> language {};
+    std::optional<string> scheme {};
+    string pattern;
 };
 
 template<>
@@ -1597,9 +1723,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_4
 
 using TextDocumentFilter = std::variant<anon_2, anon_3, anon_4>;
 struct anon_5 {
-    string notebookType ;
-    std::optional<string> scheme  {};
-    std::optional<string> pattern  {};
+    string notebookType;
+    std::optional<string> scheme {};
+    std::optional<string> pattern {};
 };
 
 template<>
@@ -1625,9 +1751,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_5
 }
 
 struct anon_6 {
-    std::optional<string> notebookType  {};
-    string scheme ;
-    std::optional<string> pattern  {};
+    std::optional<string> notebookType {};
+    string scheme;
+    std::optional<string> pattern {};
 };
 
 template<>
@@ -1653,9 +1779,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_6
 }
 
 struct anon_7 {
-    std::optional<string> notebookType  {};
-    std::optional<string> scheme  {};
-    string pattern ;
+    std::optional<string> notebookType {};
+    std::optional<string> scheme {};
+    string pattern;
 };
 
 template<>
@@ -1682,8 +1808,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_7
 
 using NotebookDocumentFilter = std::variant<anon_5, anon_6, anon_7>;
 struct NotebookCellTextDocumentFilter {
-    std::variant<string, NotebookDocumentFilter> notebook  {};
-    std::optional<string> language  {};
+    std::variant<string, NotebookDocumentFilter> notebook {};
+    std::optional<string> language {};
 };
 
 template<>
@@ -1711,8 +1837,8 @@ using DocumentSelector = std::vector<DocumentFilter>;
 using ProgressToken = std::variant<integer, string>;
 using ChangeAnnotationIdentifier = string;
 struct WorkspaceFullDocumentDiagnosticReport : public FullDocumentDiagnosticReport {
-    DocumentUri uri ;
-    std::variant<integer, null> version  {};
+    DocumentUri uri;
+    std::variant<integer, null> version {};
 };
 
 template<>
@@ -1740,8 +1866,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Worksp
 }
 
 struct WorkspaceUnchangedDocumentDiagnosticReport : public UnchangedDocumentDiagnosticReport {
-    DocumentUri uri ;
-    std::variant<integer, null> version  {};
+    DocumentUri uri;
+    std::variant<integer, null> version {};
 };
 
 template<>
@@ -1769,9 +1895,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Worksp
 
 using WorkspaceDocumentDiagnosticReport = std::variant<WorkspaceFullDocumentDiagnosticReport, WorkspaceUnchangedDocumentDiagnosticReport>;
 struct anon_8 {
-    Range range ;
-    std::optional<uinteger> rangeLength  {};
-    string text ;
+    Range range;
+    std::optional<uinteger> rangeLength {};
+    string text;
 };
 
 template<>
@@ -1797,7 +1923,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_8
 }
 
 struct anon_9 {
-    string text ;
+    string text;
 };
 
 template<>
@@ -1820,8 +1946,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_9
 
 using TextDocumentContentChangeEvent = std::variant<anon_8, anon_9>;
 struct anon_10 {
-    string language ;
-    string value ;
+    string language;
+    string value;
 };
 
 template<>
@@ -1847,8 +1973,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_1
 using MarkedString = std::variant<string, anon_10>;
 using Pattern = string;
 struct WorkspaceFolder {
-    URI uri ;
-    string name ;
+    URI uri;
+    string name;
 };
 
 template<>
@@ -1872,8 +1998,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Worksp
 }
 
 struct RelativePattern {
-    std::variant<WorkspaceFolder, URI> baseUri  {};
-    Pattern pattern ;
+    std::variant<WorkspaceFolder, URI> baseUri {};
+    Pattern pattern;
 };
 
 template<>
@@ -1899,7 +2025,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Relati
 using GlobPattern = std::variant<Pattern, RelativePattern>;
 
 struct TextDocumentIdentifier {
-    DocumentUri uri ;
+    DocumentUri uri;
 };
 
 template<>
@@ -1921,8 +2047,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, TextDo
 }
 
 struct TextDocumentPositionParams {
-    TextDocumentIdentifier textDocument ;
-    Position position ;
+    TextDocumentIdentifier textDocument;
+    Position position;
 };
 
 template<>
@@ -1946,7 +2072,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, TextDo
 }
 
 struct WorkDoneProgressParams {
-    std::optional<ProgressToken> workDoneToken  {};
+    std::optional<ProgressToken> workDoneToken {};
 };
 
 template<>
@@ -1968,7 +2094,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, WorkDo
 }
 
 struct PartialResultParams {
-    std::optional<ProgressToken> partialResultToken  {};
+    std::optional<ProgressToken> partialResultToken {};
 };
 
 template<>
@@ -2016,7 +2142,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Implem
 }
 
 struct TextDocumentRegistrationOptions {
-    std::variant<DocumentSelector, null> documentSelector  {};
+    std::variant<DocumentSelector, null> documentSelector {};
 };
 
 template<>
@@ -2038,7 +2164,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, TextDo
 }
 
 struct WorkDoneProgressOptions {
-    std::optional<boolean> workDoneProgress  {};
+    std::optional<boolean> workDoneProgress {};
 };
 
 template<>
@@ -2081,7 +2207,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Implem
 }
 
 struct StaticRegistrationOptions {
-    std::optional<string> id  {};
+    std::optional<string> id {};
 };
 
 template<>
@@ -2200,8 +2326,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, TypeDe
 }
 
 struct WorkspaceFoldersChangeEvent {
-    std::vector<WorkspaceFolder> added  {};
-    std::vector<WorkspaceFolder> removed  {};
+    std::vector<WorkspaceFolder> added {};
+    std::vector<WorkspaceFolder> removed {};
 };
 
 template<>
@@ -2225,7 +2351,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Worksp
 }
 
 struct DidChangeWorkspaceFoldersParams {
-    WorkspaceFoldersChangeEvent event ;
+    WorkspaceFoldersChangeEvent event;
 };
 
 template<>
@@ -2247,8 +2373,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, DidCha
 }
 
 struct ConfigurationItem {
-    std::optional<string> scopeUri  {};
-    std::optional<string> section  {};
+    std::optional<string> scopeUri {};
+    std::optional<string> section {};
 };
 
 template<>
@@ -2272,7 +2398,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Config
 }
 
 struct ConfigurationParams {
-    std::vector<ConfigurationItem> items  {};
+    std::vector<ConfigurationItem> items {};
 };
 
 template<>
@@ -2294,7 +2420,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Config
 }
 
 struct DocumentColorParams : public WorkDoneProgressParams, public PartialResultParams {
-    TextDocumentIdentifier textDocument ;
+    TextDocumentIdentifier textDocument;
 };
 
 template<>
@@ -2320,10 +2446,10 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Docume
 }
 
 struct Color {
-    decimal red ;
-    decimal green ;
-    decimal blue ;
-    decimal alpha ;
+    decimal red { 0.0 };
+    decimal green { 0.0 };
+    decimal blue { 0.0 };
+    decimal alpha { 0.0 };
 };
 
 template<>
@@ -2351,8 +2477,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Color&
 }
 
 struct ColorInformation {
-    Range range ;
-    Color color ;
+    Range range;
+    Color color;
 };
 
 template<>
@@ -2422,9 +2548,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Docume
 }
 
 struct ColorPresentationParams : public WorkDoneProgressParams, public PartialResultParams {
-    TextDocumentIdentifier textDocument ;
-    Color color ;
-    Range range ;
+    TextDocumentIdentifier textDocument;
+    Color color;
+    Range range;
 };
 
 template<>
@@ -2454,8 +2580,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, ColorP
 }
 
 struct TextEdit {
-    Range range ;
-    string newText ;
+    Range range;
+    string newText;
 };
 
 template<>
@@ -2479,9 +2605,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, TextEd
 }
 
 struct ColorPresentation {
-    string label ;
-    std::optional<TextEdit> textEdit  {};
-    std::optional<std::vector<TextEdit>> additionalTextEdits  {};
+    string label;
+    std::optional<TextEdit> textEdit {};
+    std::optional<std::vector<TextEdit>> additionalTextEdits {};
 };
 
 template<>
@@ -2507,7 +2633,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, ColorP
 }
 
 struct FoldingRangeParams : public WorkDoneProgressParams, public PartialResultParams {
-    TextDocumentIdentifier textDocument ;
+    TextDocumentIdentifier textDocument;
 };
 
 template<>
@@ -2534,11 +2660,11 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Foldin
 
 struct FoldingRange {
     uinteger startLine { 0 };
-    std::optional<uinteger> startCharacter  {};
+    std::optional<uinteger> startCharacter {};
     uinteger endLine { 0 };
-    std::optional<uinteger> endCharacter  {};
-    std::optional<FoldingRangeKind> kind  {};
-    std::optional<string> collapsedText  {};
+    std::optional<uinteger> endCharacter {};
+    std::optional<FoldingRangeKind> kind {};
+    std::optional<string> collapsedText {};
 };
 
 template<>
@@ -2688,8 +2814,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Declar
 }
 
 struct SelectionRangeParams : public WorkDoneProgressParams, public PartialResultParams {
-    TextDocumentIdentifier textDocument ;
-    std::vector<Position> positions  {};
+    TextDocumentIdentifier textDocument;
+    std::vector<Position> positions {};
 };
 
 template<>
@@ -2717,7 +2843,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Select
 }
 
 struct SelectionRange {
-    Range range ;
+    Range range;
 };
 
 template<>
@@ -2785,7 +2911,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Select
 }
 
 struct WorkDoneProgressCreateParams {
-    ProgressToken token ;
+    ProgressToken token;
 };
 
 template<>
@@ -2807,7 +2933,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, WorkDo
 }
 
 struct WorkDoneProgressCancelParams {
-    ProgressToken token ;
+    ProgressToken token;
 };
 
 template<>
@@ -2853,14 +2979,14 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, CallHi
 }
 
 struct CallHierarchyItem {
-    string name ;
-    SymbolKind kind ;
-    std::optional<std::vector<SymbolTag>> tags  {};
-    std::optional<string> detail  {};
-    DocumentUri uri ;
-    Range range ;
-    Range selectionRange ;
-    std::optional<LSPAny> data  {};
+    string name;
+    SymbolKind kind;
+    std::optional<std::vector<SymbolTag>> tags {};
+    std::optional<string> detail {};
+    DocumentUri uri;
+    Range range;
+    Range selectionRange;
+    std::optional<LSPAny> data {};
 };
 
 template<>
@@ -2942,7 +3068,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, CallHi
 }
 
 struct CallHierarchyIncomingCallsParams : public WorkDoneProgressParams, public PartialResultParams {
-    CallHierarchyItem item ;
+    CallHierarchyItem item;
 };
 
 template<>
@@ -2968,8 +3094,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, CallHi
 }
 
 struct CallHierarchyIncomingCall {
-    CallHierarchyItem from ;
-    std::vector<Range> fromRanges  {};
+    CallHierarchyItem from;
+    std::vector<Range> fromRanges {};
 };
 
 template<>
@@ -2993,7 +3119,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, CallHi
 }
 
 struct CallHierarchyOutgoingCallsParams : public WorkDoneProgressParams, public PartialResultParams {
-    CallHierarchyItem item ;
+    CallHierarchyItem item;
 };
 
 template<>
@@ -3019,8 +3145,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, CallHi
 }
 
 struct CallHierarchyOutgoingCall {
-    CallHierarchyItem to ;
-    std::vector<Range> fromRanges  {};
+    CallHierarchyItem to;
+    std::vector<Range> fromRanges {};
 };
 
 template<>
@@ -3044,7 +3170,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, CallHi
 }
 
 struct SemanticTokensParams : public WorkDoneProgressParams, public PartialResultParams {
-    TextDocumentIdentifier textDocument ;
+    TextDocumentIdentifier textDocument;
 };
 
 template<>
@@ -3070,8 +3196,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Semant
 }
 
 struct SemanticTokens {
-    std::optional<string> resultId  {};
-    std::vector<uinteger> data  {};
+    std::optional<string> resultId {};
+    std::vector<uinteger> data {};
 };
 
 template<>
@@ -3095,7 +3221,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Semant
 }
 
 struct SemanticTokensPartialResult {
-    std::vector<uinteger> data  {};
+    std::vector<uinteger> data {};
 };
 
 template<>
@@ -3117,8 +3243,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Semant
 }
 
 struct SemanticTokensLegend {
-    std::vector<string> tokenTypes  {};
-    std::vector<string> tokenModifiers  {};
+    std::vector<string> tokenTypes {};
+    std::vector<string> tokenModifiers {};
 };
 
 template<>
@@ -3161,7 +3287,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_1
 }
 
 struct anon_12 {
-    std::optional<boolean> delta  {};
+    std::optional<boolean> delta {};
 };
 
 template<>
@@ -3183,9 +3309,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_1
 }
 
 struct SemanticTokensOptions : public WorkDoneProgressOptions {
-    SemanticTokensLegend legend ;
-    std::optional<std::variant<boolean, anon_11>> range  {};
-    std::optional<std::variant<boolean, anon_12>> full  {};
+    SemanticTokensLegend legend;
+    std::optional<std::variant<boolean, anon_11>> range {};
+    std::optional<std::variant<boolean, anon_12>> full {};
 };
 
 template<>
@@ -3241,8 +3367,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Semant
 }
 
 struct SemanticTokensDeltaParams : public WorkDoneProgressParams, public PartialResultParams {
-    TextDocumentIdentifier textDocument ;
-    string previousResultId ;
+    TextDocumentIdentifier textDocument;
+    string previousResultId;
 };
 
 template<>
@@ -3272,7 +3398,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Semant
 struct SemanticTokensEdit {
     uinteger start { 0 };
     uinteger deleteCount { 0 };
-    std::optional<std::vector<uinteger>> data  {};
+    std::optional<std::vector<uinteger>> data {};
 };
 
 template<>
@@ -3298,8 +3424,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Semant
 }
 
 struct SemanticTokensDelta {
-    std::optional<string> resultId  {};
-    std::vector<SemanticTokensEdit> edits  {};
+    std::optional<string> resultId {};
+    std::vector<SemanticTokensEdit> edits {};
 };
 
 template<>
@@ -3323,7 +3449,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Semant
 }
 
 struct SemanticTokensDeltaPartialResult {
-    std::vector<SemanticTokensEdit> edits  {};
+    std::vector<SemanticTokensEdit> edits {};
 };
 
 template<>
@@ -3345,8 +3471,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Semant
 }
 
 struct SemanticTokensRangeParams : public WorkDoneProgressParams, public PartialResultParams {
-    TextDocumentIdentifier textDocument ;
-    Range range ;
+    TextDocumentIdentifier textDocument;
+    Range range;
 };
 
 template<>
@@ -3374,10 +3500,10 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Semant
 }
 
 struct ShowDocumentParams {
-    URI uri ;
-    std::optional<boolean> external  {};
-    std::optional<boolean> takeFocus  {};
-    std::optional<Range> selection  {};
+    URI uri;
+    std::optional<boolean> external {};
+    std::optional<boolean> takeFocus {};
+    std::optional<Range> selection {};
 };
 
 template<>
@@ -3451,8 +3577,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Linked
 }
 
 struct LinkedEditingRanges {
-    std::vector<Range> ranges  {};
-    std::optional<string> wordPattern  {};
+    std::vector<Range> ranges {};
+    std::optional<string> wordPattern {};
 };
 
 template<>
@@ -3522,7 +3648,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Linked
 }
 
 struct FileCreate {
-    string uri ;
+    string uri;
 };
 
 template<>
@@ -3544,7 +3670,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, FileCr
 }
 
 struct CreateFilesParams {
-    std::vector<FileCreate> files  {};
+    std::vector<FileCreate> files {};
 };
 
 template<>
@@ -3566,7 +3692,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Create
 }
 
 struct OptionalVersionedTextDocumentIdentifier : public TextDocumentIdentifier {
-    std::variant<integer, null> version  {};
+    std::variant<integer, null> version {};
 };
 
 template<>
@@ -3590,7 +3716,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Option
 }
 
 struct AnnotatedTextEdit : public TextEdit {
-    ChangeAnnotationIdentifier annotationId ;
+    ChangeAnnotationIdentifier annotationId;
 };
 
 template<>
@@ -3615,8 +3741,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Annota
 }
 
 struct TextDocumentEdit {
-    OptionalVersionedTextDocumentIdentifier textDocument ;
-    std::vector<std::variant<TextEdit, AnnotatedTextEdit>> edits  {};
+    OptionalVersionedTextDocumentIdentifier textDocument;
+    std::vector<std::variant<TextEdit, AnnotatedTextEdit>> edits {};
 };
 
 template<>
@@ -3640,8 +3766,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, TextDo
 }
 
 struct ResourceOperation {
-    string kind ;
-    std::optional<ChangeAnnotationIdentifier> annotationId  {};
+    string kind;
+    std::optional<ChangeAnnotationIdentifier> annotationId {};
 };
 
 template<>
@@ -3665,8 +3791,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Resour
 }
 
 struct CreateFileOptions {
-    std::optional<boolean> overwrite  {};
-    std::optional<boolean> ignoreIfExists  {};
+    std::optional<boolean> overwrite {};
+    std::optional<boolean> ignoreIfExists {};
 };
 
 template<>
@@ -3690,9 +3816,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Create
 }
 
 struct CreateFile : public ResourceOperation {
-    std::string kind  { "create" };
-    DocumentUri uri ;
-    std::optional<CreateFileOptions> options  {};
+    std::string kind { "create" };
+    DocumentUri uri;
+    std::optional<CreateFileOptions> options {};
 };
 
 template<>
@@ -3721,8 +3847,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Create
 }
 
 struct RenameFileOptions {
-    std::optional<boolean> overwrite  {};
-    std::optional<boolean> ignoreIfExists  {};
+    std::optional<boolean> overwrite {};
+    std::optional<boolean> ignoreIfExists {};
 };
 
 template<>
@@ -3746,10 +3872,10 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Rename
 }
 
 struct RenameFile : public ResourceOperation {
-    std::string kind  { "rename" };
-    DocumentUri oldUri ;
-    DocumentUri newUri ;
-    std::optional<RenameFileOptions> options  {};
+    std::string kind { "rename" };
+    DocumentUri oldUri;
+    DocumentUri newUri;
+    std::optional<RenameFileOptions> options {};
 };
 
 template<>
@@ -3780,8 +3906,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Rename
 }
 
 struct DeleteFileOptions {
-    std::optional<boolean> recursive  {};
-    std::optional<boolean> ignoreIfNotExists  {};
+    std::optional<boolean> recursive {};
+    std::optional<boolean> ignoreIfNotExists {};
 };
 
 template<>
@@ -3805,9 +3931,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Delete
 }
 
 struct DeleteFile : public ResourceOperation {
-    std::string kind  { "delete" };
-    DocumentUri uri ;
-    std::optional<DeleteFileOptions> options  {};
+    std::string kind { "delete" };
+    DocumentUri uri;
+    std::optional<DeleteFileOptions> options {};
 };
 
 template<>
@@ -3836,9 +3962,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Delete
 }
 
 struct ChangeAnnotation {
-    string label ;
-    std::optional<boolean> needsConfirmation  {};
-    std::optional<string> description  {};
+    string label;
+    std::optional<boolean> needsConfirmation {};
+    std::optional<string> description {};
 };
 
 template<>
@@ -3864,9 +3990,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Change
 }
 
 struct WorkspaceEdit {
-    std::optional<std::map<DocumentUri, std::vector<TextEdit>>> changes  {};
-    std::optional<std::vector<std::variant<TextDocumentEdit, CreateFile, RenameFile, DeleteFile>>> documentChanges  {};
-    std::optional<std::map<ChangeAnnotationIdentifier, ChangeAnnotation>> changeAnnotations  {};
+    std::optional<std::map<DocumentUri, std::vector<TextEdit>>> changes {};
+    std::optional<std::vector<std::variant<TextDocumentEdit, CreateFile, RenameFile, DeleteFile>>> documentChanges {};
+    std::optional<std::map<ChangeAnnotationIdentifier, ChangeAnnotation>> changeAnnotations {};
 };
 
 template<>
@@ -3892,7 +4018,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Worksp
 }
 
 struct FileOperationPatternOptions {
-    std::optional<boolean> ignoreCase  {};
+    std::optional<boolean> ignoreCase {};
 };
 
 template<>
@@ -3914,9 +4040,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, FileOp
 }
 
 struct FileOperationPattern {
-    string glob ;
-    std::optional<FileOperationPatternKind> matches  {};
-    std::optional<FileOperationPatternOptions> options  {};
+    string glob;
+    std::optional<FileOperationPatternKind> matches {};
+    std::optional<FileOperationPatternOptions> options {};
 };
 
 template<>
@@ -3942,8 +4068,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, FileOp
 }
 
 struct FileOperationFilter {
-    std::optional<string> scheme  {};
-    FileOperationPattern pattern ;
+    std::optional<string> scheme {};
+    FileOperationPattern pattern;
 };
 
 template<>
@@ -3967,7 +4093,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, FileOp
 }
 
 struct FileOperationRegistrationOptions {
-    std::vector<FileOperationFilter> filters  {};
+    std::vector<FileOperationFilter> filters {};
 };
 
 template<>
@@ -3989,8 +4115,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, FileOp
 }
 
 struct FileRename {
-    string oldUri ;
-    string newUri ;
+    string oldUri;
+    string newUri;
 };
 
 template<>
@@ -4014,7 +4140,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, FileRe
 }
 
 struct RenameFilesParams {
-    std::vector<FileRename> files  {};
+    std::vector<FileRename> files {};
 };
 
 template<>
@@ -4036,7 +4162,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Rename
 }
 
 struct FileDelete {
-    string uri ;
+    string uri;
 };
 
 template<>
@@ -4058,7 +4184,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, FileDe
 }
 
 struct DeleteFilesParams {
-    std::vector<FileDelete> files  {};
+    std::vector<FileDelete> files {};
 };
 
 template<>
@@ -4106,10 +4232,10 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Monike
 }
 
 struct Moniker {
-    string scheme ;
-    string identifier ;
-    UniquenessLevel unique ;
-    std::optional<MonikerKind> kind  {};
+    string scheme;
+    string identifier;
+    UniquenessLevel unique;
+    std::optional<MonikerKind> kind {};
 };
 
 template<>
@@ -4205,14 +4331,14 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, TypeHi
 }
 
 struct TypeHierarchyItem {
-    string name ;
-    SymbolKind kind ;
-    std::optional<std::vector<SymbolTag>> tags  {};
-    std::optional<string> detail  {};
-    DocumentUri uri ;
-    Range range ;
-    Range selectionRange ;
-    std::optional<LSPAny> data  {};
+    string name;
+    SymbolKind kind;
+    std::optional<std::vector<SymbolTag>> tags {};
+    std::optional<string> detail {};
+    DocumentUri uri;
+    Range range;
+    Range selectionRange;
+    std::optional<LSPAny> data {};
 };
 
 template<>
@@ -4294,7 +4420,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, TypeHi
 }
 
 struct TypeHierarchySupertypesParams : public WorkDoneProgressParams, public PartialResultParams {
-    TypeHierarchyItem item ;
+    TypeHierarchyItem item;
 };
 
 template<>
@@ -4320,7 +4446,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, TypeHi
 }
 
 struct TypeHierarchySubtypesParams : public WorkDoneProgressParams, public PartialResultParams {
-    TypeHierarchyItem item ;
+    TypeHierarchyItem item;
 };
 
 template<>
@@ -4347,7 +4473,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, TypeHi
 
 struct InlineValueContext {
     integer frameId { 0 };
-    Range stoppedLocation ;
+    Range stoppedLocation;
 };
 
 template<>
@@ -4371,9 +4497,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Inline
 }
 
 struct InlineValueParams : public WorkDoneProgressParams {
-    TextDocumentIdentifier textDocument ;
-    Range range ;
-    InlineValueContext context ;
+    TextDocumentIdentifier textDocument;
+    Range range;
+    InlineValueContext context;
 };
 
 template<>
@@ -4447,8 +4573,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Inline
 }
 
 struct InlayHintParams : public WorkDoneProgressParams {
-    TextDocumentIdentifier textDocument ;
-    Range range ;
+    TextDocumentIdentifier textDocument;
+    Range range;
 };
 
 template<>
@@ -4474,8 +4600,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, InlayH
 }
 
 struct MarkupContent {
-    MarkupKind kind ;
-    string value ;
+    MarkupKind kind;
+    string value;
 };
 
 template<>
@@ -4499,9 +4625,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Markup
 }
 
 struct Command {
-    string title ;
-    string command ;
-    std::optional<std::vector<LSPAny>> arguments  {};
+    string title;
+    string command;
+    std::optional<std::vector<LSPAny>> arguments {};
 };
 
 template<>
@@ -4527,10 +4653,10 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Comman
 }
 
 struct InlayHintLabelPart {
-    string value ;
-    std::optional<std::variant<string, MarkupContent>> tooltip  {};
-    std::optional<Location> location  {};
-    std::optional<Command> command  {};
+    string value;
+    std::optional<std::variant<string, MarkupContent>> tooltip {};
+    std::optional<Location> location {};
+    std::optional<Command> command {};
 };
 
 template<>
@@ -4558,14 +4684,14 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, InlayH
 }
 
 struct InlayHint {
-    Position position ;
-    std::variant<string, std::vector<InlayHintLabelPart>> label  {};
-    std::optional<InlayHintKind> kind  {};
-    std::optional<std::vector<TextEdit>> textEdits  {};
-    std::optional<std::variant<string, MarkupContent>> tooltip  {};
-    std::optional<boolean> paddingLeft  {};
-    std::optional<boolean> paddingRight  {};
-    std::optional<LSPAny> data  {};
+    Position position;
+    std::variant<string, std::vector<InlayHintLabelPart>> label {};
+    std::optional<InlayHintKind> kind {};
+    std::optional<std::vector<TextEdit>> textEdits {};
+    std::optional<std::variant<string, MarkupContent>> tooltip {};
+    std::optional<boolean> paddingLeft {};
+    std::optional<boolean> paddingRight {};
+    std::optional<LSPAny> data {};
 };
 
 template<>
@@ -4601,7 +4727,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, InlayH
 }
 
 struct InlayHintOptions : public WorkDoneProgressOptions {
-    std::optional<boolean> resolveProvider  {};
+    std::optional<boolean> resolveProvider {};
 };
 
 template<>
@@ -4651,9 +4777,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, InlayH
 }
 
 struct DocumentDiagnosticParams : public WorkDoneProgressParams, public PartialResultParams {
-    TextDocumentIdentifier textDocument ;
-    std::optional<string> identifier  {};
-    std::optional<string> previousResultId  {};
+    TextDocumentIdentifier textDocument;
+    std::optional<string> identifier {};
+    std::optional<string> previousResultId {};
 };
 
 template<>
@@ -4683,7 +4809,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Docume
 }
 
 struct DocumentDiagnosticReportPartialResult {
-    std::map<DocumentUri, std::variant<FullDocumentDiagnosticReport, UnchangedDocumentDiagnosticReport>> relatedDocuments  {};
+    std::map<DocumentUri, std::variant<FullDocumentDiagnosticReport, UnchangedDocumentDiagnosticReport>> relatedDocuments {};
 };
 
 template<>
@@ -4727,7 +4853,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Diagno
 }
 
 struct DiagnosticOptions : public WorkDoneProgressOptions {
-    std::optional<string> identifier  {};
+    std::optional<string> identifier {};
     boolean interFileDependencies { false };
     boolean workspaceDiagnostics { false };
 };
@@ -4785,8 +4911,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Diagno
 }
 
 struct PreviousResultId {
-    DocumentUri uri ;
-    string value ;
+    DocumentUri uri;
+    string value;
 };
 
 template<>
@@ -4810,8 +4936,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Previo
 }
 
 struct WorkspaceDiagnosticParams : public WorkDoneProgressParams, public PartialResultParams {
-    std::optional<string> identifier  {};
-    std::vector<PreviousResultId> previousResultIds  {};
+    std::optional<string> identifier {};
+    std::vector<PreviousResultId> previousResultIds {};
 };
 
 template<>
@@ -4839,7 +4965,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Worksp
 }
 
 struct WorkspaceDiagnosticReport {
-    std::vector<WorkspaceDocumentDiagnosticReport> items  {};
+    std::vector<WorkspaceDocumentDiagnosticReport> items {};
 };
 
 template<>
@@ -4861,7 +4987,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Worksp
 }
 
 struct WorkspaceDiagnosticReportPartialResult {
-    std::vector<WorkspaceDocumentDiagnosticReport> items  {};
+    std::vector<WorkspaceDocumentDiagnosticReport> items {};
 };
 
 template<>
@@ -4884,7 +5010,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Worksp
 
 struct ExecutionSummary {
     uinteger executionOrder { 0 };
-    std::optional<boolean> success  {};
+    std::optional<boolean> success {};
 };
 
 template<>
@@ -4908,10 +5034,10 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Execut
 }
 
 struct NotebookCell {
-    NotebookCellKind kind ;
-    DocumentUri document ;
-    std::optional<LSPObject> metadata  {};
-    std::optional<ExecutionSummary> executionSummary  {};
+    NotebookCellKind kind;
+    DocumentUri document;
+    std::optional<LSPObject> metadata {};
+    std::optional<ExecutionSummary> executionSummary {};
 };
 
 template<>
@@ -4939,11 +5065,11 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Notebo
 }
 
 struct NotebookDocument {
-    URI uri ;
-    string notebookType ;
+    URI uri;
+    string notebookType;
     integer version { 0 };
-    std::optional<LSPObject> metadata  {};
-    std::vector<NotebookCell> cells  {};
+    std::optional<LSPObject> metadata {};
+    std::vector<NotebookCell> cells {};
 };
 
 template<>
@@ -4973,10 +5099,10 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Notebo
 }
 
 struct TextDocumentItem {
-    DocumentUri uri ;
-    string languageId ;
+    DocumentUri uri;
+    string languageId;
     integer version { 0 };
-    string text ;
+    string text;
 };
 
 template<>
@@ -5004,8 +5130,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, TextDo
 }
 
 struct DidOpenNotebookDocumentParams {
-    NotebookDocument notebookDocument ;
-    std::vector<TextDocumentItem> cellTextDocuments  {};
+    NotebookDocument notebookDocument;
+    std::vector<TextDocumentItem> cellTextDocuments {};
 };
 
 template<>
@@ -5030,7 +5156,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, DidOpe
 
 struct VersionedNotebookDocumentIdentifier {
     integer version { 0 };
-    URI uri ;
+    URI uri;
 };
 
 template<>
@@ -5056,7 +5182,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Versio
 struct NotebookCellArrayChange {
     uinteger start { 0 };
     uinteger deleteCount { 0 };
-    std::optional<std::vector<NotebookCell>> cells  {};
+    std::optional<std::vector<NotebookCell>> cells {};
 };
 
 template<>
@@ -5082,9 +5208,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Notebo
 }
 
 struct anon_14 {
-    NotebookCellArrayChange array ;
-    std::optional<std::vector<TextDocumentItem>> didOpen  {};
-    std::optional<std::vector<TextDocumentIdentifier>> didClose  {};
+    NotebookCellArrayChange array;
+    std::optional<std::vector<TextDocumentItem>> didOpen {};
+    std::optional<std::vector<TextDocumentIdentifier>> didClose {};
 };
 
 template<>
@@ -5134,8 +5260,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Versio
 }
 
 struct anon_15 {
-    VersionedTextDocumentIdentifier document ;
-    std::vector<TextDocumentContentChangeEvent> changes  {};
+    VersionedTextDocumentIdentifier document;
+    std::vector<TextDocumentContentChangeEvent> changes {};
 };
 
 template<>
@@ -5159,9 +5285,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_1
 }
 
 struct anon_16 {
-    NotebookCellArrayChange array ;
-    std::optional<std::vector<TextDocumentItem>> didOpen  {};
-    std::optional<std::vector<TextDocumentIdentifier>> didClose  {};
+    NotebookCellArrayChange array;
+    std::optional<std::vector<TextDocumentItem>> didOpen {};
+    std::optional<std::vector<TextDocumentIdentifier>> didClose {};
 };
 
 template<>
@@ -5187,8 +5313,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_1
 }
 
 struct anon_17 {
-    VersionedTextDocumentIdentifier document ;
-    std::vector<TextDocumentContentChangeEvent> changes  {};
+    VersionedTextDocumentIdentifier document;
+    std::vector<TextDocumentContentChangeEvent> changes {};
 };
 
 template<>
@@ -5212,9 +5338,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_1
 }
 
 struct anon_13 {
-    std::optional<anon_16> structure  {};
-    std::optional<std::vector<NotebookCell>> data  {};
-    std::optional<std::vector<anon_17>> textContent  {};
+    std::optional<anon_16> structure {};
+    std::optional<std::vector<NotebookCell>> data {};
+    std::optional<std::vector<anon_17>> textContent {};
 };
 
 template<>
@@ -5240,8 +5366,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_1
 }
 
 struct NotebookDocumentChangeEvent {
-    std::optional<LSPObject> metadata  {};
-    std::optional<anon_13> cells  {};
+    std::optional<LSPObject> metadata {};
+    std::optional<anon_13> cells {};
 };
 
 template<>
@@ -5265,8 +5391,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Notebo
 }
 
 struct DidChangeNotebookDocumentParams {
-    VersionedNotebookDocumentIdentifier notebookDocument ;
-    NotebookDocumentChangeEvent change ;
+    VersionedNotebookDocumentIdentifier notebookDocument;
+    NotebookDocumentChangeEvent change;
 };
 
 template<>
@@ -5290,7 +5416,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, DidCha
 }
 
 struct NotebookDocumentIdentifier {
-    URI uri ;
+    URI uri;
 };
 
 template<>
@@ -5312,7 +5438,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Notebo
 }
 
 struct DidSaveNotebookDocumentParams {
-    NotebookDocumentIdentifier notebookDocument ;
+    NotebookDocumentIdentifier notebookDocument;
 };
 
 template<>
@@ -5334,8 +5460,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, DidSav
 }
 
 struct DidCloseNotebookDocumentParams {
-    NotebookDocumentIdentifier notebookDocument ;
-    std::vector<TextDocumentIdentifier> cellTextDocuments  {};
+    NotebookDocumentIdentifier notebookDocument;
+    std::vector<TextDocumentIdentifier> cellTextDocuments {};
 };
 
 template<>
@@ -5359,9 +5485,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, DidClo
 }
 
 struct Registration {
-    string id ;
-    string method ;
-    std::optional<LSPAny> registerOptions  {};
+    string id;
+    string method;
+    std::optional<LSPAny> registerOptions {};
 };
 
 template<>
@@ -5387,7 +5513,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Regist
 }
 
 struct RegistrationParams {
-    std::vector<Registration> registrations  {};
+    std::vector<Registration> registrations {};
 };
 
 template<>
@@ -5409,8 +5535,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Regist
 }
 
 struct Unregistration {
-    string id ;
-    string method ;
+    string id;
+    string method;
 };
 
 template<>
@@ -5434,7 +5560,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Unregi
 }
 
 struct UnregistrationParams {
-    std::vector<Unregistration> unregisterations  {};
+    std::vector<Unregistration> unregisterations {};
 };
 
 template<>
@@ -5456,8 +5582,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Unregi
 }
 
 struct anon_18 {
-    string name ;
-    std::optional<string> version  {};
+    string name;
+    std::optional<string> version {};
 };
 
 template<>
@@ -5481,7 +5607,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_1
 }
 
 struct anon_19 {
-    std::optional<boolean> groupsOnLabel  {};
+    std::optional<boolean> groupsOnLabel {};
 };
 
 template<>
@@ -5503,11 +5629,11 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_1
 }
 
 struct WorkspaceEditClientCapabilities {
-    std::optional<boolean> documentChanges  {};
-    std::optional<std::vector<ResourceOperationKind>> resourceOperations  {};
-    std::optional<FailureHandlingKind> failureHandling  {};
-    std::optional<boolean> normalizesLineEndings  {};
-    std::optional<anon_19> changeAnnotationSupport  {};
+    std::optional<boolean> documentChanges {};
+    std::optional<std::vector<ResourceOperationKind>> resourceOperations {};
+    std::optional<FailureHandlingKind> failureHandling {};
+    std::optional<boolean> normalizesLineEndings {};
+    std::optional<anon_19> changeAnnotationSupport {};
 };
 
 template<>
@@ -5537,7 +5663,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Worksp
 }
 
 struct DidChangeConfigurationClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
+    std::optional<boolean> dynamicRegistration {};
 };
 
 template<>
@@ -5559,8 +5685,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, DidCha
 }
 
 struct DidChangeWatchedFilesClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
-    std::optional<boolean> relativePatternSupport  {};
+    std::optional<boolean> dynamicRegistration {};
+    std::optional<boolean> relativePatternSupport {};
 };
 
 template<>
@@ -5584,7 +5710,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, DidCha
 }
 
 struct anon_20 {
-    std::optional<std::vector<SymbolKind>> valueSet  {};
+    std::optional<std::vector<SymbolKind>> valueSet {};
 };
 
 template<>
@@ -5606,7 +5732,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_2
 }
 
 struct anon_21 {
-    std::vector<SymbolTag> valueSet  {};
+    std::vector<SymbolTag> valueSet {};
 };
 
 template<>
@@ -5628,7 +5754,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_2
 }
 
 struct anon_22 {
-    std::vector<string> properties  {};
+    std::vector<string> properties {};
 };
 
 template<>
@@ -5650,10 +5776,10 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_2
 }
 
 struct WorkspaceSymbolClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
-    std::optional<anon_20> symbolKind  {};
-    std::optional<anon_21> tagSupport  {};
-    std::optional<anon_22> resolveSupport  {};
+    std::optional<boolean> dynamicRegistration {};
+    std::optional<anon_20> symbolKind {};
+    std::optional<anon_21> tagSupport {};
+    std::optional<anon_22> resolveSupport {};
 };
 
 template<>
@@ -5681,7 +5807,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Worksp
 }
 
 struct ExecuteCommandClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
+    std::optional<boolean> dynamicRegistration {};
 };
 
 template<>
@@ -5703,7 +5829,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Execut
 }
 
 struct SemanticTokensWorkspaceClientCapabilities {
-    std::optional<boolean> refreshSupport  {};
+    std::optional<boolean> refreshSupport {};
 };
 
 template<>
@@ -5725,7 +5851,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Semant
 }
 
 struct CodeLensWorkspaceClientCapabilities {
-    std::optional<boolean> refreshSupport  {};
+    std::optional<boolean> refreshSupport {};
 };
 
 template<>
@@ -5747,13 +5873,13 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, CodeLe
 }
 
 struct FileOperationClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
-    std::optional<boolean> didCreate  {};
-    std::optional<boolean> willCreate  {};
-    std::optional<boolean> didRename  {};
-    std::optional<boolean> willRename  {};
-    std::optional<boolean> didDelete  {};
-    std::optional<boolean> willDelete  {};
+    std::optional<boolean> dynamicRegistration {};
+    std::optional<boolean> didCreate {};
+    std::optional<boolean> willCreate {};
+    std::optional<boolean> didRename {};
+    std::optional<boolean> willRename {};
+    std::optional<boolean> didDelete {};
+    std::optional<boolean> willDelete {};
 };
 
 template<>
@@ -5787,7 +5913,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, FileOp
 }
 
 struct InlineValueWorkspaceClientCapabilities {
-    std::optional<boolean> refreshSupport  {};
+    std::optional<boolean> refreshSupport {};
 };
 
 template<>
@@ -5809,7 +5935,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Inline
 }
 
 struct InlayHintWorkspaceClientCapabilities {
-    std::optional<boolean> refreshSupport  {};
+    std::optional<boolean> refreshSupport {};
 };
 
 template<>
@@ -5831,7 +5957,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, InlayH
 }
 
 struct DiagnosticWorkspaceClientCapabilities {
-    std::optional<boolean> refreshSupport  {};
+    std::optional<boolean> refreshSupport {};
 };
 
 template<>
@@ -5853,20 +5979,20 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Diagno
 }
 
 struct WorkspaceClientCapabilities {
-    std::optional<boolean> applyEdit  {};
-    std::optional<WorkspaceEditClientCapabilities> workspaceEdit  {};
-    std::optional<DidChangeConfigurationClientCapabilities> didChangeConfiguration  {};
-    std::optional<DidChangeWatchedFilesClientCapabilities> didChangeWatchedFiles  {};
-    std::optional<WorkspaceSymbolClientCapabilities> symbol  {};
-    std::optional<ExecuteCommandClientCapabilities> executeCommand  {};
-    std::optional<boolean> workspaceFolders  {};
-    std::optional<boolean> configuration  {};
-    std::optional<SemanticTokensWorkspaceClientCapabilities> semanticTokens  {};
-    std::optional<CodeLensWorkspaceClientCapabilities> codeLens  {};
-    std::optional<FileOperationClientCapabilities> fileOperations  {};
-    std::optional<InlineValueWorkspaceClientCapabilities> inlineValue  {};
-    std::optional<InlayHintWorkspaceClientCapabilities> inlayHint  {};
-    std::optional<DiagnosticWorkspaceClientCapabilities> diagnostics  {};
+    std::optional<boolean> applyEdit {};
+    std::optional<WorkspaceEditClientCapabilities> workspaceEdit {};
+    std::optional<DidChangeConfigurationClientCapabilities> didChangeConfiguration {};
+    std::optional<DidChangeWatchedFilesClientCapabilities> didChangeWatchedFiles {};
+    std::optional<WorkspaceSymbolClientCapabilities> symbol {};
+    std::optional<ExecuteCommandClientCapabilities> executeCommand {};
+    std::optional<boolean> workspaceFolders {};
+    std::optional<boolean> configuration {};
+    std::optional<SemanticTokensWorkspaceClientCapabilities> semanticTokens {};
+    std::optional<CodeLensWorkspaceClientCapabilities> codeLens {};
+    std::optional<FileOperationClientCapabilities> fileOperations {};
+    std::optional<InlineValueWorkspaceClientCapabilities> inlineValue {};
+    std::optional<InlayHintWorkspaceClientCapabilities> inlayHint {};
+    std::optional<DiagnosticWorkspaceClientCapabilities> diagnostics {};
 };
 
 template<>
@@ -5914,10 +6040,10 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Worksp
 }
 
 struct TextDocumentSyncClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
-    std::optional<boolean> willSave  {};
-    std::optional<boolean> willSaveWaitUntil  {};
-    std::optional<boolean> didSave  {};
+    std::optional<boolean> dynamicRegistration {};
+    std::optional<boolean> willSave {};
+    std::optional<boolean> willSaveWaitUntil {};
+    std::optional<boolean> didSave {};
 };
 
 template<>
@@ -5945,7 +6071,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, TextDo
 }
 
 struct anon_24 {
-    std::vector<CompletionItemTag> valueSet  {};
+    std::vector<CompletionItemTag> valueSet {};
 };
 
 template<>
@@ -5967,7 +6093,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_2
 }
 
 struct anon_25 {
-    std::vector<string> properties  {};
+    std::vector<string> properties {};
 };
 
 template<>
@@ -5989,7 +6115,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_2
 }
 
 struct anon_26 {
-    std::vector<InsertTextMode> valueSet  {};
+    std::vector<InsertTextMode> valueSet {};
 };
 
 template<>
@@ -6011,7 +6137,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_2
 }
 
 struct anon_27 {
-    std::vector<CompletionItemTag> valueSet  {};
+    std::vector<CompletionItemTag> valueSet {};
 };
 
 template<>
@@ -6033,7 +6159,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_2
 }
 
 struct anon_28 {
-    std::vector<string> properties  {};
+    std::vector<string> properties {};
 };
 
 template<>
@@ -6055,7 +6181,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_2
 }
 
 struct anon_29 {
-    std::vector<InsertTextMode> valueSet  {};
+    std::vector<InsertTextMode> valueSet {};
 };
 
 template<>
@@ -6077,16 +6203,16 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_2
 }
 
 struct anon_23 {
-    std::optional<boolean> snippetSupport  {};
-    std::optional<boolean> commitCharactersSupport  {};
-    std::optional<std::vector<MarkupKind>> documentationFormat  {};
-    std::optional<boolean> deprecatedSupport  {};
-    std::optional<boolean> preselectSupport  {};
-    std::optional<anon_27> tagSupport  {};
-    std::optional<boolean> insertReplaceSupport  {};
-    std::optional<anon_28> resolveSupport  {};
-    std::optional<anon_29> insertTextModeSupport  {};
-    std::optional<boolean> labelDetailsSupport  {};
+    std::optional<boolean> snippetSupport {};
+    std::optional<boolean> commitCharactersSupport {};
+    std::optional<std::vector<MarkupKind>> documentationFormat {};
+    std::optional<boolean> deprecatedSupport {};
+    std::optional<boolean> preselectSupport {};
+    std::optional<anon_27> tagSupport {};
+    std::optional<boolean> insertReplaceSupport {};
+    std::optional<anon_28> resolveSupport {};
+    std::optional<anon_29> insertTextModeSupport {};
+    std::optional<boolean> labelDetailsSupport {};
 };
 
 template<>
@@ -6126,7 +6252,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_2
 }
 
 struct anon_30 {
-    std::optional<std::vector<CompletionItemKind>> valueSet  {};
+    std::optional<std::vector<CompletionItemKind>> valueSet {};
 };
 
 template<>
@@ -6148,7 +6274,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_3
 }
 
 struct anon_31 {
-    std::optional<std::vector<string>> itemDefaults  {};
+    std::optional<std::vector<string>> itemDefaults {};
 };
 
 template<>
@@ -6170,12 +6296,12 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_3
 }
 
 struct CompletionClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
-    std::optional<anon_23> completionItem  {};
-    std::optional<anon_30> completionItemKind  {};
-    std::optional<InsertTextMode> insertTextMode  {};
-    std::optional<boolean> contextSupport  {};
-    std::optional<anon_31> completionList  {};
+    std::optional<boolean> dynamicRegistration {};
+    std::optional<anon_23> completionItem {};
+    std::optional<anon_30> completionItemKind {};
+    std::optional<InsertTextMode> insertTextMode {};
+    std::optional<boolean> contextSupport {};
+    std::optional<anon_31> completionList {};
 };
 
 template<>
@@ -6207,8 +6333,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Comple
 }
 
 struct HoverClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
-    std::optional<std::vector<MarkupKind>> contentFormat  {};
+    std::optional<boolean> dynamicRegistration {};
+    std::optional<std::vector<MarkupKind>> contentFormat {};
 };
 
 template<>
@@ -6232,7 +6358,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, HoverC
 }
 
 struct anon_33 {
-    std::optional<boolean> labelOffsetSupport  {};
+    std::optional<boolean> labelOffsetSupport {};
 };
 
 template<>
@@ -6254,7 +6380,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_3
 }
 
 struct anon_34 {
-    std::optional<boolean> labelOffsetSupport  {};
+    std::optional<boolean> labelOffsetSupport {};
 };
 
 template<>
@@ -6276,9 +6402,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_3
 }
 
 struct anon_32 {
-    std::optional<std::vector<MarkupKind>> documentationFormat  {};
-    std::optional<anon_34> parameterInformation  {};
-    std::optional<boolean> activeParameterSupport  {};
+    std::optional<std::vector<MarkupKind>> documentationFormat {};
+    std::optional<anon_34> parameterInformation {};
+    std::optional<boolean> activeParameterSupport {};
 };
 
 template<>
@@ -6304,9 +6430,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_3
 }
 
 struct SignatureHelpClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
-    std::optional<anon_32> signatureInformation  {};
-    std::optional<boolean> contextSupport  {};
+    std::optional<boolean> dynamicRegistration {};
+    std::optional<anon_32> signatureInformation {};
+    std::optional<boolean> contextSupport {};
 };
 
 template<>
@@ -6332,8 +6458,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Signat
 }
 
 struct DeclarationClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
-    std::optional<boolean> linkSupport  {};
+    std::optional<boolean> dynamicRegistration {};
+    std::optional<boolean> linkSupport {};
 };
 
 template<>
@@ -6357,8 +6483,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Declar
 }
 
 struct DefinitionClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
-    std::optional<boolean> linkSupport  {};
+    std::optional<boolean> dynamicRegistration {};
+    std::optional<boolean> linkSupport {};
 };
 
 template<>
@@ -6382,8 +6508,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Defini
 }
 
 struct TypeDefinitionClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
-    std::optional<boolean> linkSupport  {};
+    std::optional<boolean> dynamicRegistration {};
+    std::optional<boolean> linkSupport {};
 };
 
 template<>
@@ -6407,8 +6533,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, TypeDe
 }
 
 struct ImplementationClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
-    std::optional<boolean> linkSupport  {};
+    std::optional<boolean> dynamicRegistration {};
+    std::optional<boolean> linkSupport {};
 };
 
 template<>
@@ -6432,7 +6558,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Implem
 }
 
 struct ReferenceClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
+    std::optional<boolean> dynamicRegistration {};
 };
 
 template<>
@@ -6454,7 +6580,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Refere
 }
 
 struct DocumentHighlightClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
+    std::optional<boolean> dynamicRegistration {};
 };
 
 template<>
@@ -6476,7 +6602,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Docume
 }
 
 struct anon_35 {
-    std::optional<std::vector<SymbolKind>> valueSet  {};
+    std::optional<std::vector<SymbolKind>> valueSet {};
 };
 
 template<>
@@ -6498,7 +6624,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_3
 }
 
 struct anon_36 {
-    std::vector<SymbolTag> valueSet  {};
+    std::vector<SymbolTag> valueSet {};
 };
 
 template<>
@@ -6520,11 +6646,11 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_3
 }
 
 struct DocumentSymbolClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
-    std::optional<anon_35> symbolKind  {};
-    std::optional<boolean> hierarchicalDocumentSymbolSupport  {};
-    std::optional<anon_36> tagSupport  {};
-    std::optional<boolean> labelSupport  {};
+    std::optional<boolean> dynamicRegistration {};
+    std::optional<anon_35> symbolKind {};
+    std::optional<boolean> hierarchicalDocumentSymbolSupport {};
+    std::optional<anon_36> tagSupport {};
+    std::optional<boolean> labelSupport {};
 };
 
 template<>
@@ -6554,7 +6680,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Docume
 }
 
 struct anon_38 {
-    std::vector<CodeActionKind> valueSet  {};
+    std::vector<CodeActionKind> valueSet {};
 };
 
 template<>
@@ -6576,7 +6702,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_3
 }
 
 struct anon_39 {
-    std::vector<CodeActionKind> valueSet  {};
+    std::vector<CodeActionKind> valueSet {};
 };
 
 template<>
@@ -6598,7 +6724,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_3
 }
 
 struct anon_37 {
-    anon_39 codeActionKind ;
+    anon_39 codeActionKind;
 };
 
 template<>
@@ -6620,7 +6746,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_3
 }
 
 struct anon_40 {
-    std::vector<string> properties  {};
+    std::vector<string> properties {};
 };
 
 template<>
@@ -6642,13 +6768,13 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_4
 }
 
 struct CodeActionClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
-    std::optional<anon_37> codeActionLiteralSupport  {};
-    std::optional<boolean> isPreferredSupport  {};
-    std::optional<boolean> disabledSupport  {};
-    std::optional<boolean> dataSupport  {};
-    std::optional<anon_40> resolveSupport  {};
-    std::optional<boolean> honorsChangeAnnotations  {};
+    std::optional<boolean> dynamicRegistration {};
+    std::optional<anon_37> codeActionLiteralSupport {};
+    std::optional<boolean> isPreferredSupport {};
+    std::optional<boolean> disabledSupport {};
+    std::optional<boolean> dataSupport {};
+    std::optional<anon_40> resolveSupport {};
+    std::optional<boolean> honorsChangeAnnotations {};
 };
 
 template<>
@@ -6682,7 +6808,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, CodeAc
 }
 
 struct CodeLensClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
+    std::optional<boolean> dynamicRegistration {};
 };
 
 template<>
@@ -6704,8 +6830,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, CodeLe
 }
 
 struct DocumentLinkClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
-    std::optional<boolean> tooltipSupport  {};
+    std::optional<boolean> dynamicRegistration {};
+    std::optional<boolean> tooltipSupport {};
 };
 
 template<>
@@ -6729,7 +6855,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Docume
 }
 
 struct DocumentColorClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
+    std::optional<boolean> dynamicRegistration {};
 };
 
 template<>
@@ -6751,7 +6877,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Docume
 }
 
 struct DocumentFormattingClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
+    std::optional<boolean> dynamicRegistration {};
 };
 
 template<>
@@ -6773,7 +6899,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Docume
 }
 
 struct DocumentRangeFormattingClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
+    std::optional<boolean> dynamicRegistration {};
 };
 
 template<>
@@ -6795,7 +6921,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Docume
 }
 
 struct DocumentOnTypeFormattingClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
+    std::optional<boolean> dynamicRegistration {};
 };
 
 template<>
@@ -6817,10 +6943,10 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Docume
 }
 
 struct RenameClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
-    std::optional<boolean> prepareSupport  {};
-    std::optional<PrepareSupportDefaultBehavior> prepareSupportDefaultBehavior  {};
-    std::optional<boolean> honorsChangeAnnotations  {};
+    std::optional<boolean> dynamicRegistration {};
+    std::optional<boolean> prepareSupport {};
+    std::optional<PrepareSupportDefaultBehavior> prepareSupportDefaultBehavior {};
+    std::optional<boolean> honorsChangeAnnotations {};
 };
 
 template<>
@@ -6848,7 +6974,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Rename
 }
 
 struct anon_41 {
-    std::optional<std::vector<FoldingRangeKind>> valueSet  {};
+    std::optional<std::vector<FoldingRangeKind>> valueSet {};
 };
 
 template<>
@@ -6870,7 +6996,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_4
 }
 
 struct anon_42 {
-    std::optional<boolean> collapsedText  {};
+    std::optional<boolean> collapsedText {};
 };
 
 template<>
@@ -6892,11 +7018,11 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_4
 }
 
 struct FoldingRangeClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
-    std::optional<uinteger> rangeLimit  {};
-    std::optional<boolean> lineFoldingOnly  {};
-    std::optional<anon_41> foldingRangeKind  {};
-    std::optional<anon_42> foldingRange  {};
+    std::optional<boolean> dynamicRegistration {};
+    std::optional<uinteger> rangeLimit {};
+    std::optional<boolean> lineFoldingOnly {};
+    std::optional<anon_41> foldingRangeKind {};
+    std::optional<anon_42> foldingRange {};
 };
 
 template<>
@@ -6926,7 +7052,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Foldin
 }
 
 struct SelectionRangeClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
+    std::optional<boolean> dynamicRegistration {};
 };
 
 template<>
@@ -6948,7 +7074,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Select
 }
 
 struct anon_43 {
-    std::vector<DiagnosticTag> valueSet  {};
+    std::vector<DiagnosticTag> valueSet {};
 };
 
 template<>
@@ -6970,11 +7096,11 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_4
 }
 
 struct PublishDiagnosticsClientCapabilities {
-    std::optional<boolean> relatedInformation  {};
-    std::optional<anon_43> tagSupport  {};
-    std::optional<boolean> versionSupport  {};
-    std::optional<boolean> codeDescriptionSupport  {};
-    std::optional<boolean> dataSupport  {};
+    std::optional<boolean> relatedInformation {};
+    std::optional<anon_43> tagSupport {};
+    std::optional<boolean> versionSupport {};
+    std::optional<boolean> codeDescriptionSupport {};
+    std::optional<boolean> dataSupport {};
 };
 
 template<>
@@ -7004,7 +7130,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Publis
 }
 
 struct CallHierarchyClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
+    std::optional<boolean> dynamicRegistration {};
 };
 
 template<>
@@ -7045,7 +7171,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_4
 }
 
 struct anon_46 {
-    std::optional<boolean> delta  {};
+    std::optional<boolean> delta {};
 };
 
 template<>
@@ -7086,7 +7212,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_4
 }
 
 struct anon_48 {
-    std::optional<boolean> delta  {};
+    std::optional<boolean> delta {};
 };
 
 template<>
@@ -7108,8 +7234,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_4
 }
 
 struct anon_44 {
-    std::optional<std::variant<boolean, anon_47>> range  {};
-    std::optional<std::variant<boolean, anon_48>> full  {};
+    std::optional<std::variant<boolean, anon_47>> range {};
+    std::optional<std::variant<boolean, anon_48>> full {};
 };
 
 template<>
@@ -7133,15 +7259,15 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_4
 }
 
 struct SemanticTokensClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
-    anon_44 requests ;
-    std::vector<string> tokenTypes  {};
-    std::vector<string> tokenModifiers  {};
-    std::vector<TokenFormat> formats  {};
-    std::optional<boolean> overlappingTokenSupport  {};
-    std::optional<boolean> multilineTokenSupport  {};
-    std::optional<boolean> serverCancelSupport  {};
-    std::optional<boolean> augmentsSyntaxTokens  {};
+    std::optional<boolean> dynamicRegistration {};
+    anon_44 requests;
+    std::vector<string> tokenTypes {};
+    std::vector<string> tokenModifiers {};
+    std::vector<TokenFormat> formats {};
+    std::optional<boolean> overlappingTokenSupport {};
+    std::optional<boolean> multilineTokenSupport {};
+    std::optional<boolean> serverCancelSupport {};
+    std::optional<boolean> augmentsSyntaxTokens {};
 };
 
 template<>
@@ -7179,7 +7305,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Semant
 }
 
 struct LinkedEditingRangeClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
+    std::optional<boolean> dynamicRegistration {};
 };
 
 template<>
@@ -7201,7 +7327,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Linked
 }
 
 struct MonikerClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
+    std::optional<boolean> dynamicRegistration {};
 };
 
 template<>
@@ -7223,7 +7349,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Monike
 }
 
 struct TypeHierarchyClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
+    std::optional<boolean> dynamicRegistration {};
 };
 
 template<>
@@ -7245,7 +7371,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, TypeHi
 }
 
 struct InlineValueClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
+    std::optional<boolean> dynamicRegistration {};
 };
 
 template<>
@@ -7267,7 +7393,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Inline
 }
 
 struct anon_49 {
-    std::vector<string> properties  {};
+    std::vector<string> properties {};
 };
 
 template<>
@@ -7289,8 +7415,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_4
 }
 
 struct InlayHintClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
-    std::optional<anon_49> resolveSupport  {};
+    std::optional<boolean> dynamicRegistration {};
+    std::optional<anon_49> resolveSupport {};
 };
 
 template<>
@@ -7314,8 +7440,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, InlayH
 }
 
 struct DiagnosticClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
-    std::optional<boolean> relatedDocumentSupport  {};
+    std::optional<boolean> dynamicRegistration {};
+    std::optional<boolean> relatedDocumentSupport {};
 };
 
 template<>
@@ -7339,36 +7465,36 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Diagno
 }
 
 struct TextDocumentClientCapabilities {
-    std::optional<TextDocumentSyncClientCapabilities> synchronization  {};
-    std::optional<CompletionClientCapabilities> completion  {};
-    std::optional<HoverClientCapabilities> hover  {};
-    std::optional<SignatureHelpClientCapabilities> signatureHelp  {};
-    std::optional<DeclarationClientCapabilities> declaration  {};
-    std::optional<DefinitionClientCapabilities> definition  {};
-    std::optional<TypeDefinitionClientCapabilities> typeDefinition  {};
-    std::optional<ImplementationClientCapabilities> implementation  {};
-    std::optional<ReferenceClientCapabilities> references  {};
-    std::optional<DocumentHighlightClientCapabilities> documentHighlight  {};
-    std::optional<DocumentSymbolClientCapabilities> documentSymbol  {};
-    std::optional<CodeActionClientCapabilities> codeAction  {};
-    std::optional<CodeLensClientCapabilities> codeLens  {};
-    std::optional<DocumentLinkClientCapabilities> documentLink  {};
-    std::optional<DocumentColorClientCapabilities> colorProvider  {};
-    std::optional<DocumentFormattingClientCapabilities> formatting  {};
-    std::optional<DocumentRangeFormattingClientCapabilities> rangeFormatting  {};
-    std::optional<DocumentOnTypeFormattingClientCapabilities> onTypeFormatting  {};
-    std::optional<RenameClientCapabilities> rename  {};
-    std::optional<FoldingRangeClientCapabilities> foldingRange  {};
-    std::optional<SelectionRangeClientCapabilities> selectionRange  {};
-    std::optional<PublishDiagnosticsClientCapabilities> publishDiagnostics  {};
-    std::optional<CallHierarchyClientCapabilities> callHierarchy  {};
-    std::optional<SemanticTokensClientCapabilities> semanticTokens  {};
-    std::optional<LinkedEditingRangeClientCapabilities> linkedEditingRange  {};
-    std::optional<MonikerClientCapabilities> moniker  {};
-    std::optional<TypeHierarchyClientCapabilities> typeHierarchy  {};
-    std::optional<InlineValueClientCapabilities> inlineValue  {};
-    std::optional<InlayHintClientCapabilities> inlayHint  {};
-    std::optional<DiagnosticClientCapabilities> diagnostic  {};
+    std::optional<TextDocumentSyncClientCapabilities> synchronization {};
+    std::optional<CompletionClientCapabilities> completion {};
+    std::optional<HoverClientCapabilities> hover {};
+    std::optional<SignatureHelpClientCapabilities> signatureHelp {};
+    std::optional<DeclarationClientCapabilities> declaration {};
+    std::optional<DefinitionClientCapabilities> definition {};
+    std::optional<TypeDefinitionClientCapabilities> typeDefinition {};
+    std::optional<ImplementationClientCapabilities> implementation {};
+    std::optional<ReferenceClientCapabilities> references {};
+    std::optional<DocumentHighlightClientCapabilities> documentHighlight {};
+    std::optional<DocumentSymbolClientCapabilities> documentSymbol {};
+    std::optional<CodeActionClientCapabilities> codeAction {};
+    std::optional<CodeLensClientCapabilities> codeLens {};
+    std::optional<DocumentLinkClientCapabilities> documentLink {};
+    std::optional<DocumentColorClientCapabilities> colorProvider {};
+    std::optional<DocumentFormattingClientCapabilities> formatting {};
+    std::optional<DocumentRangeFormattingClientCapabilities> rangeFormatting {};
+    std::optional<DocumentOnTypeFormattingClientCapabilities> onTypeFormatting {};
+    std::optional<RenameClientCapabilities> rename {};
+    std::optional<FoldingRangeClientCapabilities> foldingRange {};
+    std::optional<SelectionRangeClientCapabilities> selectionRange {};
+    std::optional<PublishDiagnosticsClientCapabilities> publishDiagnostics {};
+    std::optional<CallHierarchyClientCapabilities> callHierarchy {};
+    std::optional<SemanticTokensClientCapabilities> semanticTokens {};
+    std::optional<LinkedEditingRangeClientCapabilities> linkedEditingRange {};
+    std::optional<MonikerClientCapabilities> moniker {};
+    std::optional<TypeHierarchyClientCapabilities> typeHierarchy {};
+    std::optional<InlineValueClientCapabilities> inlineValue {};
+    std::optional<InlayHintClientCapabilities> inlayHint {};
+    std::optional<DiagnosticClientCapabilities> diagnostic {};
 };
 
 template<>
@@ -7448,8 +7574,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, TextDo
 }
 
 struct NotebookDocumentSyncClientCapabilities {
-    std::optional<boolean> dynamicRegistration  {};
-    std::optional<boolean> executionSummarySupport  {};
+    std::optional<boolean> dynamicRegistration {};
+    std::optional<boolean> executionSummarySupport {};
 };
 
 template<>
@@ -7473,7 +7599,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Notebo
 }
 
 struct NotebookDocumentClientCapabilities {
-    NotebookDocumentSyncClientCapabilities synchronization ;
+    NotebookDocumentSyncClientCapabilities synchronization;
 };
 
 template<>
@@ -7495,7 +7621,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Notebo
 }
 
 struct anon_50 {
-    std::optional<boolean> additionalPropertiesSupport  {};
+    std::optional<boolean> additionalPropertiesSupport {};
 };
 
 template<>
@@ -7517,7 +7643,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_5
 }
 
 struct ShowMessageRequestClientCapabilities {
-    std::optional<anon_50> messageActionItem  {};
+    std::optional<anon_50> messageActionItem {};
 };
 
 template<>
@@ -7561,9 +7687,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, ShowDo
 }
 
 struct WindowClientCapabilities {
-    std::optional<boolean> workDoneProgress  {};
-    std::optional<ShowMessageRequestClientCapabilities> showMessage  {};
-    std::optional<ShowDocumentClientCapabilities> showDocument  {};
+    std::optional<boolean> workDoneProgress {};
+    std::optional<ShowMessageRequestClientCapabilities> showMessage {};
+    std::optional<ShowDocumentClientCapabilities> showDocument {};
 };
 
 template<>
@@ -7590,7 +7716,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Window
 
 struct anon_51 {
     boolean cancel { false };
-    std::vector<string> retryOnContentModified  {};
+    std::vector<string> retryOnContentModified {};
 };
 
 template<>
@@ -7614,8 +7740,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_5
 }
 
 struct RegularExpressionsClientCapabilities {
-    string engine ;
-    std::optional<string> version  {};
+    string engine;
+    std::optional<string> version {};
 };
 
 template<>
@@ -7639,9 +7765,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Regula
 }
 
 struct MarkdownClientCapabilities {
-    string parser ;
-    std::optional<string> version  {};
-    std::optional<std::vector<string>> allowedTags  {};
+    string parser;
+    std::optional<string> version {};
+    std::optional<std::vector<string>> allowedTags {};
 };
 
 template<>
@@ -7667,10 +7793,10 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Markdo
 }
 
 struct GeneralClientCapabilities {
-    std::optional<anon_51> staleRequestSupport  {};
-    std::optional<RegularExpressionsClientCapabilities> regularExpressions  {};
-    std::optional<MarkdownClientCapabilities> markdown  {};
-    std::optional<std::vector<PositionEncodingKind>> positionEncodings  {};
+    std::optional<anon_51> staleRequestSupport {};
+    std::optional<RegularExpressionsClientCapabilities> regularExpressions {};
+    std::optional<MarkdownClientCapabilities> markdown {};
+    std::optional<std::vector<PositionEncodingKind>> positionEncodings {};
 };
 
 template<>
@@ -7698,12 +7824,12 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Genera
 }
 
 struct ClientCapabilities {
-    std::optional<WorkspaceClientCapabilities> workspace  {};
-    std::optional<TextDocumentClientCapabilities> textDocument  {};
-    std::optional<NotebookDocumentClientCapabilities> notebookDocument  {};
-    std::optional<WindowClientCapabilities> window  {};
-    std::optional<GeneralClientCapabilities> general  {};
-    std::optional<LSPAny> experimental  {};
+    std::optional<WorkspaceClientCapabilities> workspace {};
+    std::optional<TextDocumentClientCapabilities> textDocument {};
+    std::optional<NotebookDocumentClientCapabilities> notebookDocument {};
+    std::optional<WindowClientCapabilities> window {};
+    std::optional<GeneralClientCapabilities> general {};
+    std::optional<LSPAny> experimental {};
 };
 
 template<>
@@ -7735,14 +7861,14 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Client
 }
 
 struct _InitializeParams : public WorkDoneProgressParams {
-    std::variant<integer, null> processId  {};
-    std::optional<anon_18> clientInfo  {};
-    std::optional<string> locale  {};
-    std::optional<std::variant<string, null>> rootPath  {};
-    std::variant<DocumentUri, null> rootUri  {};
-    ClientCapabilities capabilities ;
-    std::optional<LSPAny> initializationOptions  {};
-    std::optional<TraceValues> trace  {};
+    std::variant<integer, null> processId {};
+    std::optional<anon_18> clientInfo {};
+    std::optional<string> locale {};
+    std::optional<std::variant<string, null>> rootPath {};
+    std::variant<DocumentUri, null> rootUri {};
+    ClientCapabilities capabilities;
+    std::optional<LSPAny> initializationOptions {};
+    std::optional<TraceValues> trace {};
 };
 
 template<>
@@ -7780,7 +7906,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, _Initi
 }
 
 struct WorkspaceFoldersInitializeParams {
-    std::optional<std::variant<std::vector<WorkspaceFolder>, null>> workspaceFolders  {};
+    std::optional<std::variant<std::vector<WorkspaceFolder>, null>> workspaceFolders {};
 };
 
 template<>
@@ -7833,7 +7959,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Initia
 }
 
 struct SaveOptions {
-    std::optional<boolean> includeText  {};
+    std::optional<boolean> includeText {};
 };
 
 template<>
@@ -7855,11 +7981,11 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, SaveOp
 }
 
 struct TextDocumentSyncOptions {
-    std::optional<boolean> openClose  {};
-    std::optional<TextDocumentSyncKind> change  {};
-    std::optional<boolean> willSave  {};
-    std::optional<boolean> willSaveWaitUntil  {};
-    std::optional<std::variant<boolean, SaveOptions>> save  {};
+    std::optional<boolean> openClose {};
+    std::optional<TextDocumentSyncKind> change {};
+    std::optional<boolean> willSave {};
+    std::optional<boolean> willSaveWaitUntil {};
+    std::optional<std::variant<boolean, SaveOptions>> save {};
 };
 
 template<>
@@ -7889,7 +8015,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, TextDo
 }
 
 struct anon_53 {
-    string language ;
+    string language;
 };
 
 template<>
@@ -7911,7 +8037,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_5
 }
 
 struct anon_54 {
-    string language ;
+    string language;
 };
 
 template<>
@@ -7933,8 +8059,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_5
 }
 
 struct anon_52 {
-    std::variant<string, NotebookDocumentFilter> notebook  {};
-    std::optional<std::vector<anon_54>> cells  {};
+    std::variant<string, NotebookDocumentFilter> notebook {};
+    std::optional<std::vector<anon_54>> cells {};
 };
 
 template<>
@@ -7958,7 +8084,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_5
 }
 
 struct anon_56 {
-    string language ;
+    string language;
 };
 
 template<>
@@ -7980,7 +8106,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_5
 }
 
 struct anon_57 {
-    string language ;
+    string language;
 };
 
 template<>
@@ -8002,8 +8128,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_5
 }
 
 struct anon_55 {
-    std::optional<std::variant<string, NotebookDocumentFilter>> notebook  {};
-    std::vector<anon_57> cells  {};
+    std::optional<std::variant<string, NotebookDocumentFilter>> notebook {};
+    std::vector<anon_57> cells {};
 };
 
 template<>
@@ -8027,8 +8153,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_5
 }
 
 struct NotebookDocumentSyncOptions {
-    std::vector<std::variant<anon_52, anon_55>> notebookSelector  {};
-    std::optional<boolean> save  {};
+    std::vector<std::variant<anon_52, anon_55>> notebookSelector {};
+    std::optional<boolean> save {};
 };
 
 template<>
@@ -8076,7 +8202,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Notebo
 }
 
 struct anon_58 {
-    std::optional<boolean> labelDetailsSupport  {};
+    std::optional<boolean> labelDetailsSupport {};
 };
 
 template<>
@@ -8098,10 +8224,10 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_5
 }
 
 struct CompletionOptions : public WorkDoneProgressOptions {
-    std::optional<std::vector<string>> triggerCharacters  {};
-    std::optional<std::vector<string>> allCommitCharacters  {};
-    std::optional<boolean> resolveProvider  {};
-    std::optional<anon_58> completionItem  {};
+    std::optional<std::vector<string>> triggerCharacters {};
+    std::optional<std::vector<string>> allCommitCharacters {};
+    std::optional<boolean> resolveProvider {};
+    std::optional<anon_58> completionItem {};
 };
 
 template<>
@@ -8152,8 +8278,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, HoverO
 }
 
 struct SignatureHelpOptions : public WorkDoneProgressOptions {
-    std::optional<std::vector<string>> triggerCharacters  {};
-    std::optional<std::vector<string>> retriggerCharacters  {};
+    std::optional<std::vector<string>> triggerCharacters {};
+    std::optional<std::vector<string>> retriggerCharacters {};
 };
 
 template<>
@@ -8242,7 +8368,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Docume
 }
 
 struct DocumentSymbolOptions : public WorkDoneProgressOptions {
-    std::optional<string> label  {};
+    std::optional<string> label {};
 };
 
 template<>
@@ -8266,8 +8392,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Docume
 }
 
 struct CodeActionOptions : public WorkDoneProgressOptions {
-    std::optional<std::vector<CodeActionKind>> codeActionKinds  {};
-    std::optional<boolean> resolveProvider  {};
+    std::optional<std::vector<CodeActionKind>> codeActionKinds {};
+    std::optional<boolean> resolveProvider {};
 };
 
 template<>
@@ -8293,7 +8419,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, CodeAc
 }
 
 struct CodeLensOptions : public WorkDoneProgressOptions {
-    std::optional<boolean> resolveProvider  {};
+    std::optional<boolean> resolveProvider {};
 };
 
 template<>
@@ -8317,7 +8443,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, CodeLe
 }
 
 struct DocumentLinkOptions : public WorkDoneProgressOptions {
-    std::optional<boolean> resolveProvider  {};
+    std::optional<boolean> resolveProvider {};
 };
 
 template<>
@@ -8341,7 +8467,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Docume
 }
 
 struct WorkspaceSymbolOptions : public WorkDoneProgressOptions {
-    std::optional<boolean> resolveProvider  {};
+    std::optional<boolean> resolveProvider {};
 };
 
 template<>
@@ -8407,8 +8533,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Docume
 }
 
 struct DocumentOnTypeFormattingOptions {
-    string firstTriggerCharacter ;
-    std::optional<std::vector<string>> moreTriggerCharacter  {};
+    string firstTriggerCharacter;
+    std::optional<std::vector<string>> moreTriggerCharacter {};
 };
 
 template<>
@@ -8432,7 +8558,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Docume
 }
 
 struct RenameOptions : public WorkDoneProgressOptions {
-    std::optional<boolean> prepareProvider  {};
+    std::optional<boolean> prepareProvider {};
 };
 
 template<>
@@ -8456,7 +8582,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Rename
 }
 
 struct ExecuteCommandOptions : public WorkDoneProgressOptions {
-    std::vector<string> commands  {};
+    std::vector<string> commands {};
 };
 
 template<>
@@ -8480,8 +8606,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Execut
 }
 
 struct WorkspaceFoldersServerCapabilities {
-    std::optional<boolean> supported  {};
-    std::optional<std::variant<string, boolean>> changeNotifications  {};
+    std::optional<boolean> supported {};
+    std::optional<std::variant<string, boolean>> changeNotifications {};
 };
 
 template<>
@@ -8505,12 +8631,12 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Worksp
 }
 
 struct FileOperationOptions {
-    std::optional<FileOperationRegistrationOptions> didCreate  {};
-    std::optional<FileOperationRegistrationOptions> willCreate  {};
-    std::optional<FileOperationRegistrationOptions> didRename  {};
-    std::optional<FileOperationRegistrationOptions> willRename  {};
-    std::optional<FileOperationRegistrationOptions> didDelete  {};
-    std::optional<FileOperationRegistrationOptions> willDelete  {};
+    std::optional<FileOperationRegistrationOptions> didCreate {};
+    std::optional<FileOperationRegistrationOptions> willCreate {};
+    std::optional<FileOperationRegistrationOptions> didRename {};
+    std::optional<FileOperationRegistrationOptions> willRename {};
+    std::optional<FileOperationRegistrationOptions> didDelete {};
+    std::optional<FileOperationRegistrationOptions> willDelete {};
 };
 
 template<>
@@ -8542,8 +8668,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, FileOp
 }
 
 struct anon_59 {
-    std::optional<WorkspaceFoldersServerCapabilities> workspaceFolders  {};
-    std::optional<FileOperationOptions> fileOperations  {};
+    std::optional<WorkspaceFoldersServerCapabilities> workspaceFolders {};
+    std::optional<FileOperationOptions> fileOperations {};
 };
 
 template<>
@@ -8567,41 +8693,41 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_5
 }
 
 struct ServerCapabilities {
-    std::optional<PositionEncodingKind> positionEncoding  {};
-    std::optional<std::variant<TextDocumentSyncOptions, TextDocumentSyncKind>> textDocumentSync  {};
-    std::optional<std::variant<NotebookDocumentSyncOptions, NotebookDocumentSyncRegistrationOptions>> notebookDocumentSync  {};
-    std::optional<CompletionOptions> completionProvider  {};
-    std::optional<std::variant<boolean, HoverOptions>> hoverProvider  {};
-    std::optional<SignatureHelpOptions> signatureHelpProvider  {};
-    std::optional<std::variant<boolean, DeclarationOptions, DeclarationRegistrationOptions>> declarationProvider  {};
-    std::optional<std::variant<boolean, DefinitionOptions>> definitionProvider  {};
-    std::optional<std::variant<boolean, TypeDefinitionOptions, TypeDefinitionRegistrationOptions>> typeDefinitionProvider  {};
-    std::optional<std::variant<boolean, ImplementationOptions, ImplementationRegistrationOptions>> implementationProvider  {};
-    std::optional<std::variant<boolean, ReferenceOptions>> referencesProvider  {};
-    std::optional<std::variant<boolean, DocumentHighlightOptions>> documentHighlightProvider  {};
-    std::optional<std::variant<boolean, DocumentSymbolOptions>> documentSymbolProvider  {};
-    std::optional<std::variant<boolean, CodeActionOptions>> codeActionProvider  {};
-    std::optional<CodeLensOptions> codeLensProvider  {};
-    std::optional<DocumentLinkOptions> documentLinkProvider  {};
-    std::optional<std::variant<boolean, DocumentColorOptions, DocumentColorRegistrationOptions>> colorProvider  {};
-    std::optional<std::variant<boolean, WorkspaceSymbolOptions>> workspaceSymbolProvider  {};
-    std::optional<std::variant<boolean, DocumentFormattingOptions>> documentFormattingProvider  {};
-    std::optional<std::variant<boolean, DocumentRangeFormattingOptions>> documentRangeFormattingProvider  {};
-    std::optional<DocumentOnTypeFormattingOptions> documentOnTypeFormattingProvider  {};
-    std::optional<std::variant<boolean, RenameOptions>> renameProvider  {};
-    std::optional<std::variant<boolean, FoldingRangeOptions, FoldingRangeRegistrationOptions>> foldingRangeProvider  {};
-    std::optional<std::variant<boolean, SelectionRangeOptions, SelectionRangeRegistrationOptions>> selectionRangeProvider  {};
-    std::optional<ExecuteCommandOptions> executeCommandProvider  {};
-    std::optional<std::variant<boolean, CallHierarchyOptions, CallHierarchyRegistrationOptions>> callHierarchyProvider  {};
-    std::optional<std::variant<boolean, LinkedEditingRangeOptions, LinkedEditingRangeRegistrationOptions>> linkedEditingRangeProvider  {};
-    std::optional<std::variant<SemanticTokensOptions, SemanticTokensRegistrationOptions>> semanticTokensProvider  {};
-    std::optional<std::variant<boolean, MonikerOptions, MonikerRegistrationOptions>> monikerProvider  {};
-    std::optional<std::variant<boolean, TypeHierarchyOptions, TypeHierarchyRegistrationOptions>> typeHierarchyProvider  {};
-    std::optional<std::variant<boolean, InlineValueOptions, InlineValueRegistrationOptions>> inlineValueProvider  {};
-    std::optional<std::variant<boolean, InlayHintOptions, InlayHintRegistrationOptions>> inlayHintProvider  {};
-    std::optional<std::variant<DiagnosticOptions, DiagnosticRegistrationOptions>> diagnosticProvider  {};
-    std::optional<anon_59> workspace  {};
-    std::optional<LSPAny> experimental  {};
+    std::optional<PositionEncodingKind> positionEncoding {};
+    std::optional<std::variant<TextDocumentSyncOptions, TextDocumentSyncKind>> textDocumentSync {};
+    std::optional<std::variant<NotebookDocumentSyncOptions, NotebookDocumentSyncRegistrationOptions>> notebookDocumentSync {};
+    std::optional<CompletionOptions> completionProvider {};
+    std::optional<std::variant<boolean, HoverOptions>> hoverProvider {};
+    std::optional<SignatureHelpOptions> signatureHelpProvider {};
+    std::optional<std::variant<boolean, DeclarationOptions, DeclarationRegistrationOptions>> declarationProvider {};
+    std::optional<std::variant<boolean, DefinitionOptions>> definitionProvider {};
+    std::optional<std::variant<boolean, TypeDefinitionOptions, TypeDefinitionRegistrationOptions>> typeDefinitionProvider {};
+    std::optional<std::variant<boolean, ImplementationOptions, ImplementationRegistrationOptions>> implementationProvider {};
+    std::optional<std::variant<boolean, ReferenceOptions>> referencesProvider {};
+    std::optional<std::variant<boolean, DocumentHighlightOptions>> documentHighlightProvider {};
+    std::optional<std::variant<boolean, DocumentSymbolOptions>> documentSymbolProvider {};
+    std::optional<std::variant<boolean, CodeActionOptions>> codeActionProvider {};
+    std::optional<CodeLensOptions> codeLensProvider {};
+    std::optional<DocumentLinkOptions> documentLinkProvider {};
+    std::optional<std::variant<boolean, DocumentColorOptions, DocumentColorRegistrationOptions>> colorProvider {};
+    std::optional<std::variant<boolean, WorkspaceSymbolOptions>> workspaceSymbolProvider {};
+    std::optional<std::variant<boolean, DocumentFormattingOptions>> documentFormattingProvider {};
+    std::optional<std::variant<boolean, DocumentRangeFormattingOptions>> documentRangeFormattingProvider {};
+    std::optional<DocumentOnTypeFormattingOptions> documentOnTypeFormattingProvider {};
+    std::optional<std::variant<boolean, RenameOptions>> renameProvider {};
+    std::optional<std::variant<boolean, FoldingRangeOptions, FoldingRangeRegistrationOptions>> foldingRangeProvider {};
+    std::optional<std::variant<boolean, SelectionRangeOptions, SelectionRangeRegistrationOptions>> selectionRangeProvider {};
+    std::optional<ExecuteCommandOptions> executeCommandProvider {};
+    std::optional<std::variant<boolean, CallHierarchyOptions, CallHierarchyRegistrationOptions>> callHierarchyProvider {};
+    std::optional<std::variant<boolean, LinkedEditingRangeOptions, LinkedEditingRangeRegistrationOptions>> linkedEditingRangeProvider {};
+    std::optional<std::variant<SemanticTokensOptions, SemanticTokensRegistrationOptions>> semanticTokensProvider {};
+    std::optional<std::variant<boolean, MonikerOptions, MonikerRegistrationOptions>> monikerProvider {};
+    std::optional<std::variant<boolean, TypeHierarchyOptions, TypeHierarchyRegistrationOptions>> typeHierarchyProvider {};
+    std::optional<std::variant<boolean, InlineValueOptions, InlineValueRegistrationOptions>> inlineValueProvider {};
+    std::optional<std::variant<boolean, InlayHintOptions, InlayHintRegistrationOptions>> inlayHintProvider {};
+    std::optional<std::variant<DiagnosticOptions, DiagnosticRegistrationOptions>> diagnosticProvider {};
+    std::optional<anon_59> workspace {};
+    std::optional<LSPAny> experimental {};
 };
 
 template<>
@@ -8691,8 +8817,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Server
 }
 
 struct anon_60 {
-    string name ;
-    std::optional<string> version  {};
+    string name;
+    std::optional<string> version {};
 };
 
 template<>
@@ -8716,8 +8842,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_6
 }
 
 struct InitializeResult {
-    ServerCapabilities capabilities ;
-    std::optional<anon_60> serverInfo  {};
+    ServerCapabilities capabilities;
+    std::optional<anon_60> serverInfo {};
 };
 
 template<>
@@ -8782,7 +8908,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Initia
 }
 
 struct DidChangeConfigurationParams {
-    LSPAny settings ;
+    LSPAny settings;
 };
 
 template<>
@@ -8804,7 +8930,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, DidCha
 }
 
 struct DidChangeConfigurationRegistrationOptions {
-    std::optional<std::variant<string, std::vector<string>>> section  {};
+    std::optional<std::variant<string, std::vector<string>>> section {};
 };
 
 template<>
@@ -8826,8 +8952,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, DidCha
 }
 
 struct ShowMessageParams {
-    MessageType type ;
-    string message ;
+    MessageType type;
+    string message;
 };
 
 template<>
@@ -8851,7 +8977,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, ShowMe
 }
 
 struct MessageActionItem {
-    string title ;
+    string title;
 };
 
 template<>
@@ -8873,9 +8999,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Messag
 }
 
 struct ShowMessageRequestParams {
-    MessageType type ;
-    string message ;
-    std::optional<std::vector<MessageActionItem>> actions  {};
+    MessageType type;
+    string message;
+    std::optional<std::vector<MessageActionItem>> actions {};
 };
 
 template<>
@@ -8901,8 +9027,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, ShowMe
 }
 
 struct LogMessageParams {
-    MessageType type ;
-    string message ;
+    MessageType type;
+    string message;
 };
 
 template<>
@@ -8926,7 +9052,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, LogMes
 }
 
 struct DidOpenTextDocumentParams {
-    TextDocumentItem textDocument ;
+    TextDocumentItem textDocument;
 };
 
 template<>
@@ -8948,8 +9074,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, DidOpe
 }
 
 struct DidChangeTextDocumentParams {
-    VersionedTextDocumentIdentifier textDocument ;
-    std::vector<TextDocumentContentChangeEvent> contentChanges  {};
+    VersionedTextDocumentIdentifier textDocument;
+    std::vector<TextDocumentContentChangeEvent> contentChanges {};
 };
 
 template<>
@@ -8973,7 +9099,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, DidCha
 }
 
 struct TextDocumentChangeRegistrationOptions : public TextDocumentRegistrationOptions {
-    TextDocumentSyncKind syncKind ;
+    TextDocumentSyncKind syncKind;
 };
 
 template<>
@@ -8997,7 +9123,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, TextDo
 }
 
 struct DidCloseTextDocumentParams {
-    TextDocumentIdentifier textDocument ;
+    TextDocumentIdentifier textDocument;
 };
 
 template<>
@@ -9019,8 +9145,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, DidClo
 }
 
 struct DidSaveTextDocumentParams {
-    TextDocumentIdentifier textDocument ;
-    std::optional<string> text  {};
+    TextDocumentIdentifier textDocument;
+    std::optional<string> text {};
 };
 
 template<>
@@ -9067,8 +9193,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, TextDo
 }
 
 struct WillSaveTextDocumentParams {
-    TextDocumentIdentifier textDocument ;
-    TextDocumentSaveReason reason ;
+    TextDocumentIdentifier textDocument;
+    TextDocumentSaveReason reason;
 };
 
 template<>
@@ -9092,8 +9218,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, WillSa
 }
 
 struct FileEvent {
-    DocumentUri uri ;
-    FileChangeType type ;
+    DocumentUri uri;
+    FileChangeType type;
 };
 
 template<>
@@ -9117,7 +9243,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, FileEv
 }
 
 struct DidChangeWatchedFilesParams {
-    std::vector<FileEvent> changes  {};
+    std::vector<FileEvent> changes {};
 };
 
 template<>
@@ -9139,8 +9265,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, DidCha
 }
 
 struct FileSystemWatcher {
-    GlobPattern globPattern ;
-    std::optional<WatchKind> kind  {};
+    GlobPattern globPattern;
+    std::optional<WatchKind> kind {};
 };
 
 template<>
@@ -9164,7 +9290,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, FileSy
 }
 
 struct DidChangeWatchedFilesRegistrationOptions {
-    std::vector<FileSystemWatcher> watchers  {};
+    std::vector<FileSystemWatcher> watchers {};
 };
 
 template<>
@@ -9186,9 +9312,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, DidCha
 }
 
 struct PublishDiagnosticsParams {
-    DocumentUri uri ;
-    std::optional<integer> version  {};
-    std::vector<Diagnostic> diagnostics  {};
+    DocumentUri uri;
+    std::optional<integer> version {};
+    std::vector<Diagnostic> diagnostics {};
 };
 
 template<>
@@ -9214,8 +9340,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Publis
 }
 
 struct CompletionContext {
-    CompletionTriggerKind triggerKind ;
-    std::optional<string> triggerCharacter  {};
+    CompletionTriggerKind triggerKind;
+    std::optional<string> triggerCharacter {};
 };
 
 template<>
@@ -9239,7 +9365,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Comple
 }
 
 struct CompletionParams : public TextDocumentPositionParams, public WorkDoneProgressParams, public PartialResultParams {
-    std::optional<CompletionContext> context  {};
+    std::optional<CompletionContext> context {};
 };
 
 template<>
@@ -9268,8 +9394,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Comple
 }
 
 struct CompletionItemLabelDetails {
-    std::optional<string> detail  {};
-    std::optional<string> description  {};
+    std::optional<string> detail {};
+    std::optional<string> description {};
 };
 
 template<>
@@ -9293,9 +9419,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Comple
 }
 
 struct InsertReplaceEdit {
-    string newText ;
-    Range insert ;
-    Range replace ;
+    string newText;
+    Range insert;
+    Range replace;
 };
 
 template<>
@@ -9321,25 +9447,25 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Insert
 }
 
 struct CompletionItem {
-    string label ;
-    std::optional<CompletionItemLabelDetails> labelDetails  {};
-    std::optional<CompletionItemKind> kind  {};
-    std::optional<std::vector<CompletionItemTag>> tags  {};
-    std::optional<string> detail  {};
-    std::optional<std::variant<string, MarkupContent>> documentation  {};
-    std::optional<boolean> deprecated  {};
-    std::optional<boolean> preselect  {};
-    std::optional<string> sortText  {};
-    std::optional<string> filterText  {};
-    std::optional<string> insertText  {};
-    std::optional<InsertTextFormat> insertTextFormat  {};
-    std::optional<InsertTextMode> insertTextMode  {};
-    std::optional<std::variant<TextEdit, InsertReplaceEdit>> textEdit  {};
-    std::optional<string> textEditText  {};
-    std::optional<std::vector<TextEdit>> additionalTextEdits  {};
-    std::optional<std::vector<string>> commitCharacters  {};
-    std::optional<Command> command  {};
-    std::optional<LSPAny> data  {};
+    string label;
+    std::optional<CompletionItemLabelDetails> labelDetails {};
+    std::optional<CompletionItemKind> kind {};
+    std::optional<std::vector<CompletionItemTag>> tags {};
+    std::optional<string> detail {};
+    std::optional<std::variant<string, MarkupContent>> documentation {};
+    std::optional<boolean> deprecated {};
+    std::optional<boolean> preselect {};
+    std::optional<string> sortText {};
+    std::optional<string> filterText {};
+    std::optional<string> insertText {};
+    std::optional<InsertTextFormat> insertTextFormat {};
+    std::optional<InsertTextMode> insertTextMode {};
+    std::optional<std::variant<TextEdit, InsertReplaceEdit>> textEdit {};
+    std::optional<string> textEditText {};
+    std::optional<std::vector<TextEdit>> additionalTextEdits {};
+    std::optional<std::vector<string>> commitCharacters {};
+    std::optional<Command> command {};
+    std::optional<LSPAny> data {};
 };
 
 template<>
@@ -9397,8 +9523,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Comple
 }
 
 struct anon_62 {
-    Range insert ;
-    Range replace ;
+    Range insert;
+    Range replace;
 };
 
 template<>
@@ -9422,8 +9548,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_6
 }
 
 struct anon_63 {
-    Range insert ;
-    Range replace ;
+    Range insert;
+    Range replace;
 };
 
 template<>
@@ -9447,11 +9573,11 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_6
 }
 
 struct anon_61 {
-    std::optional<std::vector<string>> commitCharacters  {};
-    std::optional<std::variant<Range, anon_63>> editRange  {};
-    std::optional<InsertTextFormat> insertTextFormat  {};
-    std::optional<InsertTextMode> insertTextMode  {};
-    std::optional<LSPAny> data  {};
+    std::optional<std::vector<string>> commitCharacters {};
+    std::optional<std::variant<Range, anon_63>> editRange {};
+    std::optional<InsertTextFormat> insertTextFormat {};
+    std::optional<InsertTextMode> insertTextMode {};
+    std::optional<LSPAny> data {};
 };
 
 template<>
@@ -9482,8 +9608,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_6
 
 struct CompletionList {
     boolean isIncomplete { false };
-    std::optional<anon_61> itemDefaults  {};
-    std::vector<CompletionItem> items  {};
+    std::optional<anon_61> itemDefaults {};
+    std::vector<CompletionItem> items {};
 };
 
 template<>
@@ -9560,8 +9686,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, HoverP
 }
 
 struct Hover {
-    std::variant<MarkupContent, MarkedString, std::vector<MarkedString>> contents  {};
-    std::optional<Range> range  {};
+    std::variant<MarkupContent, MarkedString, std::vector<MarkedString>> contents {};
+    std::optional<Range> range {};
 };
 
 template<>
@@ -9608,8 +9734,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, HoverR
 }
 
 struct ParameterInformation {
-    std::variant<string, std::pair<uinteger, uinteger>> label  {};
-    std::optional<std::variant<string, MarkupContent>> documentation  {};
+    std::variant<string, std::pair<uinteger, uinteger>> label {};
+    std::optional<std::variant<string, MarkupContent>> documentation {};
 };
 
 template<>
@@ -9633,10 +9759,10 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Parame
 }
 
 struct SignatureInformation {
-    string label ;
-    std::optional<std::variant<string, MarkupContent>> documentation  {};
-    std::optional<std::vector<ParameterInformation>> parameters  {};
-    std::optional<uinteger> activeParameter  {};
+    string label;
+    std::optional<std::variant<string, MarkupContent>> documentation {};
+    std::optional<std::vector<ParameterInformation>> parameters {};
+    std::optional<uinteger> activeParameter {};
 };
 
 template<>
@@ -9664,9 +9790,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Signat
 }
 
 struct SignatureHelp {
-    std::vector<SignatureInformation> signatures  {};
-    std::optional<uinteger> activeSignature  {};
-    std::optional<uinteger> activeParameter  {};
+    std::vector<SignatureInformation> signatures {};
+    std::optional<uinteger> activeSignature {};
+    std::optional<uinteger> activeParameter {};
 };
 
 template<>
@@ -9692,10 +9818,10 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Signat
 }
 
 struct SignatureHelpContext {
-    SignatureHelpTriggerKind triggerKind ;
-    std::optional<string> triggerCharacter  {};
+    SignatureHelpTriggerKind triggerKind;
+    std::optional<string> triggerCharacter {};
     boolean isRetrigger { false };
-    std::optional<SignatureHelp> activeSignatureHelp  {};
+    std::optional<SignatureHelp> activeSignatureHelp {};
 };
 
 template<>
@@ -9723,7 +9849,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Signat
 }
 
 struct SignatureHelpParams : public TextDocumentPositionParams, public WorkDoneProgressParams {
-    std::optional<SignatureHelpContext> context  {};
+    std::optional<SignatureHelpContext> context {};
 };
 
 template<>
@@ -9846,7 +9972,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Refere
 }
 
 struct ReferenceParams : public TextDocumentPositionParams, public WorkDoneProgressParams, public PartialResultParams {
-    ReferenceContext context ;
+    ReferenceContext context;
 };
 
 template<>
@@ -9924,8 +10050,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Docume
 }
 
 struct DocumentHighlight {
-    Range range ;
-    std::optional<DocumentHighlightKind> kind  {};
+    Range range;
+    std::optional<DocumentHighlightKind> kind {};
 };
 
 template<>
@@ -9972,7 +10098,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Docume
 }
 
 struct DocumentSymbolParams : public WorkDoneProgressParams, public PartialResultParams {
-    TextDocumentIdentifier textDocument ;
+    TextDocumentIdentifier textDocument;
 };
 
 template<>
@@ -9998,10 +10124,10 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Docume
 }
 
 struct BaseSymbolInformation {
-    string name ;
-    SymbolKind kind ;
-    std::optional<std::vector<SymbolTag>> tags  {};
-    std::optional<string> containerName  {};
+    string name;
+    SymbolKind kind;
+    std::optional<std::vector<SymbolTag>> tags {};
+    std::optional<string> containerName {};
 };
 
 template<>
@@ -10029,8 +10155,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, BaseSy
 }
 
 struct SymbolInformation : public BaseSymbolInformation {
-    std::optional<boolean> deprecated  {};
-    Location location ;
+    std::optional<boolean> deprecated {};
+    Location location;
 };
 
 template<>
@@ -10059,14 +10185,14 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Symbol
 }
 
 struct DocumentSymbol {
-    string name ;
-    std::optional<string> detail  {};
-    SymbolKind kind ;
-    std::optional<std::vector<SymbolTag>> tags  {};
-    std::optional<boolean> deprecated  {};
-    Range range ;
-    Range selectionRange ;
-    std::optional<std::vector<DocumentSymbol>> children  {};
+    string name;
+    std::optional<string> detail {};
+    SymbolKind kind;
+    std::optional<std::vector<SymbolTag>> tags {};
+    std::optional<boolean> deprecated {};
+    Range range;
+    Range selectionRange;
+    std::optional<std::vector<DocumentSymbol>> children {};
 };
 
 template<>
@@ -10126,9 +10252,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Docume
 }
 
 struct CodeActionContext {
-    std::vector<Diagnostic> diagnostics  {};
-    std::optional<std::vector<CodeActionKind>> only  {};
-    std::optional<CodeActionTriggerKind> triggerKind  {};
+    std::vector<Diagnostic> diagnostics {};
+    std::optional<std::vector<CodeActionKind>> only {};
+    std::optional<CodeActionTriggerKind> triggerKind {};
 };
 
 template<>
@@ -10154,9 +10280,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, CodeAc
 }
 
 struct CodeActionParams : public WorkDoneProgressParams, public PartialResultParams {
-    TextDocumentIdentifier textDocument ;
-    Range range ;
-    CodeActionContext context ;
+    TextDocumentIdentifier textDocument;
+    Range range;
+    CodeActionContext context;
 };
 
 template<>
@@ -10186,7 +10312,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, CodeAc
 }
 
 struct anon_64 {
-    string reason ;
+    string reason;
 };
 
 template<>
@@ -10208,14 +10334,14 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_6
 }
 
 struct CodeAction {
-    string title ;
-    std::optional<CodeActionKind> kind  {};
-    std::optional<std::vector<Diagnostic>> diagnostics  {};
-    std::optional<boolean> isPreferred  {};
-    std::optional<anon_64> disabled  {};
-    std::optional<WorkspaceEdit> edit  {};
-    std::optional<Command> command  {};
-    std::optional<LSPAny> data  {};
+    string title;
+    std::optional<CodeActionKind> kind {};
+    std::optional<std::vector<Diagnostic>> diagnostics {};
+    std::optional<boolean> isPreferred {};
+    std::optional<anon_64> disabled {};
+    std::optional<WorkspaceEdit> edit {};
+    std::optional<Command> command {};
+    std::optional<LSPAny> data {};
 };
 
 template<>
@@ -10276,7 +10402,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, CodeAc
 }
 
 struct WorkspaceSymbolParams : public WorkDoneProgressParams, public PartialResultParams {
-    string query ;
+    string query;
 };
 
 template<>
@@ -10302,7 +10428,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Worksp
 }
 
 struct anon_65 {
-    DocumentUri uri ;
+    DocumentUri uri;
 };
 
 template<>
@@ -10324,8 +10450,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, anon_6
 }
 
 struct WorkspaceSymbol : public BaseSymbolInformation {
-    std::variant<Location, anon_65> location  {};
-    std::optional<LSPAny> data  {};
+    std::variant<Location, anon_65> location {};
+    std::optional<LSPAny> data {};
 };
 
 template<>
@@ -10376,7 +10502,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Worksp
 }
 
 struct CodeLensParams : public WorkDoneProgressParams, public PartialResultParams {
-    TextDocumentIdentifier textDocument ;
+    TextDocumentIdentifier textDocument;
 };
 
 template<>
@@ -10402,9 +10528,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, CodeLe
 }
 
 struct CodeLens {
-    Range range ;
-    std::optional<Command> command  {};
-    std::optional<LSPAny> data  {};
+    Range range;
+    std::optional<Command> command {};
+    std::optional<LSPAny> data {};
 };
 
 template<>
@@ -10454,7 +10580,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, CodeLe
 }
 
 struct DocumentLinkParams : public WorkDoneProgressParams, public PartialResultParams {
-    TextDocumentIdentifier textDocument ;
+    TextDocumentIdentifier textDocument;
 };
 
 template<>
@@ -10480,10 +10606,10 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Docume
 }
 
 struct DocumentLink {
-    Range range ;
-    std::optional<string> target  {};
-    std::optional<string> tooltip  {};
-    std::optional<LSPAny> data  {};
+    Range range;
+    std::optional<string> target {};
+    std::optional<string> tooltip {};
+    std::optional<LSPAny> data {};
 };
 
 template<>
@@ -10537,9 +10663,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Docume
 struct FormattingOptions {
     uinteger tabSize { 0 };
     boolean insertSpaces { false };
-    std::optional<boolean> trimTrailingWhitespace  {};
-    std::optional<boolean> insertFinalNewline  {};
-    std::optional<boolean> trimFinalNewlines  {};
+    std::optional<boolean> trimTrailingWhitespace {};
+    std::optional<boolean> insertFinalNewline {};
+    std::optional<boolean> trimFinalNewlines {};
 };
 
 template<>
@@ -10569,8 +10695,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Format
 }
 
 struct DocumentFormattingParams : public WorkDoneProgressParams {
-    TextDocumentIdentifier textDocument ;
-    FormattingOptions options ;
+    TextDocumentIdentifier textDocument;
+    FormattingOptions options;
 };
 
 template<>
@@ -10619,9 +10745,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Docume
 }
 
 struct DocumentRangeFormattingParams : public WorkDoneProgressParams {
-    TextDocumentIdentifier textDocument ;
-    Range range ;
-    FormattingOptions options ;
+    TextDocumentIdentifier textDocument;
+    Range range;
+    FormattingOptions options;
 };
 
 template<>
@@ -10672,10 +10798,10 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Docume
 }
 
 struct DocumentOnTypeFormattingParams {
-    TextDocumentIdentifier textDocument ;
-    Position position ;
-    string ch ;
-    FormattingOptions options ;
+    TextDocumentIdentifier textDocument;
+    Position position;
+    string ch;
+    FormattingOptions options;
 };
 
 template<>
@@ -10727,9 +10853,9 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Docume
 }
 
 struct RenameParams : public WorkDoneProgressParams {
-    TextDocumentIdentifier textDocument ;
-    Position position ;
-    string newName ;
+    TextDocumentIdentifier textDocument;
+    Position position;
+    string newName;
 };
 
 template<>
@@ -10805,8 +10931,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Prepar
 }
 
 struct ExecuteCommandParams : public WorkDoneProgressParams {
-    string command ;
-    std::optional<std::vector<LSPAny>> arguments  {};
+    string command;
+    std::optional<std::vector<LSPAny>> arguments {};
 };
 
 template<>
@@ -10854,8 +10980,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Execut
 }
 
 struct ApplyWorkspaceEditParams {
-    std::optional<string> label  {};
-    WorkspaceEdit edit ;
+    std::optional<string> label {};
+    WorkspaceEdit edit;
 };
 
 template<>
@@ -10880,8 +11006,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, ApplyW
 
 struct ApplyWorkspaceEditResult {
     boolean applied { false };
-    std::optional<string> failureReason  {};
-    std::optional<uinteger> failedChange  {};
+    std::optional<string> failureReason {};
+    std::optional<uinteger> failedChange {};
 };
 
 template<>
@@ -10907,11 +11033,11 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, ApplyW
 }
 
 struct WorkDoneProgressBegin {
-    std::string kind  { "begin" };
-    string title ;
-    std::optional<boolean> cancellable  {};
-    std::optional<string> message  {};
-    std::optional<uinteger> percentage  {};
+    std::string kind { "begin" };
+    string title;
+    std::optional<boolean> cancellable {};
+    std::optional<string> message {};
+    std::optional<uinteger> percentage {};
 };
 
 template<>
@@ -10941,10 +11067,10 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, WorkDo
 }
 
 struct WorkDoneProgressReport {
-    std::string kind  { "report" };
-    std::optional<boolean> cancellable  {};
-    std::optional<string> message  {};
-    std::optional<uinteger> percentage  {};
+    std::string kind { "report" };
+    std::optional<boolean> cancellable {};
+    std::optional<string> message {};
+    std::optional<uinteger> percentage {};
 };
 
 template<>
@@ -10972,8 +11098,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, WorkDo
 }
 
 struct WorkDoneProgressEnd {
-    std::string kind  { "end" };
-    std::optional<string> message  {};
+    std::string kind { "end" };
+    std::optional<string> message {};
 };
 
 template<>
@@ -10997,7 +11123,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, WorkDo
 }
 
 struct SetTraceParams {
-    TraceValues value ;
+    TraceValues value;
 };
 
 template<>
@@ -11019,8 +11145,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, SetTra
 }
 
 struct LogTraceParams {
-    string message ;
-    std::optional<string> verbose  {};
+    string message;
+    std::optional<string> verbose {};
 };
 
 template<>
@@ -11044,7 +11170,7 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, LogTra
 }
 
 struct CancelParams {
-    std::variant<integer, string> id  {};
+    std::variant<integer, string> id {};
 };
 
 template<>
@@ -11066,8 +11192,8 @@ inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, Cancel
 }
 
 struct ProgressParams {
-    ProgressToken token ;
-    LSPAny value ;
+    ProgressToken token;
+    LSPAny value;
 };
 
 template<>
@@ -12981,3 +13107,4 @@ JSONValue to_json(WorkspaceApplyEdit const& obj)
 }
 
 } // scratch::lsp
+

@@ -127,7 +127,7 @@ add_library(
         App/ArgumentHandler.cpp
         App/Buffer.cpp
         App/CommandHandler.cpp
-        App/Console.cpp
+#        App/Console.cpp
         App/DefaultArgumentHandler.cpp
         App/Document.cpp
         App/EditAction.cpp
@@ -137,11 +137,11 @@ add_library(
         App/Palette.h
         App/Scratch.cpp
         App/StatusBar.cpp
-        Parser/CPlusPlus.cpp
-        Parser/PlainText.cpp
-        Parser/ScratchParser.cpp
-        Parser/Scribble.cpp
-)
+#        Parser/CPlusPlus.cpp
+#        Parser/PlainText.cpp
+#        Parser/ScratchParser.cpp
+#        Parser/Scribble.cpp
+        Mode/Mode.cpp Mode/Mode.h Mode/PlainText.cpp Mode/PlainText.h Mode/CPlusPlus.cpp Mode/CPlusPlus.h)
 
 add_executable(
         scratch

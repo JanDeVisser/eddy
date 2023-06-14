@@ -11,10 +11,7 @@
 
 #include <SDL.h>
 
-#include <lexer/BasicParser.h>
-
 #include <App/Buffer.h>
-#include <Parser/CPlusPlus.h>
 #include <Widget/Command.h>
 #include <Widget/Widget.h>
 
@@ -24,10 +21,12 @@ namespace fs=std::filesystem;
 
 using namespace Obelix;
 
+class Mode;
+
 struct FileType {
     std::vector<std::string> extensions;
     std::string mimetype;
-    std::function<parser::ScratchParser*()> parser_builder;
+    std::function<Mode*(Document&)> mode_builder;
 };
 
 enum class EditActionType {
@@ -67,8 +66,10 @@ class Document : public Buffer {
 public:
     explicit Document(Editor *);
 
+    void update(size_t, Line);
+
     [[nodiscard]] int text_length() const;
-    [[nodiscard]] std::string line(size_t) const;
+    [[nodiscard]] Line const& line(size_t);
     [[nodiscard]] std::string const& text() const { return m_text; }
     [[nodiscard]] int line_length(size_t) const;
     [[nodiscard]] int line_count() const;
@@ -162,14 +163,16 @@ private:
     void move_point(int);
     void update_internals(bool, int = -1);
     void add_edit_action(EditAction);
+    void fill_lines();
 
     fs::path m_path {};
     bool m_dirty { false };
     FileType m_filetype;
-    std::unique_ptr<parser::ScratchParser> m_parser;
+    std::unique_ptr<Mode> m_mode;
 
     std::string m_text;
     bool m_changed { false };
+    std::recursive_mutex m_line_lock;
     std::vector<Line> m_lines {};
 
     int m_screen_top {0};

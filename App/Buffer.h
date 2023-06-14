@@ -9,21 +9,76 @@
 #include <numeric>
 
 #include <lexer/Token.h>
+#include <App/EditorState.h>
 #include <Widget/Widget.h>
 
 namespace scratch {
 
-struct Line {
+class Line {
+public:
     Line() = default;
+    Line(size_t index, std::string_view text)
+        : m_start_index(index)
+        , m_text(text)
+    {
+    }
 
-    int start_index {0};
-    std::vector<Token> tokens {};
+    [[nodiscard]] size_t index() const
+    {
+        return m_start_index;
+    }
+
+    [[nodiscard]] std::string_view const& text() const {
+        return m_text;
+    }
 
     [[nodiscard]] size_t length() const
     {
-        return std::accumulate(tokens.cbegin(), tokens.cend(), 0u,
-            [](size_t len, Token const& token) { return len + token.string_value().length(); });
+        return m_text.length();
     }
+
+    void clear()
+    {
+        m_tokens.clear();
+    }
+
+    void add_token(size_t length, PaletteIndex color)
+    {
+        auto offset { 0u };
+        if (!m_tokens.empty()) {
+            auto last = m_tokens.back();
+            offset = last.offset + last.token.text.length();
+        }
+        if (offset + length <= m_text.length())
+            m_tokens.emplace_back(offset, m_text.substr(offset, length), color);
+    }
+
+    [[nodiscard]] std::vector<DisplayToken> tokens() const
+    {
+        if (m_tokens.empty())
+            return { DisplayToken { m_text, PaletteIndex::Default } };
+
+        std::vector<DisplayToken> ret;
+        for (auto const& t : m_tokens)
+            ret.emplace_back(t.token); // NOLINT(performance-inefficient-vector-operation)
+        return ret;
+    }
+
+private:
+    struct LineToken {
+        LineToken(size_t start, std::string_view text, PaletteIndex color)
+            : offset(start)
+            , token(text, color)
+        {
+        }
+
+        size_t offset;
+        DisplayToken token;
+    };
+
+    size_t m_start_index {0};
+    std::string_view m_text;
+    std::vector<LineToken> m_tokens {};
 };
 
 struct DocumentPosition {

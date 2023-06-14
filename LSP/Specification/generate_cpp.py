@@ -78,9 +78,11 @@ def type_initializer(optional, typedesc):
     else:
         if typedesc["kind"] == "base":
             if typedesc["name"] == 'integer' or typedesc["name"] == 'uinteger':
-                ret += "{ 0 }"
+                ret += " { 0 }"
             if typedesc["name"] == 'boolean':
-                ret += "{ false }"
+                ret += " { false }"
+            if typedesc["name"] == 'decimal':
+                ret += " { 0.0 }"
         if typedesc["kind"] == "reference" or typedesc["kind"] == "literal":
             pass
         if typedesc["kind"] == "array":
@@ -106,7 +108,7 @@ def emit_properties(s):
             continue
 
         optional = "optional" in prop and prop["optional"]
-        print(f"    {render_type(optional, prop['type'])} {prop['name']} {type_initializer(optional, prop['type'])};")
+        print(f"    {render_type(optional, prop['type'])} {prop['name']}{type_initializer(optional, prop['type'])};")
 
 
 def struct_to_json(s):
@@ -261,22 +263,38 @@ def emit_enumeration(name):
         print(f"    return {{ static_cast<{t}>(obj) }};")
     print("}")
     print()
+
+    if t == "string":
+        print(
+f"""
+inline std::optional<{name}> {name}_from_string(std::string const& s)
+{{""")
+        for value in enum['values']:
+            print(f'    if (s == "{value["value"]}") return {name}::{value["cname"]};')
+        print("    return {};")
+        print("}")
+        print()
+
     print(
 f"""template <>
 inline ErrorOr<void,JSONDecodeError> decode_value(JSONValue const& value, {name}& target)
 {{""")
     if t == "string":
-        print(f"    if (!value.is_string())")
-        print(f'         return JSONDecodeError {{ JSONDecodeError::Code::TypeMismatch, "" }};')
-        for value in enum['values']:
-            print(f'    if (value.to_string() == "{value["value"]}") target = {name}::{value["cname"]};')
+        print(
+f"""    if (!value.is_string())
+        return JSONDecodeError {{ JSONDecodeError::Code::TypeMismatch, "" }};
+    auto s = {name}_from_string(value.to_string());
+    if (s)
+        target = *s;""")
     if t == "integer" or t == "uinteger":
-        print(f"    if (!value.is_integer())")
-        print(f'         return JSONDecodeError {{ JSONDecodeError::Code::TypeMismatch, "" }};')
-        print(f"    target = static_cast<{name}>(*(value.to_int<{t}>()));")
-    print("    return {};")
-    print("}")
-    print()
+        print(
+f"""    if (!value.is_integer())
+        return JSONDecodeError {{ JSONDecodeError::Code::TypeMismatch, "" }};
+    target = static_cast<{name}>(*(value.to_int<{t}>()));""")
+    print(
+"""    return {};
+}
+""")
 
     emitted_structures.add(name)
     emitted_types.append(('E', name))
