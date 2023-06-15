@@ -85,6 +85,7 @@ public:
 
     [[nodiscard]] int find_line_number(int) const;
     [[nodiscard]] DocumentPosition position(int) const;
+    [[nodiscard]] int position_to_cursor(DocumentPosition);
     [[nodiscard]] int point() const { return m_point; };
     [[nodiscard]] int mark() const { return m_mark; }
     [[nodiscard]] int point_line() const;

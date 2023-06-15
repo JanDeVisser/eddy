@@ -224,7 +224,7 @@ void Document::fill_lines()
             // FALL THROUGH!
         case TokenCode::NewLine:
             m_lines.emplace_back(offset, text.substr(offset, length));
-            offset += length;
+            offset += length + token.value().length();
             length = 0u;
             break;
         default:
@@ -499,11 +499,20 @@ int Document::find_line_number(int cursor) const
 
 DocumentPosition Document::position(int cursor) const
 {
-    if (cursor == 0) {
-        return { 0, 0 };
-    }
     auto line = find_line_number(cursor);
-    return { line, cursor - static_cast<int>(m_lines[line].index()) };
+    if (line < line_count())
+        return { line, cursor - static_cast<int>(m_lines[line].index()) };
+    else
+        return { line_count(), 0 };
+}
+
+int Document::position_to_cursor(DocumentPosition position) {
+    if (line_count() == 0) {
+        return 0;
+    }
+    position.line = clamp(position.line, 0, line_count() - 1);
+    position.column = clamp(position.column, 0, line_length(position.line));
+    return m_lines[position.line].index() + position.column;
 }
 
 int Document::point_line() const
@@ -545,9 +554,14 @@ void Document::set_point_and_mark(int point, int mark)
 
 void Document::move_to(int line, int column, bool select)
 {
-    line = clamp(line, 0, (int)line_count() - 1);
-    column = clamp(column, 0, (int)line_length(line));
-    move_point(m_lines[line].index() + column);
+    if (line_count() == 0) {
+        line = 0;
+        column = 0;
+    } else {
+        line = clamp(line, 0, (int)line_count() - 1);
+        column = clamp(column, 0, (int)line_length(line));
+    }
+    move_point(position_to_cursor(DocumentPosition { line, column }));
     if (m_screen_top > line || m_screen_top + rows() < line)
         m_screen_top = line - rows() / 2;
     if (m_screen_left > column || m_screen_left + columns() < column)
@@ -561,9 +575,9 @@ void Document::update_internals(bool select, int line)
         fill_lines();
         m_changed = false;
     }
-    if (line < 0)
-        line = find_line_number(m_point);
-    int column = m_point - m_lines[line].index();
+    auto pos = position(m_point);
+    line = pos.line;
+    auto column = pos.column;
     m_screen_top = clamp(m_screen_top, std::max(0, line - editor()->rows() + 1), line);
     m_screen_left = clamp(m_screen_left, std::max(0, column - editor()->columns() + 1), column);
     if (!select)
@@ -612,22 +626,22 @@ void Document::redo()
 
 void Document::up(bool select)
 {
-    int line = find_line_number(m_point);
-    int column = m_point - m_lines[line].index();
+    int line = point_line();
+    int column = point_column();
     if (line > 0) {
-        move_point(clamp(m_lines[line - 1].index() + column, m_lines[line - 1].index(), m_lines[line - 1].index() + line_length(line - 1)));
+        move_point(position_to_cursor(DocumentPosition { line - 1, column }));
+        update_internals(select, line - 1);
     }
-    update_internals(select, line - 1);
 }
 
 void Document::down(bool select)
 {
-    int line = find_line_number(m_point);
-    int column = m_point - m_lines[line].index();
+    int line = point_line();
+    int column = point_column();
     if (line < (line_count() - 1)) {
-        move_point(clamp(m_lines[line + 1].index() + column, m_lines[line + 1].index(), m_lines[line + 1].index() + line_length(line + 1)));
+        move_point(position_to_cursor(DocumentPosition { line + 1, column }));
+        update_internals(select, line + 1);
     }
-    update_internals(select, line + 1);
 }
 
 void Document::left(bool select)
@@ -769,6 +783,7 @@ std::string Document::load(std::string const& file_name)
     m_mode->on_load();
     m_point = m_mark = 0;
     m_dirty = false;
+    fill_lines();
     m_changed = false;
     return "";
 }

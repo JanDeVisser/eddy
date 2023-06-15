@@ -11,7 +11,7 @@
 #include <mutex>
 #include <string>
 
-#include "Format.h"
+#include <Core/Format.h>
 
 namespace Obelix {
 
@@ -231,6 +231,6 @@ private:
 #    undef assert
 #endif
 #define assert(condition) Obelix::Logger::get_logger().assert_msg(__FILE__, __LINE__, __func__, condition, "Assertion error: " #condition)
-#define oassert(condition, fmt, args...) Obelix::Logger::get_logger().assert_msg(__FILE__, __LINE__, __func__, condition, fmt, ##args)
+#define oassert(condition, fmt, args...) Obelix::Logger::get_logger().assert_msg(__FILE__, __LINE__, __func__, condition, "Assertion error: " #condition ": " fmt, ##args)
 
 }

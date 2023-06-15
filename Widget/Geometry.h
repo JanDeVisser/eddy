@@ -18,7 +18,7 @@ namespace eddy {
 template<typename T>
 T clamp(T v, T lo, T hi)
 {
-    assert(lo <= hi);
+    oassert(lo <= hi, "{} > {} for v = {}", lo, hi, v);
     if (v < lo)
         v = lo;
     if (v > hi)
