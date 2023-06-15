@@ -88,6 +88,7 @@ public:
     {
         m_current_context = ctx;
         m_entries = std::move(get_entries<EntryCls>(m_parameter, ctx));
+        m_current = m_top = 0;
         filter_matches();
     }
 
