@@ -5,18 +5,18 @@
  */
 
 #include <App/Console.h>
+#include <App/Eddy.h>
 #include <App/Editor.h>
-#include <App/Scratch.h>
 #include <Parser/Scribble.h>
-#include <Widget/App.h>
+#include <Scribble/Interp/CommandAdapter.h>
 #include <Scribble/Parser.h>
 #include <Scribble/Scribble.h>
-#include <Scribble/Interp/CommandAdapter.h>
 #include <Scribble/Syntax/Literal.h>
+#include <Widget/App.h>
 
-namespace scratch {
+namespace eddy {
 
-using namespace scratch::scribble;
+using namespace eddy::scribble;
 
 ErrorOr<void, SyntaxError> register_command(InterpreterContext& ctx, std::string const& command, Widget& widget)
 {
@@ -30,7 +30,7 @@ ErrorOr<void, SyntaxError> register_command(InterpreterContext& ctx, std::string
 
 ErrorOr<void, SyntaxError> initialize_context(InterpreterContext& ctx)
 {
-    TRY_RETURN(register_command(ctx, "set-fixed-width-font", Scratch::scratch()));
+    TRY_RETURN(register_command(ctx, "set-fixed-width-font", Eddy::eddy()));
 
     TRY_RETURN(register_builtin(ctx, "console-log",
         [](Values const& args, InterpreterContext& ctx) -> Value {
@@ -161,7 +161,7 @@ void Console::render()
                 } else if (len + t.length() > m_screen_left + columns()) {
                     t = t.substr(0, m_screen_left + columns() - len);
                 }
-                editor()->append(scratch::parser::ScribbleParser::token_for(token.code(), t));
+                editor()->append(eddy::parser::ScribbleParser::token_for(token.code(), t));
                 len += token.value().length();
                 if (len >= m_screen_left + editor()->columns())
                     break;
@@ -313,4 +313,4 @@ void Console::execute()
     m_cursor = 0;
 }
 
-} // Scratch
+} // Eddy

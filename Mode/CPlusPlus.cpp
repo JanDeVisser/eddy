@@ -4,15 +4,15 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include <core/FileBuffer.h>
+#include <Core/FileBuffer.h>
 #include <LSP/LSP.h>
 #include <LSP/LSPMessages.h>
 #include <Mode/CPlusPlus.h>
 
-namespace scratch {
+namespace eddy {
 
 using namespace Obelix;
-using namespace scratch::lsp;
+using namespace eddy::lsp;
 
 CPlusPlus::CPlusPlus(Document& doc)
     : Mode(doc)
@@ -44,6 +44,9 @@ CPlusPlus::CPlusPlus(Document& doc)
                         break;
                     case LSPMessageType::Edit:
                         // Collect all messages
+                        break;
+                    default:
+                        break;
                     }
                     if (!handle(msg))
                         return;

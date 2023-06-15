@@ -7,7 +7,7 @@
 #include <App/EditorState.h>
 #include <Widget/App.h>
 
-namespace scratch {
+namespace eddy {
 
 Glyph::Glyph(Char ch, PaletteIndex idx)
     : character(ch)

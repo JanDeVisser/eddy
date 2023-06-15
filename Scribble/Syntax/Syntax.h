@@ -11,12 +11,12 @@
 #include <string>
 #include <vector>
 
-#include <core/Logging.h>
-#include <lexer/Token.h>
+#include <Core/Logging.h>
+#include <Lexer/Token.h>
 
 #include <Scribble/Syntax/SyntaxNodeType.h>
 
-namespace scratch::scribble {
+namespace eddy::scribble {
 
 using namespace Obelix;
 

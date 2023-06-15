@@ -6,11 +6,11 @@
 
 #include <Test/ScribbleTest.h>
 
-namespace scratch::test {
+namespace eddy::test {
 
 TEST_F(ScribbleTest, Var)
 {
-    scratch::ConsoleStatement stmt;
+    Eddy::ConsoleStatement stmt;
     stmt.compile("var x = \n42");
     EXPECT_NE(stmt.node, nullptr);
     stmt.execute(m_ctx);
@@ -19,7 +19,7 @@ TEST_F(ScribbleTest, Var)
 
 TEST_F(ScribbleTest, Assign)
 {
-    scratch::ConsoleStatement stmt;
+    Eddy::ConsoleStatement stmt;
     stmt.compile("var x = 42\nx = 12\nx\n");
     EXPECT_NE(stmt.node, nullptr);
     stmt.execute(m_ctx);
@@ -28,7 +28,7 @@ TEST_F(ScribbleTest, Assign)
 
 TEST_F(ScribbleTest, VarAdd)
 {
-    scratch::ConsoleStatement stmt;
+    Eddy::ConsoleStatement stmt;
     stmt.compile("var x = \n42  var y = x + 12");
     EXPECT_NE(stmt.node, nullptr);
     stmt.execute(m_ctx);
@@ -37,7 +37,7 @@ TEST_F(ScribbleTest, VarAdd)
 
 TEST_F(ScribbleTest, VarMult)
 {
-    scratch::ConsoleStatement stmt;
+    Eddy::ConsoleStatement stmt;
     stmt.compile("var x = \n42  var y = x + 12 var z = y * 2");
     EXPECT_NE(stmt.node, nullptr);
     stmt.execute(m_ctx);
@@ -46,7 +46,7 @@ TEST_F(ScribbleTest, VarMult)
 
 TEST_F(ScribbleTest, FuncDef)
 {
-    scratch::ConsoleStatement stmt;
+    Eddy::ConsoleStatement stmt;
     stmt.compile("func foo(x) { return 2*x }");
     EXPECT_NE(stmt.node, nullptr);
     stmt.execute(m_ctx);
@@ -55,7 +55,7 @@ TEST_F(ScribbleTest, FuncDef)
 
 TEST_F(ScribbleTest, FuncCall)
 {
-    scratch::ConsoleStatement stmt;
+    Eddy::ConsoleStatement stmt;
     stmt.compile("func foo(x) { return 2*x }   foo(4)");
     EXPECT_NE(stmt.node, nullptr);
     stmt.execute(m_ctx);
@@ -68,7 +68,7 @@ TEST_F(ScribbleTest, FuncCall)
 
 TEST_F(ScribbleTest, If)
 {
-    scratch::ConsoleStatement stmt;
+    Eddy::ConsoleStatement stmt;
     stmt.compile("var x = 2 var y = 0 if x > y { y = 3 } else { y = 4 } y");
     EXPECT_NE(stmt.node, nullptr);
     stmt.execute(m_ctx);
@@ -78,7 +78,7 @@ TEST_F(ScribbleTest, If)
 
 TEST_F(ScribbleTest, While)
 {
-    scratch::ConsoleStatement stmt;
+    Eddy::ConsoleStatement stmt;
     stmt.compile("var x = 2 var y = 0 while y < 10 { x = x + y y = y + 1 } x");
     EXPECT_NE(stmt.node, nullptr);
     stmt.execute(m_ctx);
@@ -88,7 +88,7 @@ TEST_F(ScribbleTest, While)
 
 TEST_F(ScribbleTest, For)
 {
-    scratch::ConsoleStatement stmt;
+    Eddy::ConsoleStatement stmt;
     stmt.compile("var x = 2 for y in 0..10 { x = x + y } x");
     EXPECT_NE(stmt.node, nullptr);
     stmt.execute(m_ctx);
@@ -98,7 +98,7 @@ TEST_F(ScribbleTest, For)
 
 TEST_F(ScribbleTest, Precedence)
 {
-    scratch::ConsoleStatement stmt;
+    Eddy::ConsoleStatement stmt;
     stmt.compile("5*4+2");
     EXPECT_NE(stmt.node, nullptr);
     stmt.execute(m_ctx);
@@ -145,12 +145,12 @@ TEST_F(ScribbleTest, Precedence)
 TEST_F(ScribbleTest, BuiltInNoArgs)
 {
     auto err = register_builtin(m_ctx, "builtin_function",
-            [](scratch::interp::Values const&, InterpreterContext&) {
+            [](Eddy::interp::Values const&, InterpreterContext&) {
                 return Value { 69 };
             }
         );
     EXPECT_FALSE(err.is_error());
-    scratch::ConsoleStatement stmt;
+    Eddy::ConsoleStatement stmt;
     stmt.compile("builtin_function()");
     EXPECT_NE(stmt.node, nullptr);
     stmt.execute(m_ctx);
@@ -161,12 +161,12 @@ TEST_F(ScribbleTest, BuiltInNoArgs)
 TEST_F(ScribbleTest, BuiltInWithArgs)
 {
     auto err = register_builtin(m_ctx, "builtin_function",
-            [](scratch::interp::Values const& values, InterpreterContext&) {
+            [](Eddy::interp::Values const& values, InterpreterContext&) {
                 return Value { *(values[0].to_int<int>()) + *(values[1].to_int<int>()) };
             }
         );
     EXPECT_FALSE(err.is_error());
-    scratch::ConsoleStatement stmt;
+    Eddy::ConsoleStatement stmt;
     stmt.compile("builtin_function(12, 37)");
     EXPECT_NE(stmt.node, nullptr);
     stmt.execute(m_ctx);
@@ -174,4 +174,4 @@ TEST_F(ScribbleTest, BuiltInWithArgs)
     EXPECT_EQ(stmt.result.to_int<int>(), 49);
 }
 
-} // scratch::test
+} // Eddy::test

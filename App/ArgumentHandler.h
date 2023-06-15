@@ -9,10 +9,10 @@
 #include <SDL.h>
 
 #include <App/CommandHandler.h>
-#include <App/Scratch.h>
+#include <App/Eddy.h>
 #include <Widget/Command.h>
 
-namespace scratch {
+namespace eddy {
 
 class ArgumentHandler : public ModalWidget {
 protected:
@@ -118,8 +118,8 @@ public:
                     -4,
                     App::instance().context()->character_height() + 1
                 };
-                box(r, Scratch::scratch().color(PaletteIndex::CurrentLineFill));
-                rectangle(r, Scratch::scratch().color(PaletteIndex::CurrentLineEdge));
+                box(r, Eddy::eddy().color(PaletteIndex::CurrentLineFill));
+                rectangle(r, Eddy::eddy().color(PaletteIndex::CurrentLineEdge));
             }
             render_fixed(10, y, match.text);
             y += App::instance().context()->character_height() + 2;

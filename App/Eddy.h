@@ -11,7 +11,7 @@
 #include <App/StatusBar.h>
 #include <Widget/App.h>
 
-namespace scratch {
+namespace eddy {
 
 struct Config {
 public:
@@ -37,24 +37,24 @@ private:
     std::unordered_map<std::string, std::variant<std::string,bool>> m_cmdline_flags;
 };
 
-class Scratch : public App {
+class Eddy : public App {
 public:
     static void run_app(int, char const**);
     [[nodiscard]] static Editor* editor();
     [[nodiscard]] static StatusBar* status_bar();
     static void add_status_bar_applet(int, Renderer);
-    static Scratch& scratch();
+    static Eddy& eddy();
     SDL_Color color(PaletteIndex color);
 
-    class ScratchCommands : public Commands {
+    class EddyCommands : public Commands {
     public:
-        ScratchCommands();
+        EddyCommands();
     };
 
     void on_command(ScheduledCommand const&) override;
 
 private:
-    Scratch(Config& config, SDLContext *ctx);
+    Eddy(Config& config, SDLContext *ctx);
     Config& m_config;
     Palette m_palette;
 
@@ -62,7 +62,7 @@ private:
     Gutter* m_gutter { nullptr };
     StatusBar* m_status_bar { nullptr };
 
-    static ScratchCommands s_scratch_commands;
+    static EddyCommands s_eddy_commands;
 };
 
 }

@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include <lexer/Lexer.h>
+#include <Lexer/Lexer.h>
 
 #include <LSP/JSON.h>
 
-namespace scratch::lsp {
+namespace eddy::lsp {
 
 using namespace std::literals;
 

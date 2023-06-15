@@ -6,11 +6,11 @@
 
 #include <filesystem>
 
-#include <core/Logging.h>
+#include <Core/Logging.h>
 
 #include <LSP/LSP.h>
 
-namespace scratch::lsp {
+namespace eddy::lsp {
 
 using namespace std::literals;
 namespace fs=std::filesystem;

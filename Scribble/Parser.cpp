@@ -11,7 +11,7 @@
 #include <Scribble/Parser.h>
 #include <Scribble/Scribble.h>
 
-namespace scratch::scribble {
+namespace eddy::scribble {
 
 using namespace Obelix;
 

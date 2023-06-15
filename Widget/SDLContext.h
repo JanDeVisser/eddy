@@ -13,15 +13,15 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 
-#include <core/Logging.h>
+#include <Core/Logging.h>
 
 #include <Widget/Geometry.h>
 
 using namespace Obelix;
 
-namespace scratch {
+namespace eddy {
 
-extern_logging_category(scratch);
+extern_logging_category(eddy);
 
 class SDLContext {
 public:

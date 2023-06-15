@@ -430,12 +430,12 @@ def header():
     print()
     print("#include <LSP/Message.h>")
     print()
-    print("namespace scratch::lsp {")
+    print("namespace eddy::lsp {")
     print()
 
 
 def footer():
-    print("} // scratch::lsp")
+    print("} // eddy::lsp")
     print()
 
 

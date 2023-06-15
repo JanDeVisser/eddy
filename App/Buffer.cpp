@@ -7,7 +7,7 @@
 #include <App/Buffer.h>
 #include <App/Editor.h>
 
-namespace scratch {
+namespace eddy {
 
 Buffer::Buffer(Editor* editor)
     : m_editor(editor)
@@ -29,4 +29,4 @@ int Buffer::columns() const
     return m_editor->columns();
 }
 
-} // Scratch
+} // Eddy

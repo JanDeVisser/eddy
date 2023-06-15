@@ -6,10 +6,10 @@
 
 #include <Parser/PlainText.h>
 
-namespace scratch::parser {
+namespace eddy::parser {
 
 PlainTextParser::PlainTextParser()
-    : BasicScratchParser()
+    : BasicEddyParser()
 {
     lexer().add_scanner("plaintext", [](Tokenizer& tokenizer) {
         switch (int ch = tokenizer.peek()) {

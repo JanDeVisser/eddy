@@ -8,9 +8,9 @@
 
 #include <string_view>
 
-#include <core/Logging.h>
+#include <Core/Logging.h>
 
-namespace scratch::interp {
+namespace eddy::interp {
 
 using namespace std::literals;
 using namespace Obelix;

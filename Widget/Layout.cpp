@@ -7,7 +7,7 @@
 #include <Widget/Command.h>
 #include <Widget/Widget.h>
 
-namespace scratch {
+namespace eddy {
 
 Layout::Layout(ContainerOrientation orientation, SizePolicy policy, int size)
     : WindowedWidget(policy, size)

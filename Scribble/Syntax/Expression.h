@@ -8,7 +8,7 @@
 
 #include <Scribble/Syntax/Syntax.h>
 
-namespace scratch::scribble {
+namespace eddy::scribble {
 
 NODE_CLASS(Expression, SyntaxNode)
 public:

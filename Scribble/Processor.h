@@ -11,7 +11,7 @@
 #include <sstream>
 #include <unordered_map>
 
-#include <core/Error.h>
+#include <Core/Error.h>
 #include <Scribble/Context.h>
 #include <Scribble/Syntax/ControlFlow.h>
 #include <Scribble/Syntax/Expression.h>
@@ -21,7 +21,7 @@
 #include <Scribble/Syntax/Syntax.h>
 #include <Scribble/Syntax/Variable.h>
 
-namespace scratch::scribble {
+namespace eddy::scribble {
 
 extern_logging_category(scribble);
 

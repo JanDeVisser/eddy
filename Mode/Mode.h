@@ -10,12 +10,12 @@
 #include <functional>
 #include <string_view>
 
-#include <core/Error.h>
+#include <Core/Error.h>
 
 #include <App/Document.h>
 #include <Widget/Command.h>
 
-namespace scratch {
+namespace eddy {
 
 namespace fs=std::filesystem;
 using namespace Obelix;

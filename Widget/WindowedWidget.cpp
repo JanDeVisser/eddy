@@ -9,7 +9,7 @@
 #include <Widget/App.h>
 #include <Widget/Widget.h>
 
-namespace scratch {
+namespace eddy {
 
 WindowedWidget::WindowedWidget(SizePolicy policy, int size)
     : Widget()

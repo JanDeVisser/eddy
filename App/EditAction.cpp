@@ -6,7 +6,7 @@
 
 #include <App/Document.h>
 
-namespace scratch {
+namespace eddy {
 
 void EditAction::undo(Document& doc) const
 {

@@ -4,15 +4,15 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include <core/FileBuffer.h>
+#include <Core/FileBuffer.h>
 #include <Mode/Mode.h>
 
-namespace scratch {
+namespace eddy {
 
 Mode::Mode(Document& doc)
     : m_doc(doc)
 {
-    open_file = [this](fs::path const& path) -> ErrorOr<std::string, SystemError> {
+    open_file = [](fs::path const& path) -> ErrorOr<std::string, SystemError> {
         auto buffer = TRY(FileBuffer::from_file(path));
         return buffer->buffer();
     };

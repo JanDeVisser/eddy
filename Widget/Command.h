@@ -17,7 +17,7 @@
 #include <App/Forward.h>
 #include <Widget/Key.h>
 
-namespace scratch {
+namespace eddy {
 
 namespace fs=std::filesystem;
 

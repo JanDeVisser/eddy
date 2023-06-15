@@ -8,15 +8,15 @@
 
 #include <Widget/Command.h>
 #include <App/EditorState.h>
-#include <lexer/BasicParser.h>
+#include <Lexer/BasicParser.h>
 
 using namespace Obelix;
 
-namespace scratch::parser {
+namespace eddy::parser {
 
-class ScratchParser {
+class EddyParser {
 public:
-    virtual ~ScratchParser() = default;
+    virtual ~EddyParser() = default;
     [[nodiscard]] virtual Token const& next_token() = 0;
     [[nodiscard]] virtual DisplayToken colorize(TokenCode, std::string_view const&) = 0;
     [[nodiscard]] virtual std::vector<Command> commands() const;
@@ -27,16 +27,16 @@ public:
     virtual ErrorOr<void,SystemError> read_file(std::string const&, BufferLocator* locator = nullptr) = 0;
 
 protected:
-    ScratchParser() = default;
+    EddyParser() = default;
 };
 
-class BasicScratchParser : public BasicParser, public ScratchParser {
+class BasicEddyParser : public BasicParser, public EddyParser {
     [[nodiscard]] bool parsed() const override { return !tokens().empty(); }
     void assign(std::string const& text) override { BasicParser::assign(text); }
     void invalidate() override { BasicParser::invalidate(); }
     ErrorOr<void,SystemError> read_file(std::string const& path, BufferLocator* locator = nullptr) override { return BasicParser::read_file(path, locator); }
 protected:
-    BasicScratchParser() = default;
+    BasicEddyParser() = default;
 };
 
-} // Scratch::Parser
+} // Eddy::Parser

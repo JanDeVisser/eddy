@@ -10,7 +10,7 @@
 #include <map>
 #include <set>
 
-#include <lexer/BasicParser.h>
+#include <Lexer/BasicParser.h>
 
 #include <Scribble/Context.h>
 #include <Scribble/Processor.h>
@@ -19,7 +19,7 @@
 
 using namespace Obelix;
 
-namespace scratch::scribble {
+namespace eddy::scribble {
 
 struct ParserContext {
     std::set<std::string> modules;

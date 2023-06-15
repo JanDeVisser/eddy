@@ -8,7 +8,7 @@
 
 #include <Widget/Text.h>
 
-namespace scratch {
+namespace eddy {
 
 bool isPrintable(int cp)
 {

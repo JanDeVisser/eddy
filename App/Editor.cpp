@@ -9,14 +9,14 @@
 
 #include <SDL2_gfxPrimitives.h>
 
+#include <App/Eddy.h>
+#include <App/Editor.h>
 #include <Widget/App.h>
 #include <Widget/SDLContext.h>
-#include <App/Editor.h>
-#include <App/Scratch.h>
 
-namespace scratch {
+namespace eddy {
 
-extern_logging_category(scratch);
+extern_logging_category(eddy);
 
 namespace fs=std::filesystem;
 
@@ -24,7 +24,7 @@ EditorCommands::EditorCommands()
 {
     register_command({ "new-buffer", "New buffer", {},
         [](Widget&, strings const&) -> void {
-                             Scratch::editor()->new_file();
+                             Eddy::editor()->new_file();
         }
     }, { SDLK_n, KMOD_CTRL });
     register_command({ "open-file", "Open file",
@@ -32,12 +32,12 @@ EditorCommands::EditorCommands()
             { "File to open", CommandParameterType::ExistingFilename }
         },
         [](Widget&, strings const& args) -> void {
-            Scratch::editor()->open_file(args[0]);
+            Eddy::editor()->open_file(args[0]);
         }
     }, { SDLK_o, KMOD_CTRL });
     register_command({ "save-all-files", "Save call files", {},
         [](Widget&, strings const&) -> void {
-            Scratch::editor()->save_all();
+            Eddy::editor()->save_all();
         }
     }, { SDLK_l, KMOD_CTRL });
     register_command({ "switch-buffer", "Switch buffer",
@@ -46,10 +46,10 @@ EditorCommands::EditorCommands()
         },
         [](Widget&, strings const& args) -> void {
             if (auto ix_maybe = Obelix::try_to_ulong<std::string>()(args[0]); ix_maybe) {
-                Scratch::editor()->switch_to(*ix_maybe);
+                Eddy::editor()->switch_to(*ix_maybe);
                 return;
             }
-            Scratch::editor()->switch_to(args[0]);
+            Eddy::editor()->switch_to(args[0]);
         }
     }, { SDLK_b, KMOD_CTRL });
 }
@@ -59,10 +59,10 @@ EditorCommands Editor::s_editor_commands;
 Editor::Editor()
     : WindowedWidget()
 {
-    Scratch::status_bar()->add_applet(20, [this](WindowedWidget* applet) -> void {
+    Eddy::status_bar()->add_applet(20, [this](WindowedWidget* applet) -> void {
         applet->render_fixed_centered(2, buffer()->status(), SDL_Color { 0xff, 0xff, 0xff, 0xff });
     });
-    Scratch::status_bar()->add_applet(20, [this](WindowedWidget* applet) -> void {
+    Eddy::status_bar()->add_applet(20, [this](WindowedWidget* applet) -> void {
         applet->render_fixed(10, 2, buffer()->short_title(), SDL_Color { 0xff, 0xff, 0xff, 0xff });
     });
     m_commands = &s_editor_commands;
@@ -134,8 +134,8 @@ void Editor::mark_current_line(int line)
         0,
         line_height()
     };
-    box(r, Scratch::scratch().color(PaletteIndex::CurrentLineFill));
-    rectangle(r, Scratch::scratch().color(PaletteIndex::CurrentLineEdge));
+    box(r, Eddy::eddy().color(PaletteIndex::CurrentLineFill));
+    rectangle(r, Eddy::eddy().color(PaletteIndex::CurrentLineEdge));
 }
 
 void Editor::text_cursor(int line, int column)
@@ -154,7 +154,7 @@ void Editor::text_cursor(int line, int column)
             1,
             line_height()
         };
-        box(r, Scratch::scratch().color(PaletteIndex::Cursor));
+        box(r, Eddy::eddy().color(PaletteIndex::Cursor));
         if (elapsed > 800)
             time_start = time_end;
     }
@@ -162,7 +162,7 @@ void Editor::text_cursor(int line, int column)
 
 void Editor::append(DisplayToken const& token)
 {
-    render_fixed(column_left(m_column), line_top(m_line), token.text, Scratch::scratch().color(token.color));
+    render_fixed(column_left(m_column), line_top(m_line), token.text, Eddy::eddy().color(token.color));
     m_column += (int)token.text.length();
 }
 
@@ -205,8 +205,8 @@ void Editor::handle_motion(SDL_MouseMotionEvent const& event)
 void Editor::handle_click(SDL_MouseButtonEvent const& event)
 {
     if (event.button == SDL_BUTTON_RIGHT) {
-        if (auto cmd = Scratch::instance().command("invoke"); cmd) {
-            Scratch::instance().schedule(*cmd);
+        if (auto cmd = Eddy::instance().command("invoke"); cmd) {
+            Eddy::instance().schedule(*cmd);
             return;
         }
     }

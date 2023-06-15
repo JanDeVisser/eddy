@@ -7,7 +7,7 @@
 #include <Widget/App.h>
 #include <Widget/Alert.h>
 
-namespace scratch {
+namespace eddy {
 
 Alert::Alert(std::string text)
     : ModalWidget(App::instance().context()->text_width(text) * 1.4, App::instance().context()->character_height() * 1.6)

@@ -12,7 +12,7 @@
 #include <App/EditorState.h>
 #include <Widget/Widget.h>
 
-namespace scratch {
+namespace eddy {
 
 struct Clipper {
 public:

@@ -14,9 +14,9 @@
 #include <Widget/SDLContext.h>
 #include <Widget/Text.h>
 
-namespace scratch {
+namespace eddy {
 
-logging_category(scratch);
+logging_category(eddy);
 
 App* App::s_app { nullptr };
 

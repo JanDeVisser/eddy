@@ -11,9 +11,9 @@
 #include <cstdint>
 #include <valarray>
 
-#include <core/Logging.h>
+#include <Core/Logging.h>
 
-namespace scratch {
+namespace eddy {
 
 template<typename T>
 T clamp(T v, T lo, T hi)

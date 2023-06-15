@@ -6,7 +6,7 @@
 
 #include <Scribble/Scribble.h>
 
-namespace scratch::scribble {
+namespace eddy::scribble {
 
 Scribble::Scribble(bool ignore_ws)
     : BasicParser()
@@ -57,4 +57,4 @@ Scribble::Scribble(bool ignore_ws)
         KeywordFalse, "false");
 }
 
-} // Scratch::Scribble
+} // Eddy::Scribble

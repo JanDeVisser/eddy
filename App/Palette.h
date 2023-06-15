@@ -8,7 +8,7 @@
 
 #include <array>
 
-namespace scratch {
+namespace eddy {
 
 enum class PaletteIndex : uint8_t {
     Default,

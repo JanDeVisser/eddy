@@ -13,10 +13,10 @@
 #include <Scribble/Interp/Function.h>
 #include <Scribble/Interp/Value.h>
 
-namespace scratch::test {
+namespace eddy::test {
 
 using namespace testing;
-using namespace scratch::interp;
+using namespace eddy::interp;
 
 class ScribbleTest : public Test {
 protected:

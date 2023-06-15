@@ -6,7 +6,7 @@
 
 #include <App/ArgumentHandler.h>
 
-namespace scratch {
+namespace eddy {
 
 DefaultArgumentHandler::DefaultArgumentHandler(CommandHandler* handler, CommandParameter const& parameter)
     : ArgumentHandler(handler, parameter, 2 * (App::instance().context()->character_height() + 4) + 12)
@@ -34,7 +34,7 @@ void DefaultArgumentHandler::render()
             1,
             App::instance().context()->character_height()
         };
-        box(r, Scratch::scratch().color(PaletteIndex::Cursor));
+        box(r, Eddy::eddy().color(PaletteIndex::Cursor));
         if (elapsed > 800)
             time_start = time_end;
     }

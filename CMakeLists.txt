@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(scratch)
+project(eddy)
 
 cmake_policy(SET CMP0048 NEW)
 cmake_policy(SET CMP0115 NEW)
@@ -11,15 +11,17 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "-Wall")
 
-set(scratch_NAME Scratch)
-set(scratch_VERSION_MAJOR 0)
-set(scratch_VERSION_MINOR 1)
+set(eddy_NAME Eddy)
+set(eddy_VERSION_MAJOR 0)
+set(eddy_VERSION_MINOR 1)
 
 set(CMAKE_INSTALL_PREFIX ${PROJECT_BINARY_DIR})
-set(scratch_DIR ${CMAKE_INSTALL_PREFIX})
-set(scratch_DATADIR ${CMAKE_INSTALL_PREFIX}/share)
+set(eddy_DIR ${CMAKE_INSTALL_PREFIX})
+set(eddy_DATADIR ${CMAKE_INSTALL_PREFIX}/share)
 
 set(INCLUDES "${PROJECT_SOURCE_DIR}" "${PROJECT_SOURCE_DIR}/include")
+
+include(FetchContent)
 
 find_package(SDL2 REQUIRED)
 find_package(SDL2_gfx REQUIRED)
@@ -27,19 +29,6 @@ find_package(SDL2_image REQUIRED)
 find_package(SDL2_ttf REQUIRED)
 
 set(INCLUDES ${INCLUDES} "${SDL2_INCLUDE_DIRS}" "${SDL2_TTF_INCLUDE_DIRS}")
-
-if(FETCH_OBELIXLIBS)
-    include(FetchContent)
-    FetchContent_Declare(
-            obelixlibs
-            GIT_REPOSITORY git@github.com:JanDeVisser/obelixlibs.git
-            GIT_TAG main
-    )
-    FetchContent_MakeAvailable(obelixlibs)
-else()
-    set(INCLUDES ${INCLUDES} ${PROJECT_SOURCE_DIR}/obelixlibs)
-    add_subdirectory(${PROJECT_SOURCE_DIR}/obelixlibs)
-endif()
 
 include_directories(
         "${INCLUDES}"
@@ -54,6 +43,9 @@ FetchContent_Declare(
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
+
+add_subdirectory(Core)
+add_subdirectory(Lexer)
 
 add_library(
         Widget
@@ -75,7 +67,7 @@ add_library(
 
 target_link_libraries(
         Widget
-        oblcore
+        Core
         SDL2::Main
         SDL2::GFX
         SDL2::Image
@@ -92,8 +84,8 @@ add_library(
 
 target_link_libraries(
         LSP
-        oblcore
-        obllexer
+        Core
+        Lexer
 )
 
 add_library(
@@ -118,12 +110,12 @@ add_library(
 
 target_link_libraries(
         Scribble
-        oblcore
-        obllexer
+        Core
+        Lexer
 )
 
 add_library(
-        Scratch
+        Eddy
         App/ArgumentHandler.cpp
         App/Buffer.cpp
         App/CommandHandler.cpp
@@ -135,29 +127,32 @@ add_library(
         App/EditorState.cpp
         App/Gutter.cpp
         App/Palette.h
-        App/Scratch.cpp
+        App/Eddy.cpp
         App/StatusBar.cpp
 #        Parser/CPlusPlus.cpp
 #        Parser/PlainText.cpp
-#        Parser/ScratchParser.cpp
+#        Parser/EddyParser.cpp
 #        Parser/Scribble.cpp
-        Mode/Mode.cpp Mode/Mode.h Mode/PlainText.cpp Mode/PlainText.h Mode/CPlusPlus.cpp Mode/CPlusPlus.h)
+#        Mode/CPlusPlus.cpp
+        Mode/Mode.cpp
+        Mode/PlainText.cpp
+)
 
 add_executable(
-        scratch
+        eddy
         App/main.cpp
 )
 
 target_link_libraries(
-        scratch
-        Scratch
+        eddy
+        Eddy
         Scribble
         Widget
-        oblcore
-        obllexer
+        Core
+        Lexer
 )
 
-target_compile_features(scratch PUBLIC cxx_std_20)
+target_compile_features(eddy PUBLIC cxx_std_20)
 
 enable_testing()
 include(GoogleTest)
@@ -169,7 +164,7 @@ add_executable(
 
 target_link_libraries(
         ScribbleTest
-        Scratch
+        Eddy
         Scribble
         Widget
         gtest_main
@@ -193,7 +188,7 @@ target_link_libraries(
 add_test(NAME LSPTest COMMAND LSPTest)
 gtest_discover_tests(LSPTest)
 
-install(TARGETS scratch # ScribbleTest
+install(TARGETS eddy # ScribbleTest
         ARCHIVE DESTINATION lib
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib

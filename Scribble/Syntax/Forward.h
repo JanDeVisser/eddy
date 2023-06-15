@@ -12,7 +12,7 @@
 #include <Scribble/Syntax/SyntaxNodeType.h>
 #include <Scribble/Syntax/Syntax.h>
 
-namespace scratch::scribble {
+namespace eddy::scribble {
 
 #undef ENUM_SYNTAXNODETYPE
 #define ENUM_SYNTAXNODETYPE(type)          \

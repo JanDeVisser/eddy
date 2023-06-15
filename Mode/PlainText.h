@@ -6,10 +6,10 @@
 
 #pragma once
 
-#include <lexer/BasicParser.h>
+#include <Lexer/BasicParser.h>
 #include <Mode/Mode.h>
 
-namespace scratch {
+namespace eddy {
 
 class PlainText : public Mode {
 public:

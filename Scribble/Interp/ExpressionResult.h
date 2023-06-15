@@ -8,11 +8,11 @@
 #include <Scribble/Interp/Value.h>
 #include <Scribble/Syntax/Syntax.h>
 
-namespace scratch::interp {
+namespace eddy::interp {
 
 using namespace std::literals;
 using namespace Obelix;
-using namespace scratch::scribble;
+using namespace eddy::scribble;
 
 NODE_CLASS(ExpressionResult, SyntaxNode)
 public:

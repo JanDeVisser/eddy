@@ -7,11 +7,11 @@
 #include <SDL2_gfxPrimitives.h>
 #include <SDL_image.h>
 
-#include <core/Logging.h>
+#include <Core/Logging.h>
 
 #include <App/CommandHandler.h>
 #include <App/Console.h>
-#include <App/Scratch.h>
+#include <App/Eddy.h>
 #include <Widget/SDLContext.h>
 
 #ifndef WINDOW_WIDTH
@@ -22,13 +22,13 @@
 #define WINDOW_HEIGHT 768
 #endif
 
-namespace scratch {
+namespace eddy {
 
 using namespace Obelix;
 
-logging_category(scratch);
+logging_category(eddy);
 
-Scratch::ScratchCommands::ScratchCommands()
+Eddy::EddyCommands::EddyCommands()
 {
     register_command({ "enlarge-font", "Enlarge editor font", {},
         [](Widget&, strings const&) -> void {
@@ -54,7 +54,7 @@ Scratch::ScratchCommands::ScratchCommands()
         }
     }, { SDLK_0, KMOD_GUI });
 
-    register_command({ "scratch-quit", "Quits the editor", {},
+    register_command({ "eddy-quit", "Quits the editor", {},
         [](Widget&, strings const&) -> void {
             App::instance().quit();
         }
@@ -67,7 +67,7 @@ Scratch::ScratchCommands::ScratchCommands()
             }
         },
         [](Widget&, strings const& args) -> void {
-            Scratch::instance().set_font(args[0]);
+            Eddy::instance().set_font(args[0]);
         }
     });
 
@@ -79,7 +79,7 @@ Scratch::ScratchCommands::ScratchCommands()
 
 }
 
-Scratch::ScratchCommands Scratch::s_scratch_commands;
+Eddy::EddyCommands Eddy::s_eddy_commands;
 
 Config::Config(int argc, char const** argv)
 {
@@ -104,42 +104,42 @@ Config::Config(int argc, char const** argv)
         enable_log = true;
     }
     if (enable_log)
-        Obelix::Logger::get_logger().enable("scratch");
+        Obelix::Logger::get_logger().enable("eddy");
 }
 
-Scratch::Scratch(Config& config, SDLContext *ctx)
-    : App("Scratch", ctx)
+Eddy::Eddy(Config& config, SDLContext *ctx)
+    : App("Eddy", ctx)
     , m_config(config)
     , m_palette(DarkPalette())
 {
-    auto icon_surface = IMG_LoadTyped_RW(SDL_RWFromFile("scratch.png", "rb"), 1, "PN");
+    auto icon_surface = IMG_LoadTyped_RW(SDL_RWFromFile("eddy.png", "rb"), 1, "PN");
     if(!icon_surface) {
         log_error("Could not load application icon");
         return;
     }
     SDL_SetWindowIcon(context()->window(), icon_surface);
     SDL_FreeSurface(icon_surface);
-    m_commands = &s_scratch_commands;
+    m_commands = &s_eddy_commands;
 }
 
-Editor* Scratch::editor()
+Editor* Eddy::editor()
 {
-    return scratch().m_editor;
+    return eddy().m_editor;
 }
 
-StatusBar* Scratch::status_bar()
+StatusBar* Eddy::status_bar()
 {
-    return scratch().m_status_bar;
+    return eddy().m_status_bar;
 }
 
-void Scratch::add_status_bar_applet(int size, Renderer renderer)
+void Eddy::add_status_bar_applet(int size, Renderer renderer)
 {
     status_bar()->add_applet(size, std::move(renderer));
 }
 
-Scratch& Scratch::scratch()
+Eddy& Eddy::eddy()
 {
-    return dynamic_cast<Scratch&>(App::instance());
+    return dynamic_cast<Eddy&>(App::instance());
 }
 
 /*
@@ -150,7 +150,7 @@ Scratch& Scratch::scratch()
  *    uint8_t r = c & 0xff;
  *    return { r, g, b, a };
  */
-SDL_Color Scratch::color(PaletteIndex color)
+SDL_Color Eddy::color(PaletteIndex color)
 {
     static unsigned s_ansicolors[] = {
         0xff000000, // ANSIBlack,
@@ -178,18 +178,18 @@ SDL_Color Scratch::color(PaletteIndex color)
     return *((SDL_Color*)&c);
 }
 
-void Scratch::on_command(ScheduledCommand const& cmd)
+void Eddy::on_command(ScheduledCommand const& cmd)
 {
     add_modal(new CommandHandler(cmd));
 }
 
-void Scratch::run_app(int argc, char const** argv)
+void Eddy::run_app(int argc, char const** argv)
 {
     Config config(argc, argv);
-    debug(scratch, "The logger works!");
+    debug(eddy, "The logger works!");
 
     auto ctx = new SDLContext(WINDOW_WIDTH, WINDOW_HEIGHT);
-    Scratch app(config, ctx);
+    Eddy app(config, ctx);
     auto main_area = new Layout(ContainerOrientation::Horizontal);
     app.add_component(main_area);
     app.add_component(app.m_status_bar = new StatusBar());
@@ -206,7 +206,7 @@ void Scratch::run_app(int argc, char const** argv)
         } else {
             box_color = PaletteIndex::ANSIBrightRed;
         }
-        applet->box(SDL_Rect { 0, 0, 0, 0 }, Scratch::scratch().color(box_color));
+        applet->box(SDL_Rect { 0, 0, 0, 0 }, Eddy::eddy().color(box_color));
         applet->render_fixed_centered(2, "fps", SDL_Color { 0xff, 0xff, 0xff, 0xff });
     });
     main_area->add_component(app.m_gutter = new Gutter());

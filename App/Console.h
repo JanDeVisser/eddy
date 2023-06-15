@@ -10,7 +10,7 @@
 #include <Scribble/Interp/Interpreter.h>
 #include <Widget/Command.h>
 
-namespace scratch {
+namespace eddy {
 
 struct ConsoleCommands : public Commands {
     ConsoleCommands();
@@ -60,4 +60,4 @@ private:
     static ConsoleCommands s_console_commands;
 };
 
-} // Scratch
+} // Eddy

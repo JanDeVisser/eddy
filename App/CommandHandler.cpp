@@ -4,14 +4,14 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include <core/StringUtil.h>
+#include <Core/StringUtil.h>
 
 #include <App/ArgumentHandler.h>
 #include <App/CommandHandler.h>
 
 using namespace Obelix;
 
-namespace scratch {
+namespace eddy {
 
 CommandHandler::CommandHandler(ScheduledCommand const& scheduled_command)
     : ModalWidget(App::instance().width() / 2, App::instance().height() / 2)

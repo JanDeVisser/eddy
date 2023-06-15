@@ -4,12 +4,12 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include <core/Checked.h>
+#include <Core/Checked.h>
 
 #include <Scribble/Interp/Value.h>
 #include <Scribble/Interp/Function.h>
 
-namespace scratch::interp {
+namespace eddy::interp {
 
 using namespace Obelix;
 

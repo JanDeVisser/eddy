@@ -6,14 +6,14 @@
 
 #include <memory>
 
-#include <core/FileBuffer.h>
+#include <Core/FileBuffer.h>
 
 #include <Scribble/Processor.h>
 #include <Scribble/Syntax/Statement.h>
 #include <Scribble/Syntax/Syntax.h>
 #include <Scribble/Parser.h>
 
-namespace scratch::scribble {
+namespace eddy::scribble {
 
 using namespace Obelix;
 

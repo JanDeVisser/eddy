@@ -25,7 +25,7 @@
     S(WidgetContainer)       \
     S(WindowedWidget)
 
-namespace scratch {
+namespace eddy {
 
 #undef ENUM_CLASS
 #define ENUM_CLASS(type) \

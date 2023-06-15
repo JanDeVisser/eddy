@@ -6,15 +6,15 @@
 
 #include <iostream>
 
-#include <core/FileBuffer.h>
+#include <Core/FileBuffer.h>
 
 #include <Test/LSPTest.h>
 #include <LSP/LSPMessages.h>
 
-namespace scratch::test {
+namespace eddy::test {
 
 using namespace Obelix;
-using namespace scratch::lsp;
+using namespace eddy::lsp;
 
 TEST_F(LSPTest, GetTheLSP)
 {
@@ -27,7 +27,7 @@ TEST_F(LSPTest, GetTheLSP)
 
 TEST_F(LSPTest, EncodeInitializeParams)
 {
-    constexpr char const *URI = "file:///Users/jan/projects/scratch/App";
+    constexpr char const *URI = "file:///Users/jan/projects/Eddy/App";
     InitializeParams initialize_params;
     std::vector<WorkspaceFolder> folders { { .uri = URI, .name =  "App", } };
     initialize_params.workspaceFolders = folders;
@@ -74,12 +74,12 @@ TEST_F(LSPTest, SendDidOpenTextDocumentNotification)
     auto& lsp = LSP::the();
     EXPECT_TRUE(lsp.running());
     auto initialize_err = lsp.send_request<Initialize>(InitializeParams {});
-    auto buffer = FileBuffer::from_file("/Users/jan/projects/scratch/App/main.cpp");
+    auto buffer = FileBuffer::from_file("/Users/jan/projects/Eddy/App/main.cpp");
     ASSERT_FALSE(buffer.is_error());
     DidOpenTextDocumentParams params;
     params.textDocument.text = buffer.value()->str();
     params.textDocument.languageId = "cpp";
-    params.textDocument.uri = "file:///Users/jan/projects/scratch/App/main.cpp";
+    params.textDocument.uri = "file:///Users/jan/projects/Eddy/App/main.cpp";
     params.textDocument.version = 0;
     auto did_open_err = lsp.send_notification<TextDocumentDidOpen>(params);
     EXPECT_FALSE(did_open_err.is_error());
@@ -90,20 +90,20 @@ TEST_F(LSPTest, SendTextDocumentSemanticTokensFullRequest)
     auto& lsp = LSP::the();
     EXPECT_TRUE(lsp.running());
     InitializeParams initialize_params;
-    std::vector<WorkspaceFolder> folders { { .uri =  "file:///Users/jan/projects/scratch/App", .name =  "App", } };
+    std::vector<WorkspaceFolder> folders { { .uri =  "file:///Users/jan/projects/Eddy/App", .name =  "App", } };
     initialize_params.workspaceFolders = folders;
     auto initialize_err = lsp.send_request<Initialize>(initialize_params);
-    auto buffer = FileBuffer::from_file("/Users/jan/projects/scratch/App/main.cpp");
+    auto buffer = FileBuffer::from_file("/Users/jan/projects/Eddy/App/main.cpp");
     ASSERT_FALSE(buffer.is_error());
     DidOpenTextDocumentParams params;
     params.textDocument.text = buffer.value()->str();
     params.textDocument.languageId = "cpp";
-    params.textDocument.uri = "file:///Users/jan/projects/scratch/App/main.cpp";
+    params.textDocument.uri = "file:///Users/jan/projects/Eddy/App/main.cpp";
     params.textDocument.version = 0;
     auto did_open_err = lsp.send_notification<TextDocumentDidOpen>(params);
     EXPECT_FALSE(did_open_err.is_error());
     SemanticTokensParams semantic_tokens_params;
-    semantic_tokens_params.textDocument.uri = "file:///Users/jan/projects/scratch/App/main.cpp";
+    semantic_tokens_params.textDocument.uri = "file:///Users/jan/projects/Eddy/App/main.cpp";
     auto semantic_tokens_err = lsp.send_request<TextDocumentSemanticTokensFull>(semantic_tokens_params);
     EXPECT_FALSE(semantic_tokens_err.is_error());
     if (semantic_tokens_err.is_error()) {
@@ -115,4 +115,4 @@ TEST_F(LSPTest, SendTextDocumentSemanticTokensFullRequest)
     EXPECT_EQ(semantic_tokens.result().index(), 0);
 }
 
-} // scratch::test
+} // Eddy::test

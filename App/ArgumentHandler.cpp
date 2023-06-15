@@ -6,7 +6,7 @@
 
 #include <App/ArgumentHandler.h>
 
-namespace scratch {
+namespace eddy {
 
 ArgumentHandler::ArgumentHandler(CommandHandler* handler, CommandParameter const& parameter, int height)
     : ModalWidget((int)(App::instance().width() * 0.66), height)
@@ -135,7 +135,7 @@ void submit(CommandHandler* handler, BufferId const& entry, int const&)
 template<>
 std::vector<BufferId> get_entries(CommandParameter const& param, int const&)
 {
-    return Scratch::editor()->buffer_ids();
+    return Eddy::editor()->buffer_ids();
 }
 
 ModalWidget* create_argument_handler(CommandHandler* handler, CommandParameter const& parameter)

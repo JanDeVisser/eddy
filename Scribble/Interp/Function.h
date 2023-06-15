@@ -10,7 +10,7 @@
 #include <Scribble/Interp/Value.h>
 #include <Scribble/Syntax/Function.h>
 
-namespace scratch::interp {
+namespace eddy::interp {
 
 class Function {
 public:

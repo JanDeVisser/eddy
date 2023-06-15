@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include <App/Scratch.h>
+#include <App/Eddy.h>
 
 int main(int argc, char const** argv)
 {
-    scratch::Scratch::run_app(argc, argv);
+    eddy::Eddy::run_app(argc, argv);
     return 0;
 }

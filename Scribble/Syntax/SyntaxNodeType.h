@@ -6,12 +6,12 @@
 
 #pragma once
 
-#include <core/Format.h>
-#include <core/Logging.h>
+#include <Core/Format.h>
+#include <Core/Logging.h>
 
 using namespace Obelix;
 
-namespace scratch::scribble {
+namespace eddy::scribble {
 
 #define ENUMERATE_SYNTAXNODETYPES(S)    \
     S(SyntaxNode)                       \
@@ -100,7 +100,7 @@ constexpr char const* SyntaxNodeType_name(SyntaxNodeType type)
 
 namespace Obelix {
 
-using namespace scratch::scribble;
+using namespace eddy::scribble;
 
 template<>
 struct to_string<SyntaxNodeType> {

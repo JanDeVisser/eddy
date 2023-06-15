@@ -6,7 +6,7 @@
 
 #include <Scribble/Syntax/Function.h>
 
-namespace scratch::scribble {
+namespace eddy::scribble {
 
 extern_logging_category(scribble);
 

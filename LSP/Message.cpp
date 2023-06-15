@@ -6,7 +6,7 @@
 
 #include <LSP/Message.h>
 
-namespace scratch::lsp {
+namespace eddy::lsp {
 
 int s_next_request_id = -1;
 

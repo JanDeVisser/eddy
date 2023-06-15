@@ -9,14 +9,14 @@
 #include <future>
 #include <set>
 
-#include <core/Error.h>
-#include <core/Process.h>
+#include <Core/Error.h>
+#include <Core/Process.h>
 
 #include <LSP/JSON.h>
 #include <LSP/Message.h>
 #include <LSP/LSPMessages.h>
 
-namespace scratch::lsp {
+namespace eddy::lsp {
 
 using namespace Obelix;
 

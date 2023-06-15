@@ -14,19 +14,19 @@
 
 using namespace Obelix;
 
-namespace scratch {
+namespace eddy {
 
 SDLContext::SDLInit::SDLInit()
 {
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
         fatal("Failed to initialize SDL system");
     init = true;
-    debug(scratch, "Initialized SDL system");
+    debug(eddy, "Initialized SDL system");
 }
 
 SDLContext::SDLInit::~SDLInit()
 {
-    debug(scratch, "Terminating SDL system");
+    debug(eddy, "Terminating SDL system");
     if (init) {
         // primitivePurge();  Probably old. What did this do?
         SDL_Quit();
@@ -38,12 +38,12 @@ SDLContext::SDLTTF::SDLTTF()
     if (TTF_Init() < 0)
         fatal("Failed to initialize SDL TTF system");
     init = true;
-    debug(scratch, "Initialized SDL TTF system");
+    debug(eddy, "Initialized SDL TTF system");
 }
 
 SDLContext::SDLTTF::~SDLTTF()
 {
-    debug(scratch, "Terminating SDL TTF system");
+    debug(eddy, "Terminating SDL TTF system");
     if (init)
         TTF_Quit();
 }
@@ -53,32 +53,32 @@ SDLContext::SDLIMG::SDLIMG()
     if (IMG_Init(IMG_INIT_PNG) < 0)
         fatal("Failed to initialize SDL IMG system");
     init = true;
-    debug(scratch, "Initialized SDL IMG system");
+    debug(eddy, "Initialized SDL IMG system");
 }
 
 SDLContext::SDLIMG::~SDLIMG()
 {
-    debug(scratch, "Terminating SDL IMG system");
+    debug(eddy, "Terminating SDL IMG system");
     if (init)
         IMG_Quit();
 }
 
 SDLContext::SDLWindow::SDLWindow(int width, int height)
 {
-    debug(scratch, "Creating SDL window with size {}x{}", width, height);
+    debug(eddy, "Creating SDL window with size {}x{}", width, height);
     if (window = SDL_CreateWindow(
-            "Scratch",
+            "Eddy",
             SDL_WINDOWPOS_CENTERED_DISPLAY(0), SDL_WINDOWPOS_CENTERED_DISPLAY(0),
             width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
         window == nullptr)
         fatal("Could not create SDL window");
     SDL_SetWindowMinimumSize(window, width, height);
-    debug(scratch, "Initialized SDL window");
+    debug(eddy, "Initialized SDL window");
 }
 
 SDLContext::SDLWindow::~SDLWindow()
 {
-    debug(scratch, "Destroying SDL window");
+    debug(eddy, "Destroying SDL window");
     if (window)
         SDL_DestroyWindow(window);
 }
@@ -89,12 +89,12 @@ SDLContext::SDLRenderer::SDLRenderer(SDLWindow const& window)
         if (renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED); renderer == nullptr)
             fatal("Could not create SDL renderer");
     }
-    debug(scratch, "SDL renderer initialized");
+    debug(eddy, "SDL renderer initialized");
 }
 
 SDLContext::SDLRenderer::~SDLRenderer()
 {
-    debug(scratch, "Destroying SDL renderer");
+    debug(eddy, "Destroying SDL renderer");
     if (renderer)
         SDL_DestroyRenderer(renderer);
 }
@@ -106,7 +106,7 @@ SDLContext::SDLFont::SDLFont(SDLRenderer& renderer, std::string font_name, int p
     , size(point_size)
 {
     set_font(name);
-    debug(scratch, "Opened font '{}' w/ character size {}x{}", name, character_width, character_height);
+    debug(eddy, "Opened font '{}' w/ character size {}x{}", name, character_width, character_height);
 }
 
 SDLContext::SDLFont::~SDLFont()
@@ -203,12 +203,12 @@ SDLContext::SDLCursor::SDLCursor(SDL_SystemCursor cursor_id)
 {
     if (cursor = SDL_CreateSystemCursor(id); cursor == nullptr)
         fatal("Could not initialize SDL cursor '{}'", (int)id);
-    debug(scratch, "Initialized SDL cursor '{}'", (int)id);
+    debug(eddy, "Initialized SDL cursor '{}'", (int)id);
 }
 
 SDLContext::SDLCursor::~SDLCursor()
 {
-    debug(scratch, "Destroying SDL cursor '{}'", (int)id);
+    debug(eddy, "Destroying SDL cursor '{}'", (int)id);
     if (cursor)
         SDL_FreeCursor(cursor);
 }

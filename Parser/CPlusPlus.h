@@ -9,13 +9,13 @@
 #include <deque>
 
 #include <App/EditorState.h>
-#include <Parser/ScratchParser.h>
+#include <Parser/EddyParser.h>
 
 using namespace Obelix;
 
-namespace scratch::parser {
+namespace eddy::parser {
 
-class CPlusPlusParser : public BasicScratchParser {
+class CPlusPlusParser : public BasicEddyParser {
 public:
     constexpr static TokenCode KeywordAuto = TokenCode::Keyword0;
     constexpr static TokenCode KeywordBreak = TokenCode::Keyword1;

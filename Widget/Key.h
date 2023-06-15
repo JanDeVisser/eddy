@@ -10,7 +10,7 @@
 
 #include <SDL.h>
 
-namespace scratch {
+namespace eddy {
 
 struct SDLKey {
     SDL_Keycode sym { SDLK_UNKNOWN };
@@ -24,4 +24,4 @@ struct SDLKey {
     [[nodiscard]] std::string to_string() const;
 };
 
-} // Scratch
+} // Eddy

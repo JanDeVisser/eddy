@@ -4,15 +4,15 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include <core/StringUtil.h>
+#include <Core/StringUtil.h>
 
-#include <App/Scratch.h>
+#include <App/Eddy.h>
 #include <Widget/Command.h>
 #include <Widget/SDLContext.h>
 
 using namespace Obelix;
 
-namespace scratch {
+namespace eddy {
 
 class Widget;
 
@@ -70,4 +70,4 @@ std::vector<Command> Commands::operator*()
     return ret;
 }
 
-} // Scratch
+} // Eddy

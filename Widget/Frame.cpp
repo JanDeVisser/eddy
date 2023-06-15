@@ -6,7 +6,7 @@
 
 #include <Widget/Widget.h>
 
-namespace scratch {
+namespace eddy {
 
 Frame::Frame(FrameStyle frame_style, int margin, WindowedWidget* contents, SizePolicy policy, int size)
     : WindowedWidget(policy, size)

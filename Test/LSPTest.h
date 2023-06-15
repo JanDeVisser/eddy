@@ -10,10 +10,10 @@
 
 #include <LSP/LSP.h>
 
-namespace scratch::test {
+namespace eddy::test {
 
 using namespace testing;
-using namespace scratch::lsp;
+using namespace eddy::lsp;
 
 class LSPTest : public Test {
 protected:

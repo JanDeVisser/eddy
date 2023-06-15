@@ -7,7 +7,7 @@
 #include <Widget/App.h>
 #include <Widget/Widget.h>
 
-namespace scratch {
+namespace eddy {
 
 ModalWidget::ModalWidget(int w, int h)
     : m_width(w)

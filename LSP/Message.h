@@ -8,12 +8,12 @@
 
 #include <future>
 
-#include <core/Error.h>
-#include <core/Logging.h>
+#include <Core/Error.h>
+#include <Core/Logging.h>
 
 #include <LSP/JSON.h>
 
-namespace scratch::lsp {
+namespace eddy::lsp {
 
 using namespace Obelix;
 using namespace std::literals;

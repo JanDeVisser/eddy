@@ -12,12 +12,12 @@
 #include <vector>
 #include <variant>
 
-#include <core/Error.h>
-#include <core/Logging.h>
+#include <Core/Error.h>
+#include <Core/Logging.h>
 
 #pragma once
 
-namespace scratch::lsp {
+namespace eddy::lsp {
 
 using namespace Obelix;
 

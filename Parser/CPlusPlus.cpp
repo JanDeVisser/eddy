@@ -6,10 +6,10 @@
 
 #include <Parser/CPlusPlus.h>
 
-namespace scratch::parser {
+namespace eddy::parser {
 
 CPlusPlusParser::CPlusPlusParser()
-    : BasicScratchParser()
+    : BasicEddyParser()
 {
     lexer().add_scanner<Obelix::QStringScanner>("\"'", true);
     lexer().add_scanner<Obelix::IdentifierScanner>();

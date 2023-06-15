@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include <App/Scratch.h>
+#include <App/Eddy.h>
 #include <Scribble/Interp/CommandAdapter.h>
 
-namespace scratch::interp {
+namespace eddy::interp {
 
 CommandAdapter::CommandAdapter(std::string function, ScheduledCommand const& command)
     : Function(std::move(function))
@@ -27,4 +27,4 @@ Value CommandAdapter::execute(std::vector<Value> const& arguments, InterpreterCo
     return Value {};
 }
 
-} // Scratch::Interp
+} // Eddy::Interp

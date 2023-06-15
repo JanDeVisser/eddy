@@ -8,11 +8,11 @@
 
 #include <numeric>
 
-#include <lexer/Token.h>
+#include <Lexer/Token.h>
 #include <App/EditorState.h>
 #include <Widget/Widget.h>
 
-namespace scratch {
+namespace eddy {
 
 class Line {
 public:
@@ -112,4 +112,4 @@ private:
     Editor* m_editor;
 };
 
-} // Scratch
+} // Eddy

@@ -6,9 +6,9 @@
 
 #pragma once
 
-#include <lexer/BasicParser.h>
+#include <Lexer/BasicParser.h>
 
-namespace scratch::scribble {
+namespace eddy::scribble {
 
 using namespace Obelix;
 
@@ -61,4 +61,4 @@ private:
     bool m_ignore_ws { false };
 };
 
-} // Scratch::Scribble
+} // Eddy::Scribble

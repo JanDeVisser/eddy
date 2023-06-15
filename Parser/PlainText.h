@@ -6,13 +6,13 @@
 
 #pragma once
 
-#include <lexer/Token.h>
 #include <App/EditorState.h>
-#include <Parser/ScratchParser.h>
+#include <Parser/EddyParser.h>
+#include <Lexer/Token.h>
 
-namespace scratch::parser {
+namespace eddy::parser {
 
-class PlainTextParser : public BasicScratchParser {
+class PlainTextParser : public BasicEddyParser {
 public:
     PlainTextParser();
     Token const& next_token() override;

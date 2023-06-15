@@ -13,7 +13,7 @@
 
 #include <SDL.h>
 
-#include <core/Logging.h>
+#include <Core/Logging.h>
 
 #include <App/Palette.h>
 #include <Widget/Command.h>
@@ -54,7 +54,7 @@
 #define countof(A) (sizeof(A) / sizeof(*(A)))
 #endif /* countof */
 
-namespace scratch {
+namespace eddy {
 
 extern_logging_category(widget);
 

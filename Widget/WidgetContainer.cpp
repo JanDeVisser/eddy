@@ -7,7 +7,7 @@
 #include <Widget/App.h>
 #include <Widget/Widget.h>
 
-namespace scratch {
+namespace eddy {
 
 WidgetContainer::WidgetContainer(ContainerOrientation orientation)
     : m_orientation(orientation)
@@ -39,7 +39,7 @@ std::vector<Widget*> WidgetContainer::components() const
 
 void WidgetContainer::resize(Box const& outline)
 {
-    debug(scratch, "Resizing container within outline '{}'", outline);
+    debug(eddy, "Resizing container within outline '{}'", outline);
     m_outlines.clear();
     m_outlines.resize(m_components.size());
     auto allocated = 0;
@@ -96,7 +96,7 @@ void WidgetContainer::resize(Box const& outline)
         o.position[var_pos_coord] = offset;
         offset += o.size[var_size_coord];
         m_components[ix]->resize(o);
-        debug(scratch, "Component {}: '{}'", ix, o);
+        debug(eddy, "Component {}: '{}'", ix, o);
     }
 }
 

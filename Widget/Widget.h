@@ -15,7 +15,7 @@
 #include <Widget/Geometry.h>
 #include <Widget/SDLContext.h>
 
-namespace scratch {
+namespace eddy {
 
 enum class TextAlignment {
     Left,

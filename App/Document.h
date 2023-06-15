@@ -15,7 +15,7 @@
 #include <Widget/Command.h>
 #include <Widget/Widget.h>
 
-namespace scratch {
+namespace eddy {
 
 namespace fs=std::filesystem;
 

@@ -8,11 +8,11 @@
 
 #include <chrono>
 
-#include <core/FileBuffer.h>
+#include <Core/FileBuffer.h>
 #include <App/Document.h>
 #include <Mode/Mode.h>
 
-namespace scratch {
+namespace eddy {
 
 using namespace std::chrono_literals;
 using namespace Obelix;

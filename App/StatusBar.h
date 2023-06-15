@@ -8,7 +8,7 @@
 
 #include <Widget/App.h>
 
-namespace scratch {
+namespace eddy {
 
 class StatusBar : public Layout {
 public:

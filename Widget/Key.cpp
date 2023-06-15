@@ -9,7 +9,7 @@
 
 #include <Widget/Key.h>
 
-namespace scratch {
+namespace eddy {
 
 static uint32_t normalize_mod(uint32_t mod)
 {
@@ -92,4 +92,4 @@ std::string SDLKey::to_string() const
     return ss.str();
 }
 
-} // Scratch
+} // Eddy

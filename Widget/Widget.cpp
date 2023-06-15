@@ -8,7 +8,7 @@
 #include <Widget/SDLContext.h>
 #include <Widget/Widget.h>
 
-namespace scratch {
+namespace eddy {
 
 void Widget::render()
 {

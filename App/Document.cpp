@@ -7,31 +7,31 @@
 #include <filesystem>
 #include <fstream>
 
-#include <core/Format.h>
+#include <Core/Format.h>
 
 #include <App/Document.h>
+#include <App/Eddy.h>
 #include <App/Editor.h>
-#include <App/Scratch.h>
+#include <Mode/CPlusPlus.h>
 #include <Mode/Mode.h>
 #include <Mode/PlainText.h>
-#include <Mode/CPlusPlus.h>
 //#include <Mode/Scribble.h>
 #include <Widget/App.h>
 
 using namespace Obelix;
 
-namespace scratch {
+namespace eddy {
 
 FileType s_filetypes[] = {
     // Plain Text parser must be in slot 0! Do not sort down!
     { { ".txt" }, "text/plain", [](Document& doc) -> Mode* {
          return new PlainText(doc);
      } },
+    /*
     { { ".cpp", ".h", ".hpp" }, "text/x-cpp", [](Document& doc) -> Mode* {
          return new CPlusPlus(doc);
      } },
-    /*
-    { { ".scratch" }, "text/x-scratch", []() -> ScratchParser* {
+    { { ".eddy" }, "text/x-eddy", []() -> EddyParser* {
          return new class ScribbleParser();
      } },
      */
@@ -78,7 +78,7 @@ DocumentCommands::DocumentCommands()
         { "find-first", "Find",
             { { "Find", CommandParameterType::String,
                 []() -> std::string {
-                    auto* doc = Scratch::editor()->document();
+                    auto* doc = Eddy::editor()->document();
                     if (doc == nullptr)
                         return "";
                     return doc->selected_text();
@@ -499,6 +499,9 @@ int Document::find_line_number(int cursor) const
 
 DocumentPosition Document::position(int cursor) const
 {
+    if (cursor == 0) {
+        return { 0, 0 };
+    }
     auto line = find_line_number(cursor);
     return { line, cursor - static_cast<int>(m_lines[line].index()) };
 }
@@ -795,7 +798,7 @@ std::string Document::save_as(std::string const& new_file_name)
 void Document::render()
 {
     auto point_line = find_line_number(m_point);
-    auto point_column = m_point - m_lines[point_line].index();
+    auto point_column = (point_line < line_count()) ? m_point - m_lines[point_line].index() : 0;
     editor()->mark_current_line(point_line - m_screen_top);
 
     bool has_selection = m_point != m_mark;
@@ -820,7 +823,7 @@ void Document::render()
                     block_width * App::instance().context()->character_width(),
                     editor()->line_height()
                 };
-                editor()->box(r, Scratch::scratch().color(PaletteIndex::Selection));
+                editor()->box(r, Eddy::eddy().color(PaletteIndex::Selection));
             }
         }
 

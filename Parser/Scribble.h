@@ -8,19 +8,19 @@
 
 #include <deque>
 
-#include <Parser/ScratchParser.h>
+#include <Parser/EddyParser.h>
 #include <Scribble/Scribble.h>
 
-namespace scratch::parser {
+namespace eddy::parser {
 
 using namespace Obelix;
-using namespace scratch::scribble;
+using namespace eddy::scribble;
 
 struct ScribbleCommands : public Commands {
     ScribbleCommands();
 };
 
-class ScribbleParser : public ScratchParser {
+class ScribbleParser : public EddyParser {
 public:
     explicit ScribbleParser();
     Token const& next_token() override;

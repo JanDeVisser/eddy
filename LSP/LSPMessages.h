@@ -15,7 +15,7 @@
 
 #include <LSP/Message.h>
 
-namespace scratch::lsp {
+namespace eddy::lsp {
 
 enum class SemanticTokenTypes {
     Namespace,
@@ -13106,5 +13106,4 @@ JSONValue to_json(WorkspaceApplyEdit const& obj)
     return msg;
 }
 
-} // scratch::lsp
-
+} // eddy::lsp

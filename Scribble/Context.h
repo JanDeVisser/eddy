@@ -12,11 +12,11 @@
 #include <map>
 #include <vector>
 
-#include <core/Error.h>
-#include <core/Logging.h>
-#include <lexer/Token.h>
+#include <Core/Error.h>
+#include <Core/Logging.h>
+#include <Lexer/Token.h>
 
-namespace scratch::scribble {
+namespace eddy::scribble {
 
 using namespace Obelix;
 

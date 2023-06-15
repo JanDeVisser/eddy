@@ -15,13 +15,13 @@
 #include <variant>
 #include <vector>
 
-#include <core/Error.h>
-#include <core/Logging.h>
-#include <core/StringUtil.h>
+#include <Core/Error.h>
+#include <Core/Logging.h>
+#include <Core/StringUtil.h>
 
 #include <Scribble/Syntax/Syntax.h>
 
-namespace scratch::interp {
+namespace eddy::interp {
 
 using namespace std::literals;
 using namespace Obelix;
@@ -245,7 +245,7 @@ using Values = std::vector<Value>;
 
 namespace Obelix {
 
-using namespace scratch::interp;
+using namespace eddy::interp;
 
 template<>
 struct to_string<Value const&> {

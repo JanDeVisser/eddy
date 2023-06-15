@@ -7,7 +7,7 @@
 #include "../LSP/JSON.h"
 #include <gtest/gtest.h>
 
-using namespace scratch::lsp;
+using namespace eddy::lsp;
 
 TEST(JSONTest, CreateNull)
 {

@@ -10,7 +10,7 @@
 #include <Scribble/Interp/Value.h>
 #include <Widget/Command.h>
 
-namespace scratch::interp {
+namespace eddy::interp {
 
 class CommandAdapter : public Function {
 public:
@@ -20,4 +20,4 @@ private:
     ScheduledCommand const& m_command;
 };
 
-} // Scratch::Interp
+} // Eddy::Interp

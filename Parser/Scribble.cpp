@@ -4,23 +4,23 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include <App/Scratch.h>
+#include <App/Eddy.h>
 #include <Parser/Scribble.h>
-#include <Scribble/Parser.h>
 #include <Scribble/Interp/Interpreter.h>
+#include <Scribble/Parser.h>
 #include <Widget/Alert.h>
 
-namespace scratch::parser {
+namespace eddy::parser {
 
-using namespace scratch::interp;
-using namespace scratch::scribble;
+using namespace eddy::interp;
+using namespace eddy::scribble;
 
 ScribbleCommands::ScribbleCommands()
 {
     register_command(
         { "evaluate-buffer", "Evaluates the script in the current buffer", {},
             [](Widget& w, strings const&) -> void {
-                auto* doc = Scratch::editor()->document();
+                auto* doc = Eddy::editor()->document();
                 auto& text = doc->text();
                 auto project_maybe = compile_project(doc->path(), std::make_shared<StringBuffer>(text));
                 if (project_maybe.is_error()) {
@@ -44,7 +44,7 @@ ScribbleCommands::ScribbleCommands()
 ScribbleCommands ScribbleParser::s_scribble_commands;
 
 ScribbleParser::ScribbleParser()
-    : ScratchParser()
+    : EddyParser()
 {
 }
 
@@ -61,7 +61,7 @@ Token const& ScribbleParser::next_token()
 std::optional<ScheduledCommand> ScribbleParser::command(std::string const& name) const
 {
     if (auto* cmd = s_scribble_commands.get(name); cmd != nullptr)
-        return ScheduledCommand { dynamic_cast<Widget&>(*Scratch::editor()->buffer()), *cmd };
+        return ScheduledCommand { dynamic_cast<Widget&>(*Eddy::editor()->buffer()), *cmd };
     return {};
 }
 
@@ -119,4 +119,4 @@ DisplayToken ScribbleParser::token_for(TokenCode code, std::string_view const& t
     return ret;
 }
 
-} // Scratch
+} // Eddy
