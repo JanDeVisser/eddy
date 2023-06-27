@@ -64,16 +64,16 @@ using SizeCalculator = std::function<int(WindowedWidget*)>;
 
 class WindowedWidget : public Widget {
 public:
-    WindowedWidget(SizePolicy = SizePolicy::Stretch, int = 0);
+    WindowedWidget(SizePolicy = SizePolicy::Stretch, size_t = 0);
     WindowedWidget(SizeCalculator);
 
-    [[nodiscard]] virtual int height() const;
-    [[nodiscard]] virtual int width() const;
-    [[nodiscard]] virtual int top() const;
-    [[nodiscard]] virtual int left() const;
+    [[nodiscard]] virtual size_t height() const;
+    [[nodiscard]] virtual size_t width() const;
+    [[nodiscard]] virtual size_t top() const;
+    [[nodiscard]] virtual size_t left() const;
     [[nodiscard]] bool empty() const;
     [[nodiscard]] SizePolicy policy() const;
-    [[nodiscard]] int policy_size() const;
+    [[nodiscard]] size_t policy_size() const;
     [[nodiscard]] WidgetContainer const* parent() const;
 
     [[nodiscard]] Position position() const;
@@ -95,43 +95,132 @@ public:
     void handle_motion(SDL_MouseMotionEvent const&) override;
     void handle_text_input() override;
     void resize(Box const&) override;
-    int calculate_size();
+    size_t calculate_size();
 
-    SDL_Rect render_text(int x, int y, std::string const& text,
+    template <std::integral X, std::integral Y, class Str>
+    SDL_Rect render_text(X x, Y y, Str text,
         SDL_Color const& color = SDL_Color { 255, 255, 255, 255 },
-        TextAlignment = TextAlignment::Left,
-        SDLContext::SDLFontFamily = SDLContext::SDLFontFamily::Fixed) const;
-
-    template <class Str>
-    SDL_Rect render_fixed(int x, int y, Str text, SDL_Color const& color = SDL_Color { 255, 255, 255, 255 }) const
+        TextAlignment alignment = TextAlignment::Left,
+        SDLContext::SDLFontFamily family = SDLContext::SDLFontFamily::Fixed) const
     {
-        return render_text(x, y, std::string(text), color, TextAlignment::Left, SDLContext::SDLFontFamily::Fixed);
+        return _render_text(
+            clamp(x, 0, width()),
+            clamp(y, 0, height()),
+            std::string(text),
+            color,
+            alignment,
+            family
+        );
     }
 
-    template <class Str>
-    SDL_Rect render_fixed_right_aligned(int x, int y, Str text, SDL_Color const& color = SDL_Color { 255, 255, 255, 255 }) const
+    template <std::integral X, std::integral Y, class Str>
+    SDL_Rect render_fixed(X x, Y y, Str text, SDL_Color const& color = SDL_Color { 255, 255, 255, 255 }) const
     {
-        return render_text(x, y, std::string(text), color, TextAlignment::Left, SDLContext::SDLFontFamily::Fixed);
+        return _render_text(
+            clamp(x, 0, width()),
+            clamp(y, 0, height()),
+            std::string(text),
+            color,
+            TextAlignment::Left,
+            SDLContext::SDLFontFamily::Fixed
+        );
     }
 
-    template <class Str>
-    SDL_Rect render_fixed_centered(int y, Str text, SDL_Color const& color = SDL_Color { 255, 255, 255, 255 }) const
+    template <std::integral X, std::integral Y, class Str>
+    SDL_Rect render_fixed_right_aligned(X x, Y y, Str text, SDL_Color const& color = SDL_Color { 255, 255, 255, 255 }) const
     {
-        return render_text(0, y, std::string(text), color, TextAlignment::Center, SDLContext::SDLFontFamily::Fixed);
+        return _render_text(
+            clamp(x, 0, width()),
+            clamp(y, 0, height()),
+            std::string(text),
+            color,
+            TextAlignment::Right,
+            SDLContext::SDLFontFamily::Fixed
+        );
     }
 
-    SDL_Rect normalize(SDL_Rect const&) const;
-    void box(SDL_Rect const&, SDL_Color) const;
-    void rectangle(SDL_Rect const&, SDL_Color) const;
-    void roundedRectangle(SDL_Rect const&, int, SDL_Color) const;
+    template <std::integral Y, class Str>
+    SDL_Rect render_fixed_centered(Y y, Str text, SDL_Color const& color = SDL_Color { 255, 255, 255, 255 }) const
+    {
+        return _render_text(
+            0,
+            clamp(y, 0, height()),
+            std::string(text),
+            color,
+            TextAlignment::Center,
+            SDLContext::SDLFontFamily::Fixed
+        );
+    }
+
+    template <std::floating_point Y, class Str>
+    SDL_Rect render_fixed_centered(Y y, Str text, SDL_Color const& color = SDL_Color { 255, 255, 255, 255 }) const
+    {
+        return _render_text(
+            0,
+            clamp<int>(static_cast<size_t>(y), 0ul, height()),
+            std::string(text),
+            color,
+            TextAlignment::Center,
+            SDLContext::SDLFontFamily::Fixed
+        );
+    }
+
+    template <std::integral L, std::integral T, std::integral W, std::integral H>
+    SDL_Rect normalize(L l, T t, W w, H h) const
+    {
+        if constexpr (std::is_signed_v<L>) {
+            if (l < 0)
+                l = width() + l;
+        }
+        if constexpr (std::is_signed_v<T>) {
+            if (t < 0)
+                t = height() + t;
+        }
+        if constexpr (std::is_signed_v<W>) {
+            if (w <= 0)
+                w = width() + w;
+        }
+        if constexpr (std::is_signed_v<H>) {
+            if (h <= 0)
+                h = height() + h;
+        }
+        l = clamp(l, 0, width());
+        t = clamp(t, 0, height());
+        return make_SDL_Rect(l, t, clamp(w, 0, width() - l), clamp(h, 0, height() - t));
+    }
+
+    template <std::integral L, std::integral T, std::integral W, std::integral H>
+    void box(L l, T t, W w, H h, SDL_Color color) const
+    {
+        _box(normalize(l, t, w, h), color);
+    }
+
+    template <std::integral L, std::integral T, std::integral W, std::integral H>
+    void rectangle(L l, T t, W w, H h, SDL_Color color) const
+    {
+        _rectangle(normalize(l, t, w, h), color);
+    }
+
+    template <std::integral L, std::integral T, std::integral W, std::integral H, std::integral R>
+    void roundedRectangle(L l, T t, W w, H h, R radius, SDL_Color color) const
+    {
+        _roundedRectangle(normalize(l, t, w, h), static_cast<int>(radius), color);
+    }
 
 protected:
 private:
     friend class WidgetContainer;
     void set_parent(WidgetContainer *parent) { m_parent = parent; }
+    SDL_Rect _render_text(size_t x, size_t y, std::string const& text,
+        SDL_Color const& color = SDL_Color { 255, 255, 255, 255 },
+        TextAlignment = TextAlignment::Left,
+        SDLContext::SDLFontFamily = SDLContext::SDLFontFamily::Fixed) const;
+    void _box(SDL_Rect const& rect, SDL_Color color) const;
+    void _rectangle(SDL_Rect const&, SDL_Color) const;
+    void _roundedRectangle(SDL_Rect const&, int, SDL_Color) const;
 
     SizePolicy m_policy { SizePolicy::Absolute };
-    int m_size { 0 };
+    size_t m_size { 0 };
     Box m_outline;
     WidgetContainer* m_parent { nullptr };
 
@@ -220,19 +309,19 @@ enum class FrameStyle {
 
 class Frame : public WindowedWidget {
 public:
-    Frame(FrameStyle, int, WindowedWidget*, SizePolicy = SizePolicy::Stretch, int = 0);
+    Frame(FrameStyle, size_t, WindowedWidget*, SizePolicy = SizePolicy::Stretch, size_t = 0);
     void render() override;
     bool dispatch(SDL_Keysym) override;
     void resize(Box const&) override;
     [[nodiscard]] WindowedWidget* contents();
-    [[nodiscard]] int margin() const;
-    [[nodiscard]] int clamped_margin() const;
+    [[nodiscard]] size_t margin() const;
+    [[nodiscard]] size_t clamped_margin() const;
     [[nodiscard]] FrameStyle frame_style() const;
 
 private:
     FrameStyle m_frame_style { FrameStyle::None };
-    int m_margin { 3 };
-    int m_clamped_margin { 3 };
+    size_t m_margin { 3 };
+    size_t m_clamped_margin { 3 };
     std::unique_ptr<WindowedWidget> m_contents;
 };
 
@@ -241,10 +330,10 @@ public:
     ModalWidget(int, int);
     void dismiss();
 
-    [[nodiscard]] int width() const override;
-    [[nodiscard]] int height() const override;
-    [[nodiscard]] int top() const override;
-    [[nodiscard]] int left() const override;
+    [[nodiscard]] size_t width() const override;
+    [[nodiscard]] size_t height() const override;
+    [[nodiscard]] size_t top() const override;
+    [[nodiscard]] size_t left() const override;
 
 private:
     int m_width;

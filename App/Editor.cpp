@@ -68,42 +68,42 @@ Editor::Editor()
     m_commands = &s_editor_commands;
 }
 
-int Editor::rows() const
+size_t Editor::rows() const
 {
     return m_rows;
 }
 
-int Editor::columns() const
+size_t Editor::columns() const
 {
     return m_columns;
 }
 
-int Editor::line_top(int line) const
+size_t Editor::line_top(size_t line) const
 {
     return line * line_height();
 }
 
-int Editor::line_bottom(int line) const
+size_t Editor::line_bottom(size_t line) const
 {
     return (line + 1) * line_height();
 }
 
-int Editor::column_left(int column)
+size_t Editor::column_left(size_t column)
 {
     return column_width() * column;
 }
 
-int Editor::column_right(int column)
+size_t Editor::column_right(size_t column)
 {
     return column_width() * (column + 1);
 }
 
-int Editor::line_height() const
+size_t Editor::line_height() const
 {
     return m_line_height;
 }
 
-int Editor::column_width()
+size_t Editor::column_width()
 {
     return App::instance().context()->character_width();
 }
@@ -111,36 +111,30 @@ int Editor::column_width()
 void Editor::resize(const Box& outline)
 {
     WindowedWidget::resize(outline);
-    m_line_height = (int)(App::instance().context()->character_height() * 1.2);
+    m_line_height = static_cast<decltype(m_line_height)>(round(App::instance().context()->character_height() * 1.2));
     m_rows = height() / m_line_height;
     m_columns = width() / App::instance().context()->character_width();
 }
 
 void Editor::render()
 {
-    box(SDL_Rect { 0, 0, 0, 0 }, SDL_Color { 0x2c, 0x2c, 0x2c, 0xff });
+    box(0, 0, 0, 0, SDL_Color { 0x2c, 0x2c, 0x2c, 0xff });
     m_line = 0;
     m_column = 0;
     buffer()->render();
 }
 
-void Editor::mark_current_line(int line)
+void Editor::mark_current_line(size_t line)
 {
-    if (line < 0 || line >= rows())
+    if (line >= rows())
         return;
-    SDL_Rect r {
-        0,
-        line_top(line),
-        0,
-        line_height()
-    };
-    box(r, Eddy::eddy().color(PaletteIndex::CurrentLineFill));
-    rectangle(r, Eddy::eddy().color(PaletteIndex::CurrentLineEdge));
+    box(0, line_top(line), 0, line_height(), Eddy::eddy().color(PaletteIndex::CurrentLineFill));
+    rectangle(0, line_top(line), 0, line_height(), Eddy::eddy().color(PaletteIndex::CurrentLineEdge));
 }
 
-void Editor::text_cursor(int line, int column)
+void Editor::text_cursor(size_t line, size_t column)
 {
-    if (line < 0 || line >= rows() || column < 0 || column >= columns() || App::instance().modal() != nullptr)
+    if (line >= rows() || column >= columns() || App::instance().modal() != nullptr)
         return;
     static auto time_start = std::chrono::system_clock::now();
     auto time_end = std::chrono::system_clock::now();
@@ -148,13 +142,7 @@ void Editor::text_cursor(int line, int column)
     if (elapsed > 400) {
         //        Clipper clipCode(App::instance().renderer(), rectCode);
 
-        SDL_Rect r {
-            column_left(column),
-            line_top(line),
-            1,
-            line_height()
-        };
-        box(r, Eddy::eddy().color(PaletteIndex::Cursor));
+        box(column_left(column), line_top(line), 1, line_height(), Eddy::eddy().color(PaletteIndex::Cursor));
         if (elapsed > 800)
             time_start = time_end;
     }
@@ -163,7 +151,7 @@ void Editor::text_cursor(int line, int column)
 void Editor::append(DisplayToken const& token)
 {
     render_fixed(column_left(m_column), line_top(m_line), token.text, Eddy::eddy().color(token.color));
-    m_column += (int)token.text.length();
+    m_column += token.text.length();
 }
 
 void Editor::newline()
@@ -186,7 +174,7 @@ void Editor::handle_mousedown(SDL_MouseButtonEvent const& event)
     auto column = offset_x / App::instance().context()->character_width();
     auto line = offset_y / line_height();
     m_mouse_down_at = { column, line };
-    buffer()->mousedown(line, column);
+    buffer()->mousedown(m_mouse_down_at.value());
 }
 
 void Editor::handle_motion(SDL_MouseMotionEvent const& event)
@@ -197,7 +185,7 @@ void Editor::handle_motion(SDL_MouseMotionEvent const& event)
         auto column = offset_x / App::instance().context()->character_width();
         auto line = offset_y / line_height();
         if (column != m_mouse_down_at->left() || line != m_mouse_down_at->top()) {
-            buffer()->motion(line, column);
+            buffer()->motion(Position { column, line });
         }
     }
 }
@@ -214,7 +202,7 @@ void Editor::handle_click(SDL_MouseButtonEvent const& event)
     auto offset_y = event.y - top();
     auto column = offset_x / App::instance().context()->character_width();
     auto line = offset_y / line_height();
-    buffer()->click(line, column, event.clicks);
+    buffer()->click(Position { column, line }, event.clicks);
     m_mouse_down_at = {};
 }
 
@@ -250,7 +238,7 @@ void Editor::new_file()
     add_buffer<Document>();
 }
 
-std::string Editor::open_file(fs::path const& path)
+std::optional<std::string> Editor::open_file(fs::path const& path)
 {
     auto* doc = document();
     if (doc == nullptr || !doc->path().empty() || !doc->empty()) {
@@ -259,7 +247,7 @@ std::string Editor::open_file(fs::path const& path)
     return document()->load(path);
 }
 
-std::string Editor::save_all() const
+std::optional<std::string> Editor::save_all() const
 {
     for (auto* doc : documents()) {
         if (doc->path().empty())
@@ -267,7 +255,7 @@ std::string Editor::save_all() const
         else
             doc->save();
     }
-    return "";
+    return {};
 }
 
 Buffer* Editor::buffer() const

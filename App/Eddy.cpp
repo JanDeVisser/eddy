@@ -206,7 +206,7 @@ void Eddy::run_app(int argc, char const** argv)
         } else {
             box_color = PaletteIndex::ANSIBrightRed;
         }
-        applet->box(SDL_Rect { 0, 0, 0, 0 }, Eddy::eddy().color(box_color));
+        applet->box(0, 0, 0, 0, Eddy::eddy().color(box_color));
         applet->render_fixed_centered(2, "fps", SDL_Color { 0xff, 0xff, 0xff, 0xff });
     });
     main_area->add_component(app.m_gutter = new Gutter());

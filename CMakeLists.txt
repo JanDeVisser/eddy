@@ -136,6 +136,8 @@ add_library(
 #        Mode/CPlusPlus.cpp
         Mode/Mode.cpp
         Mode/PlainText.cpp
+        App/Text.cpp
+        App/Theme.cpp
 )
 
 add_executable(

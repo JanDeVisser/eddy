@@ -86,8 +86,8 @@ public:
     SDLKey last_key() const { return m_last_key; }
     Position mouse_position() const { return m_mouse; }
 
-    int width() const override;
-    int height() const override;
+    size_t width() const override;
+    size_t height() const override;
     intptr_t active() const;
     void active(intptr_t);
 

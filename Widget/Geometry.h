@@ -15,16 +15,51 @@
 
 namespace eddy {
 
-template<typename T>
-T clamp(T v, T lo, T hi)
+template <std::integral Ret=size_t, std::integral X, std::integral Y>
+Ret better_max(X x, Y y)
 {
-    oassert(lo <= hi, "{} > {} for v = {}", lo, hi, v);
-    if (v < lo)
-        v = lo;
-    if (v > hi)
-        v = hi;
+    if constexpr (std::is_unsigned_v<X>) {
+        if (static_cast<std::make_signed_t<X>>(x) < 0) {
+            x = 0;
+        }
+    }
+    if constexpr (std::is_unsigned_v<Y>) {
+        if (static_cast<std::make_signed_t<Y>>(y) < 0) {
+            y = 0;
+        }
+    }
+    if (x < y)
+        return static_cast<Ret>(y);
+    return static_cast<Ret>(x);
+}
 
-    return v;
+template <std::integral Ret=size_t, std::integral V, std::integral Lo, std::integral Hi>
+Ret clamp(V v, Lo lo, Hi hi)
+{
+    if constexpr (std::is_unsigned_v<Lo>) {
+        auto lo_signed = static_cast<std::make_signed_t<Lo>>(lo);
+        if (lo_signed < 0) {
+            lo = 0;
+        }
+    }
+    oassert(lo <= hi, "{} > {} for v = {}", lo, hi, v);
+    Ret ret;
+    if constexpr (std::is_signed_v<V> && std::is_unsigned_v<Ret>) {
+        if (v < 0) {
+            ret = static_cast<Ret>(-v);
+        } else {
+            ret = static_cast<Ret>(v);
+        }
+    } else {
+        ret = static_cast<Ret>(v);
+    }
+
+    if (ret < lo)
+        ret = lo;
+    if (ret > hi)
+        ret = hi;
+
+    return ret;
 }
 
 template<typename T>
@@ -45,6 +80,18 @@ constexpr bool CheckParameterType()
 {
     return (std::is_convertible<A1,T>());
 }
+
+template <std::integral L, std::integral T, std::integral W, std::integral H>
+SDL_Rect make_SDL_Rect(L left, T top, W width, H height)
+{
+    return {
+        static_cast<int>(left),
+        static_cast<int>(top),
+        static_cast<int>(width),
+        static_cast<int>(height)
+    };
+}
+
 
 template <typename T, size_t Dim=2>
 struct Vector {
@@ -79,21 +126,41 @@ private:
 };
 
 struct Tuple {
-    int coordinates[2] = { 0, 0 };
-    Tuple(int x, int y)
+    size_t coordinates[2] = { 0, 0 };
+
+    template <std::unsigned_integral X, std::unsigned_integral Y>
+    Tuple(X x, Y y)
     {
         coordinates[0] = x;
         coordinates[1] = y;
     }
+    template <std::unsigned_integral X, std::signed_integral Y>
+    Tuple(X x, Y y)
+    {
+        coordinates[0] = x;
+        coordinates[1] = (y < 0) ? 0ul : static_cast<size_t>(y);
+    }
+    template <std::signed_integral X, std::unsigned_integral Y>
+    Tuple(X x, Y y)
+    {
+        coordinates[0] = (x < 0) ? 0ul : static_cast<size_t>(x);
+        coordinates[1] = y;
+    }
+    template <std::signed_integral X, std::signed_integral Y>
+    Tuple(X x, Y y)
+    {
+        coordinates[0] = (x < 0) ? 0ul : static_cast<size_t>(x);
+        coordinates[1] = (y < 0) ? 0ul : static_cast<size_t>(y);
+    }
     Tuple() = default;
 
-    const int& operator[](size_t idx) const
+    const size_t& operator[](size_t idx) const
     {
         assert(idx < 2);
         return coordinates[idx];
     }
 
-    int& operator[](size_t idx)
+    size_t& operator[](size_t idx)
     {
         assert(idx < 2);
         return coordinates[idx];
@@ -103,40 +170,49 @@ struct Tuple {
     {
         return Obelix::format("{}x{}", coordinates[0], coordinates[1]);
     }
+
+    [[nodiscard]] size_t x() const { return coordinates[0]; }
+    [[nodiscard]] size_t y() const { return coordinates[1]; }
 };
 
 struct Position : public Tuple {
-    Position(int left, int top)
+    template <std::integral L, std::integral T>
+    Position(L left, T top)
         : Tuple(left, top)
     {
     }
+
     Position() = default;
 
-    [[nodiscard]] int left() const { return coordinates[0]; }
-    [[nodiscard]] int top() const { return coordinates[1]; }
+    [[nodiscard]] size_t left() const { return coordinates[0]; }
+    [[nodiscard]] size_t top() const { return coordinates[1]; }
+    [[nodiscard]] size_t column() const { return coordinates[0]; }
+    [[nodiscard]] size_t line() const { return coordinates[1]; }
 };
 
 struct Size : public Tuple {
-    Size(int w, int h)
-        : Tuple(w, h)
+    template <std::integral W, std::integral H>
+    Size(W width, H height)
+        : Tuple(width, height)
     {
     }
     Size() = default;
 
-    [[nodiscard]] int width() const { return coordinates[0]; }
-    [[nodiscard]] int height() const { return coordinates[1]; }
+    [[nodiscard]] size_t width() const { return coordinates[0]; }
+    [[nodiscard]] size_t height() const { return coordinates[1]; }
     [[nodiscard]] bool empty() const { return (coordinates[0] + coordinates[1]) == 0; }
 };
 
 struct Box {
-    Box(int t, int l, int w, int h)
-        : position(t, l)
-        , size(w, h)
+    template <std::integral L, std::integral T, std::integral W, std::integral H>
+    Box(L left, T top, W width, H height)
+        : position(left, top)
+        , size(width, height)
     {
     }
     Box(Position p, Size s)
-        : position(std::move(p))
-        , size(std::move(s))
+        : position(p)
+        , size(s)
     {
     }
     Box() = default;
@@ -144,14 +220,19 @@ struct Box {
     Position position;
     Size size;
 
-    [[nodiscard]] int top() const { return position.top(); }
-    [[nodiscard]] int left() const { return position.left(); }
-    [[nodiscard]] int bottom() const { return position.top() + size.height(); }
-    [[nodiscard]] int right() const { return position.left() + size.width(); }
-    [[nodiscard]] int width() const { return size.width(); }
-    [[nodiscard]] int height() const { return size.height(); }
+    [[nodiscard]] size_t top() const { return position.top(); }
+    [[nodiscard]] size_t left() const { return position.left(); }
+    [[nodiscard]] size_t bottom() const { return position.top() + size.height(); }
+    [[nodiscard]] size_t right() const { return position.left() + size.width(); }
+    [[nodiscard]] size_t width() const { return size.width(); }
+    [[nodiscard]] size_t height() const { return size.height(); }
+    [[nodiscard]] size_t column() const { return left(); }
+    [[nodiscard]] size_t line() const { return top(); }
+    [[nodiscard]] size_t columns() const { return width(); }
+    [[nodiscard]] size_t lines() const { return height(); }
+
     [[nodiscard]] bool empty() const { return size.empty(); }
-    [[nodiscard]] bool contains(int x, int y) const
+    [[nodiscard]] bool contains(size_t x, size_t y) const
     {
         return intersects(x, y, left(), top(), right(), bottom());
     }
@@ -161,9 +242,9 @@ struct Box {
         return Obelix::format("{}+{}", position, size);
     }
 
-    operator SDL_Rect()
+    explicit operator SDL_Rect() const
     {
-        return { left(), top(), width(), height() };
+        return make_SDL_Rect(left(), right(), width(), height());
     }
 };
 

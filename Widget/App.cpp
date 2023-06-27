@@ -134,12 +134,12 @@ void App::schedule(ScheduledCommand cmd)
     m_pending_commands.push_back(cmd);
 }
 
-int App::width() const
+size_t App::width() const
 {
     return context()->width();
 }
 
-int App::height() const
+size_t App::height() const
 {
     return context()->height();
 }

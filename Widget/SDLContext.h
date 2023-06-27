@@ -31,28 +31,28 @@ public:
         Max
     };
 
-    SDLContext(int width, int height);
+    SDLContext(size_t width, size_t height);
     ~SDLContext() = default;
 
-    [[nodiscard]] int width() const { return m_width; }
-    [[nodiscard]] int height() const { return m_height; }
-    void resize(int, int);
+    [[nodiscard]] size_t width() const { return m_width; }
+    [[nodiscard]] size_t height() const { return m_height; }
+    void resize(size_t, size_t);
     SDL_Window* window() { return m_window; }
     SDL_Renderer* renderer() { return m_renderer; }
     SDL_Cursor* arrow() { return m_arrow; }
     SDL_Cursor* input() { return m_arrow; }
-    [[nodiscard]] int character_width() const;
-    [[nodiscard]] int character_height() const;
+    [[nodiscard]] size_t character_width() const;
+    [[nodiscard]] size_t character_height() const;
     void enlarge_font(SDLFontFamily = SDLFontFamily::Fixed);
     void shrink_font(SDLFontFamily = SDLFontFamily::Fixed);
     void reset_font(SDLFontFamily = SDLFontFamily::Fixed);
     void set_font(std::string const&, SDLFontFamily = SDLFontFamily::Fixed);
-    void set_font_size(int, SDLFontFamily = SDLFontFamily::Fixed);
+    void set_font_size(size_t, SDLFontFamily = SDLFontFamily::Fixed);
 
-    SDL_Rect render_text(int x, int y, std::string const& text, SDL_Color const& color, SDLFontFamily = SDLFontFamily::Fixed) const;
-    SDL_Rect render_text_right_aligned(int x, int y, std::string const& text, SDL_Color const& color, SDLFontFamily = SDLFontFamily::Fixed) const;
-    SDL_Rect render_text_centered(int x, int y, std::string const& text, SDL_Color const& color, SDLFontFamily = SDLFontFamily::Fixed) const;
-    int text_width(std::string const&, SDLFontFamily = SDLFontFamily::Fixed) const;
+    SDL_Rect render_text(size_t x, size_t y, std::string const& text, SDL_Color const& color, SDLFontFamily = SDLFontFamily::Fixed) const;
+    SDL_Rect render_text_right_aligned(size_t x, size_t y, std::string const& text, SDL_Color const& color, SDLFontFamily = SDLFontFamily::Fixed) const;
+    SDL_Rect render_text_centered(size_t x, size_t y, std::string const& text, SDL_Color const& color, SDLFontFamily = SDLFontFamily::Fixed) const;
+    size_t text_width(std::string const&, SDLFontFamily = SDLFontFamily::Fixed) const;
 
 private:
     struct SDLInit {
@@ -74,7 +74,7 @@ private:
     };
 
     struct SDLWindow {
-        SDLWindow(int width, int height);
+        SDLWindow(size_t width, size_t height);
         ~SDLWindow();
         operator SDL_Window*() const { return window; }
 
@@ -90,23 +90,23 @@ private:
     };
 
     struct SDLFont {
-        SDLFont(SDLRenderer&, std::string font_name, int point_size);
+        SDLFont(SDLRenderer&, std::string font_name, size_t point_size);
         ~SDLFont();
 
-        void set_size(int);
+        void set_size(size_t);
         void set_font(std::string const&);
         [[nodiscard]] std::string to_string() const { return name; }
         operator TTF_Font*() const { return font; }
-        SDL_Rect render(int, int, std::string const& text, SDL_Color color) const;
-        SDL_Rect render_right_aligned(int, int, std::string const& text, SDL_Color color) const;
-        SDL_Rect render_centered(int, int, std::string const& text, SDL_Color color) const;
-        int text_width(std::string const&) const;
+        SDL_Rect render(size_t, size_t, std::string const& text, SDL_Color color) const;
+        SDL_Rect render_right_aligned(size_t, size_t, std::string const& text, SDL_Color color) const;
+        SDL_Rect render_centered(size_t, size_t, std::string const& text, SDL_Color color) const;
+        size_t text_width(std::string const&) const;
 
         SDLRenderer& renderer;
         TTF_Font *font;
         std::string name;
-        int initial_size;
-        int size;
+        size_t initial_size;
+        size_t size;
         int character_width;
         int character_height;
     };
@@ -120,8 +120,8 @@ private:
         SDL_Cursor* cursor;
     };
 
-    int m_width { 0 };
-    int m_height { 0 };
+    size_t m_width { 0 };
+    size_t m_height { 0 };
     SDLInit m_sdl {};
     SDLTTF m_ttf {};
     SDLWindow m_window { m_width, m_height };

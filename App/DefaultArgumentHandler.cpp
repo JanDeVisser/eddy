@@ -19,8 +19,8 @@ DefaultArgumentHandler::DefaultArgumentHandler(CommandHandler* handler, CommandP
 
 void DefaultArgumentHandler::render()
 {
-    box(SDL_Rect { 0, 0, 0, 0 }, SDL_Color { 0x2c, 0x2c, 0x2c, 0xff });
-    rectangle(SDL_Rect { 2, 2, width() - 4, height() - 4 }, { 0xff, 0xff, 0xff, 0xff });
+    box(0, 0, 0, 0, SDL_Color { 0x2c, 0x2c, 0x2c, 0xff });
+    rectangle(2, 2, width() - 4, height() - 4, { 0xff, 0xff, 0xff, 0xff });
     render_fixed(8, 4, m_parameter.prompt);
     render_fixed(8, App::instance().context()->character_height() + 12, m_value);
 
@@ -28,13 +28,13 @@ void DefaultArgumentHandler::render()
     auto time_end = std::chrono::system_clock::now();
     const long long elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(time_end - time_start).count();
     if (elapsed > 400) {
-        SDL_Rect r {
+        box(
             8 + App::instance().context()->character_width() * m_pos,
             App::instance().context()->character_height() + 12,
             1,
-            App::instance().context()->character_height()
-        };
-        box(r, Eddy::eddy().color(PaletteIndex::Cursor));
+            App::instance().context()->character_height(),
+            Eddy::eddy().color(PaletteIndex::Cursor)
+        );
         if (elapsed > 800)
             time_start = time_end;
     }

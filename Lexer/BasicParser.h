@@ -6,8 +6,8 @@
 
 #pragma once
 
-#include "Lexer.h"
 #include <Core/FileBuffer.h>
+#include <Lexer/Lexer.h>
 
 namespace Obelix {
 
@@ -85,7 +85,7 @@ private:
     std::vector<SyntaxError> m_errors {};
 };
 
-class PlainTextParser : public BasicParser {
+class PlainTextParser : public Obelix::BasicParser {
 public:
     static ErrorOr<std::shared_ptr<PlainTextParser>,SystemError> create(std::string const& file_name, BufferLocator* locator = nullptr);
 

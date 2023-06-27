@@ -291,6 +291,7 @@ struct Span {
     [[nodiscard]] std::string to_string() const;
     [[nodiscard]] Span merge(Span const&) const;
     [[nodiscard]] bool empty() const;
+    [[nodiscard]] size_t length() const { return end.index - start.index; }
 
     Span& operator=(Span const& other) = default;
     bool operator==(Span const& other) const;
@@ -361,6 +362,7 @@ public:
     [[nodiscard]] std::optional<bool> to_bool() const;
     [[nodiscard]] int compare(Token const& other) const;
     [[nodiscard]] bool is_whitespace() const;
+    [[nodiscard]] size_t length() const { return location().length(); }
 
 private:
     Span m_location;

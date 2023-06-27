@@ -63,16 +63,18 @@ SDLContext::SDLIMG::~SDLIMG()
         IMG_Quit();
 }
 
-SDLContext::SDLWindow::SDLWindow(int width, int height)
+SDLContext::SDLWindow::SDLWindow(size_t width, size_t height)
 {
     debug(eddy, "Creating SDL window with size {}x{}", width, height);
     if (window = SDL_CreateWindow(
             "Eddy",
             SDL_WINDOWPOS_CENTERED_DISPLAY(0), SDL_WINDOWPOS_CENTERED_DISPLAY(0),
-            width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+            static_cast<int>(width),
+            static_cast<int>(height),
+            SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
         window == nullptr)
         fatal("Could not create SDL window");
-    SDL_SetWindowMinimumSize(window, width, height);
+    SDL_SetWindowMinimumSize(window, static_cast<int>(width), static_cast<int>(height));
     debug(eddy, "Initialized SDL window");
 }
 
@@ -99,7 +101,7 @@ SDLContext::SDLRenderer::~SDLRenderer()
         SDL_DestroyRenderer(renderer);
 }
 
-SDLContext::SDLFont::SDLFont(SDLRenderer& renderer, std::string font_name, int point_size)
+SDLContext::SDLFont::SDLFont(SDLRenderer& renderer, std::string font_name, size_t point_size)
     : renderer(renderer)
     , name(std::move(font_name))
     , initial_size(point_size)
@@ -115,10 +117,10 @@ SDLContext::SDLFont::~SDLFont()
         TTF_CloseFont(font);
 }
 
-void SDLContext::SDLFont::set_size(int point_size)
+void SDLContext::SDLFont::set_size(size_t point_size)
 {
     size = point_size;
-    if (TTF_SetFontSize(font, size) != 0)
+    if (TTF_SetFontSize(font, static_cast<int>(size)) != 0)
         fatal("Error setting size of font {} to {}: {}", name, size, TTF_GetError());
     if (TTF_SizeUTF8(font, "W", &character_width, &character_height) != 0)
         fatal("Error getting size of text: {}", TTF_GetError());
@@ -129,14 +131,14 @@ void SDLContext::SDLFont::set_size(int point_size)
 void SDLContext::SDLFont::set_font(std::string const& font_name)
 {
     name = font_name;
-    if (font = TTF_OpenFont(format("fonts/{}.ttf", name).c_str(), size); font == nullptr)
+    if (font = TTF_OpenFont(format("fonts/{}.ttf", name).c_str(), static_cast<int>(size)); font == nullptr)
         fatal("Could not load font '{}': {}", name, TTF_GetError());
     set_size(size);
 }
 
-SDL_Rect SDLContext::SDLFont::render(int x, int y, std::string const& text, SDL_Color color) const
+SDL_Rect SDLContext::SDLFont::render(size_t x, size_t y, std::string const& text, SDL_Color color) const
 {
-    SDL_Rect rect { x, y, 0, 0 };
+    auto rect = make_SDL_Rect(x, y, 0, 0);
     if (text.empty()) {
         return rect;
     }
@@ -152,9 +154,9 @@ SDL_Rect SDLContext::SDLFont::render(int x, int y, std::string const& text, SDL_
     return rect;
 }
 
-SDL_Rect SDLContext::SDLFont::render_right_aligned(int x, int y, std::string const& text, SDL_Color color) const
+SDL_Rect SDLContext::SDLFont::render_right_aligned(size_t x, size_t y, std::string const& text, SDL_Color color) const
 {
-    SDL_Rect rect { x, y, 0, 0 };
+    SDL_Rect rect = make_SDL_Rect(x, y, 0, 0);
     if (text.empty()) {
         return rect;
     }
@@ -171,9 +173,9 @@ SDL_Rect SDLContext::SDLFont::render_right_aligned(int x, int y, std::string con
     return rect;
 }
 
-SDL_Rect SDLContext::SDLFont::render_centered(int x, int y, std::string const& text, SDL_Color color) const
+SDL_Rect SDLContext::SDLFont::render_centered(size_t x, size_t y, std::string const& text, SDL_Color color) const
 {
-    SDL_Rect rect { x, y, 0, 0 };
+    SDL_Rect rect = make_SDL_Rect(x, y, 0, 0);
     if (text.empty()) {
         return rect;
     }
@@ -190,7 +192,7 @@ SDL_Rect SDLContext::SDLFont::render_centered(int x, int y, std::string const& t
     return rect;
 }
 
-int SDLContext::SDLFont::text_width(std::string const& text) const
+size_t SDLContext::SDLFont::text_width(std::string const& text) const
 {
     int width, height;
     if (TTF_SizeUTF8(font, text.c_str(), &width, &height) != 0)
@@ -202,7 +204,7 @@ SDLContext::SDLCursor::SDLCursor(SDL_SystemCursor cursor_id)
     : id(cursor_id)
 {
     if (cursor = SDL_CreateSystemCursor(id); cursor == nullptr)
-        fatal("Could not initialize SDL cursor '{}'", (int)id);
+        fatal("Could not initialize SDL cursor '{}'", (size_t)id);
     debug(eddy, "Initialized SDL cursor '{}'", (int)id);
 }
 
@@ -213,7 +215,7 @@ SDLContext::SDLCursor::~SDLCursor()
         SDL_FreeCursor(cursor);
 }
 
-SDLContext::SDLContext(int width, int height)
+SDLContext::SDLContext(size_t width, size_t height)
     : m_width(width)
     , m_height(height)
 {
@@ -222,30 +224,31 @@ SDLContext::SDLContext(int width, int height)
     SDL_ShowCursor(1);
 }
 
-void SDLContext::resize(int width, int height)
+void SDLContext::resize(size_t width, size_t height)
 {
     m_width = width;
     m_height = height;
 }
 
-int SDLContext::character_width() const
+size_t SDLContext::character_width() const
 {
     return m_fonts[(size_t)SDLFontFamily::Fixed].character_width;
 }
 
-int SDLContext::character_height() const
+size_t SDLContext::character_height() const
 {
     return m_fonts[(size_t)SDLFontFamily::Fixed].character_height;
 }
 
 void SDLContext::enlarge_font(SDLFontFamily family)
 {
-    set_font_size(m_fonts[(size_t)family].size * 1.2, family);
+    set_font_size(static_cast<size_t>(
+                      static_cast<double>(m_fonts[(size_t)family].size) * 1.2), family);
 }
 
 void SDLContext::shrink_font(SDLFontFamily family)
 {
-    set_font_size(m_fonts[(size_t)family].size / 1.2, family);
+    set_font_size(static_cast<size_t>(static_cast<double>(m_fonts[(size_t)family].size) / 1.2), family);
 }
 
 void SDLContext::reset_font(SDLFontFamily family)
@@ -258,27 +261,27 @@ void SDLContext::set_font(std::string const& name, SDLFontFamily family)
     m_fonts[(size_t)family].set_font(name);
 }
 
-void SDLContext::set_font_size(int points, SDLFontFamily family)
+void SDLContext::set_font_size(size_t points, SDLFontFamily family)
 {
     m_fonts[(size_t)family].set_size(points);
 }
 
-SDL_Rect SDLContext::render_text(int x, int y, std::string const& text, SDL_Color const& color, SDLFontFamily family) const
+SDL_Rect SDLContext::render_text(size_t x, size_t y, std::string const& text, SDL_Color const& color, SDLFontFamily family) const
 {
     return m_fonts[(size_t)family].render(x, y, text, color);
 }
 
-SDL_Rect SDLContext::render_text_right_aligned(int x, int y, std::string const& text, SDL_Color const& color, SDLFontFamily family) const
+SDL_Rect SDLContext::render_text_right_aligned(size_t x, size_t y, std::string const& text, SDL_Color const& color, SDLFontFamily family) const
 {
     return m_fonts[(size_t)family].render_right_aligned(x, y, text, color);
 }
 
-SDL_Rect SDLContext::render_text_centered(int x, int y, std::string const& text, SDL_Color const& color, SDLFontFamily family) const
+SDL_Rect SDLContext::render_text_centered(size_t x, size_t y, std::string const& text, SDL_Color const& color, SDLFontFamily family) const
 {
     return m_fonts[(size_t)family].render_centered(x, y, text, color);
 }
 
-int SDLContext::text_width(std::string const& text, SDLFontFamily family) const
+size_t SDLContext::text_width(std::string const& text, SDLFontFamily family) const
 {
     return m_fonts[(size_t)family].text_width(text);
 }

@@ -30,7 +30,7 @@ void EditAction::redo(Document& doc) const
         doc.insert_text(text(), cursor());
         break;
     case EditActionType::DeleteText:
-        doc.erase(cursor(), static_cast<int>(text().length()));
+        doc.erase(cursor(), text().length());
         break;
     case EditActionType::CursorMove:
         doc.set_point_and_mark(pointer());
@@ -44,11 +44,11 @@ std::optional<EditAction> EditAction::merge(EditAction const& merge_with) const
         return {};
     switch (type()) {
     case EditActionType::InsertText:
-        if (merge_with.cursor() == cursor() + static_cast<int>(text().length()))
+        if (merge_with.cursor() == cursor() + text().length())
             return EditAction { EditActionType::InsertText, cursor(), text() + merge_with.text() };
         break;
     case EditActionType::DeleteText:
-        if (cursor() == merge_with.cursor() + static_cast<int>(merge_with.text().length()))
+        if (cursor() == merge_with.cursor() + merge_with.text().length())
             return EditAction { EditActionType::DeleteText, merge_with.cursor(), merge_with.text() + text() };
         break;
     case EditActionType::CursorMove:
@@ -59,29 +59,29 @@ std::optional<EditAction> EditAction::merge(EditAction const& merge_with) const
     return {};
 }
 
-EditAction EditAction::insert_text(int cursor, std::string text)
+EditAction EditAction::insert_text(size_t cursor, std::string text)
 {
     return { EditActionType::InsertText, cursor, std::move(text) };
 }
 
-EditAction EditAction::delete_text(int cursor, std::string text)
+EditAction EditAction::delete_text(size_t cursor, std::string text)
 {
     return { EditActionType::DeleteText, cursor, std::move(text) };
 }
 
-EditAction EditAction::move_cursor(int from, int new_cursor)
+EditAction EditAction::move_cursor(size_t from, size_t new_cursor)
 {
     return { EditActionType::CursorMove, from, new_cursor };
 }
 
-EditAction::EditAction(EditActionType type, int cursor, std::string text)
+EditAction::EditAction(EditActionType type, size_t cursor, std::string text)
     : m_type(type)
     , m_cursor(cursor)
     , m_text(std::move(text))
 {
 }
 
-EditAction::EditAction(EditActionType type, int cursor, int pointer)
+EditAction::EditAction(EditActionType type, size_t cursor, size_t pointer)
     : m_type(type)
     , m_cursor(cursor)
     , m_pointer(pointer)

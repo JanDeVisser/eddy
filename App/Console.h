@@ -40,9 +40,9 @@ public:
 
     void render() override;
     bool dispatch(SDL_Keysym) override;
-    void mousedown(int, int) override;
-    void motion(int, int) override;
-    void click(int, int, int) override;
+    void mousedown(Position mouse) override;
+    void motion(Position mouse) override;
+    void click(Position mouse, int clicks) override;
     void wheel(int) override;
     void handle_text_input() override;
 

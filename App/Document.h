@@ -41,24 +41,24 @@ struct DocumentCommands : public Commands {
 
 class EditAction {
 public:
-    static EditAction insert_text(int, std::string);
-    static EditAction delete_text(int, std::string);
-    static EditAction move_cursor(int, int);
+    static EditAction insert_text(size_t, std::string);
+    static EditAction delete_text(size_t, std::string);
+    static EditAction move_cursor(size_t, size_t);
 
-    [[nodiscard]] int cursor() const { return m_cursor; }
+    [[nodiscard]] size_t cursor() const { return m_cursor; }
     [[nodiscard]] EditActionType type() const { return m_type; }
     [[nodiscard]] std::string const& text() const { return m_text; }
-    [[nodiscard]] int pointer() const { return m_pointer; }
+    [[nodiscard]] size_t pointer() const { return m_pointer; }
 
     void undo(Document&) const;
     void redo(Document&) const;
     [[nodiscard]] std::optional<EditAction> merge(EditAction const&) const;
 private:
-    EditAction(EditActionType, int, std::string);
-    EditAction(EditActionType, int, int);
+    EditAction(EditActionType, size_t, std::string);
+    EditAction(EditActionType, size_t, size_t);
     EditActionType m_type;
-    int m_cursor {0};
-    int m_pointer {0};
+    size_t m_cursor {0};
+    size_t m_pointer {0};
     std::string m_text;
 };
 
@@ -66,32 +66,28 @@ class Document : public Buffer {
 public:
     explicit Document(Editor *);
 
-    void update(size_t, Line);
-
-    [[nodiscard]] int text_length() const;
+    [[nodiscard]] size_t text_length() const;
     [[nodiscard]] Line const& line(size_t);
-    [[nodiscard]] std::string const& text() const { return m_text; }
-    [[nodiscard]] int line_length(size_t) const;
-    [[nodiscard]] int line_count() const;
+    [[nodiscard]] std::string_view text() const { return m_text.text(); }
+    [[nodiscard]] size_t line_length(size_t) const;
+    [[nodiscard]] size_t line_count() const;
     [[nodiscard]] bool empty() const;
-    [[nodiscard]] size_t parsed() const;
     [[nodiscard]] fs::path const& path() const;
     [[nodiscard]] std::string title() const override;
     [[nodiscard]] std::string short_title() const override;
     [[nodiscard]] std::string status() const override;
 
-    [[nodiscard]] int screen_top() const { return m_screen_top; }
-    [[nodiscard]] int screen_left() const { return m_screen_left; }
+    [[nodiscard]] size_t screen_top() const { return m_screen_top; }
+    [[nodiscard]] size_t screen_left() const { return m_screen_left; }
 
-    [[nodiscard]] int find_line_number(int) const;
-    [[nodiscard]] DocumentPosition position(int) const;
-    [[nodiscard]] int position_to_cursor(DocumentPosition);
-    [[nodiscard]] int point() const { return m_point; };
-    [[nodiscard]] int mark() const { return m_mark; }
-    [[nodiscard]] int point_line() const;
-    [[nodiscard]] int point_column() const;
-    [[nodiscard]] int mark_line() const;
-    [[nodiscard]] int mark_column() const;
+    [[nodiscard]] DocumentPosition position(size_t) const;
+    [[nodiscard]] size_t position_to_cursor(DocumentPosition);
+    [[nodiscard]] size_t point() const { return m_point; };
+    [[nodiscard]] size_t mark() const { return m_mark; }
+    [[nodiscard]] size_t point_line() const;
+    [[nodiscard]] size_t point_column() const;
+    [[nodiscard]] size_t mark_line() const;
+    [[nodiscard]] size_t mark_column() const;
 
     void undo();
     void redo();
@@ -105,10 +101,10 @@ public:
         Up,
         Down,
     };
-    void transpose_lines(TransposeDirection = TransposeDirection::Down);
+    void transpose_lines(TransposeDirection direction = TransposeDirection::Down);
 
     void reset_selection();
-    void extend_selection(int);
+    void extend_selection(int num);
     void select_word();
     void select_line();
     void select_all();
@@ -118,8 +114,7 @@ public:
     void cut_to_clipboard();
     void paste_from_clipboard();
 
-    void set_point_and_mark(int, int = -1);
-    void move_to(int, int, bool);
+    void move_to(size_t, size_t, bool);
     void up(bool);
     void down(bool);
     void left(bool);
@@ -137,32 +132,30 @@ public:
     bool find_next();
 
     void clear();
-    std::string load(std::string const&);
-    std::string save();
-    std::string save_as(std::string const&);
+    std::optional<std::string> load(std::string const&);
+    std::optional<std::string> save();
+    std::optional<std::string> save_as(std::string const&);
     [[nodiscard]] bool dirty() const { return m_dirty; }
 
     void render() override;
     bool dispatch(SDL_Keysym) override;
-    void mousedown(int, int) override;
-    void motion(int, int) override;
-    void click(int, int, int) override;
+    void mousedown(Position mouse) override;
+    void motion(Position mouse) override;
+    void click(Position mouse, int clicks) override;
     void wheel(int) override;
     void handle_text_input() override;
 
-    Token const& lex();
-    void rewind();
-    void invalidate();
     [[nodiscard]] auto last_parse_time() const { return m_last_parse_time.count(); }
 
     std::optional<ScheduledCommand> command(std::string const&) const override;
     [[nodiscard]] std::vector<ScheduledCommand> commands() const override;
 
 private:
-    void insert_text(std::string const&, int = -1);
-    void erase(int, int);
-    void move_point(int);
-    void update_internals(bool, int = -1);
+    void set_point_and_mark(size_t point, std::optional<size_t> mark = {});
+    void insert_text(std::string const&, std::optional<size_t> point = {});
+    void erase(size_t point, size_t len);
+    void move_point(size_t point);
+    void update_internals(bool select, size_t line = -1);
     void add_edit_action(EditAction);
     void fill_lines();
 
@@ -171,19 +164,17 @@ private:
     FileType m_filetype;
     std::unique_ptr<Mode> m_mode;
 
-    std::string m_text;
     bool m_changed { false };
-    std::recursive_mutex m_line_lock;
-    std::vector<Line> m_lines {};
+    Text m_text;
 
-    int m_screen_top {0};
-    int m_screen_left {0};
-    int m_point {0};
-    int m_mark {0};
+    size_t m_screen_top {0};
+    size_t m_screen_left {0};
+    size_t m_point {0};
+    size_t m_mark {0};
     std::string m_find_term;
     bool m_found { true };
     std::vector<EditAction> m_edits;
-    int m_undo_pointer { -1 };
+    std::optional<size_t> m_undo_pointer {};
     std::chrono::milliseconds m_last_parse_time { 0 };
     static DocumentCommands s_document_commands;
 

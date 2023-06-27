@@ -12,7 +12,7 @@
 #include <App/Document.h>
 #include <App/Eddy.h>
 #include <App/Editor.h>
-#include <Mode/CPlusPlus.h>
+//#include <Mode/CPlusPlus.h>
 #include <Mode/Mode.h>
 #include <Mode/PlainText.h>
 //#include <Mode/Scribble.h>
@@ -100,15 +100,15 @@ DocumentCommands::DocumentCommands()
             { { "Line:Column to go to", CommandParameterType::String } },
             [](Widget& w, strings const& args) -> void {
                 auto line_col = split(args[0], ':');
-                if (line_col.size() < 1)
+                if (line_col.empty())
                     return;
                 if (auto line_maybe = try_to_long<std::string>()(line_col[0]); line_maybe.has_value()) {
-                    int col = -1;
+                    auto& doc = dynamic_cast<Document&>(w);
+                    auto col = doc.point_column();
                     if (line_col.size() > 1) {
                         if (auto col_maybe = try_to_long<std::string>()(line_col[1]); col_maybe.has_value())
                             col = col_maybe.value();
                     }
-                    auto& doc = dynamic_cast<Document&>(w);
                     doc.move_to(line_maybe.value() - 1, col - 1, false);
                 }
             } },
@@ -202,45 +202,14 @@ Document::Document(Editor* editor)
 
 Line const& Document::line(size_t line_no)
 {
-    std::lock_guard const lock { m_line_lock };
-    assert(line_no < m_lines.size());
-    return m_lines[line_no];
+    assert(line_no < m_text.size());
+    return m_text[line_no];
 }
 
 void Document::fill_lines()
 {
-    std::lock_guard const lock { m_line_lock };
-    PlainTextParser parser(StringBuffer { m_text });
-    std::string_view text { m_text };
-    m_lines.clear();
-    size_t offset { 0u };
-    size_t length { 0u };
-    bool done { false };
-    while (!done) {
-        auto& token = parser.lex();
-        switch (token.code()) {
-        case TokenCode::EndOfFile:
-            done = true;
-            // FALL THROUGH!
-        case TokenCode::NewLine:
-            m_lines.emplace_back(offset, text.substr(offset, length));
-            offset += length + token.value().length();
-            length = 0u;
-            break;
-        default:
-            length += token.value().length();
-            break;
-        }
-    }
-}
-
-void Document::update(size_t ix, Line line)
-{
-    std::lock_guard const lock { m_line_lock };
-    if (m_lines.size() < ix) {
-        m_lines.resize(ix + 1);
-    }
-    m_lines.emplace(m_lines.begin() + static_cast<long>(ix), std::move(line));
+    PlainTextParser parser;
+    m_text.parse(parser);
 }
 
 fs::path const& Document::path() const
@@ -266,27 +235,24 @@ std::string Document::status() const
     return ss.str();
 }
 
-int Document::text_length() const
+size_t Document::text_length() const
 {
-    return static_cast<int>(m_text.length());
+    return m_text.length();
 }
 
-int Document::line_length(size_t line_no) const
+size_t Document::line_length(size_t line_no) const
 {
-    assert(line_no < m_lines.size());
-    if (line_no == m_lines.size() - 1)
-        return text_length() - m_lines[line_no].index();
-    return m_lines[line_no + 1].index() - m_lines[line_no].index() - 1;
+    return m_text.line_length(line_no);
 }
 
-int Document::line_count() const
+size_t Document::line_count() const
 {
-    return static_cast<int>(m_lines.size());
+    return m_text.size();
 }
 
 bool Document::empty() const
 {
-    return m_lines.empty() || (m_lines.size() == 1 && (m_lines[0].length() == 0));
+    return m_text.empty() || (m_text.length() == 0);
 }
 
 void Document::split_line()
@@ -296,13 +262,10 @@ void Document::split_line()
 
 void Document::join_lines()
 {
-    int ix;
-    for (ix = m_point; (ix > 0) && (m_text[ix] != '\n'); --ix)
-        ;
-    if (ix > 0) {
-        add_edit_action(EditAction::delete_text(ix, m_text.substr(ix, 1)));
-        m_text.erase(ix, 1);
-        m_point = ix - 1;
+    auto line = m_text.find_line_number(m_point);
+    if (line < (line_count() - 1)) {
+        m_point = m_text[line].end_index();
+        m_text.join_lines(line);
         update_internals(false);
     }
 }
@@ -310,10 +273,9 @@ void Document::join_lines()
 void Document::duplicate_line()
 {
     auto point = m_point;
-    auto line = find_line_number(m_point);
+    auto line = m_text.find_line_number(m_point);
     auto len = line_length(line);
-    m_mark = m_point = m_lines[line].index() + len;
-    insert("\n" + m_text.substr(m_lines[line].index(), len));
+    m_text.duplicate_line(line);
     move_point(point + len + 1);
     m_mark = m_point;
     update_internals(false);
@@ -323,34 +285,25 @@ void Document::transpose_lines(TransposeDirection direction)
 {
     if (line_count() < 2)
         return;
-    auto line = find_line_number(m_point);
-    auto column = m_point - m_lines[line].index();
+    auto line = m_text.find_line_number(m_point);
+    auto column = m_point - m_text.index_of(line);
     if (((direction == TransposeDirection::Down) && (line < line_count() - 1)) || ((direction == TransposeDirection::Up) && (line > 0))) {
         auto top_line = (direction == TransposeDirection::Down) ? line : line - 1;
-        auto bottom_line = (direction == TransposeDirection::Down) ? line + 1 : line;
-        auto top = m_text.substr(m_lines[top_line].index(), line_length(top_line));
-        auto bottom = m_text.substr(m_lines[bottom_line].index(), line_length(bottom_line));
         auto offset = (direction == TransposeDirection::Down) ? line_length(top_line) + 1 + column : column;
-        m_mark = m_lines[top_line].index();
-        m_point = m_lines[bottom_line].index() + line_length(bottom_line);
-        add_edit_action(EditAction::delete_text(m_mark, top + "\n" + bottom));
-        add_edit_action(EditAction::insert_text(m_mark, bottom + "\n" + top));
-        erase(m_mark, m_point - m_mark);
-        insert_text(bottom + "\n" + top);
-        move_point(m_lines[top_line].index() + offset);
+        m_text.transpose_lines(top_line);
+        move_point(m_text.index_of(top_line) + offset);
         update_internals(false);
     }
 }
 
-void Document::insert_text(std::string const& str, int point)
+void Document::insert_text(std::string const& str, std::optional<size_t> point)
 {
     if (str.empty())
         return;
-    if (point < 0)
-        point = m_point;
-    m_text.insert(point, str);
+    auto p = (point.has_value()) ? point.value() : m_point;
+    m_text.insert(p, str);
     m_changed = true;
-    m_point += static_cast<int>(str.length());
+    m_point += static_cast<size_t>(str.length());
 }
 
 void Document::insert(std::string const& str)
@@ -359,7 +312,7 @@ void Document::insert(std::string const& str)
         return;
     erase_selection();
     insert_text(str);
-    add_edit_action(EditAction::insert_text(m_point - static_cast<int>(str.length()), str));
+    add_edit_action(EditAction::insert_text(m_point - static_cast<size_t>(str.length()), str));
     update_internals(false);
 }
 
@@ -375,13 +328,9 @@ void Document::extend_selection(int num)
     auto& right = (m_mark <= m_point) ? m_point : m_mark;
 
     if (num < 0) {
-        left += num;
-        if (left < 0)
-            left = 0;
+        left -= std::min(static_cast<size_t>(-num), left);
     } else {
-        right += num;
-        if (right > static_cast<int>(m_text.length()))
-            right = text_length();
+        right += std::min(static_cast<size_t>(num), text_length() - right);
     }
     add_edit_action(EditAction::move_cursor(point, m_point));
 }
@@ -389,27 +338,17 @@ void Document::extend_selection(int num)
 void Document::select_word()
 {
     auto point = m_point;
-    m_mark = m_point;
-    if (isalnum(m_text[m_point]) || m_text[m_point] == '_') {
-        while (m_point > 0 && (isalnum(m_text[m_point - 1]) || m_text[m_point - 1] == '_'))
-            --m_point;
-        while (m_mark < static_cast<int>(m_text.length()) && (isalnum(m_text[m_mark]) || m_text[m_mark] == '_'))
-            ++m_mark;
-    } else {
-        while (m_point > 0 && !isalnum(m_text[m_point - 1]) && m_text[m_point - 1] != '_')
-            --m_point;
-        while (m_mark < text_length() && !isalnum(m_text[m_mark]) && m_text[m_mark] != '_')
-            ++m_mark;
-    }
+    m_point = static_cast<size_t>(m_text.word_boundary_left(point));
+    m_mark = static_cast<size_t>(m_text.word_boundary_right(point));
     add_edit_action(EditAction::move_cursor(point, m_point));
 }
 
 void Document::select_line()
 {
-    auto line = static_cast<size_t>(find_line_number(m_point));
-    move_point(m_lines[line].index());
-    if (line < m_lines.size() - 1)
-        m_mark = m_lines[line + 1].index();
+    auto line = m_text.find_line_number(m_point);
+    move_point(static_cast<size_t>(m_text.index_of(line)));
+    if (line < m_text.size() - 1)
+        m_mark = m_text.index_of(line + 1);
     else
         m_mark = text_length();
 }
@@ -424,25 +363,24 @@ std::string Document::selected_text()
 {
     if (m_point == m_mark)
         return "";
-    int start_selection = std::min(m_point, m_mark);
-    int end_selection = std::max(m_point, m_mark);
-    return m_text.substr(start_selection, end_selection - start_selection);
+    size_t start_selection = std::min(m_point, m_mark);
+    size_t end_selection = std::max(m_point, m_mark);
+    return m_text.substring(start_selection, end_selection - start_selection);
 }
 
-void Document::erase(int point, int len)
+void Document::erase(size_t point, size_t len)
 {
-    m_text.erase(point, len);
+    m_text.remove(point, len);
     m_mark = m_point = point;
-    m_changed = true;
 }
 
 void Document::erase_selection()
 {
     if (m_point == m_mark)
         return;
-    int start_selection = std::min(m_point, m_mark);
-    int end_selection = std::max(m_point, m_mark);
-    add_edit_action(EditAction::delete_text(start_selection, m_text.substr(start_selection, end_selection - start_selection)));
+    size_t start_selection = std::min(m_point, m_mark);
+    size_t end_selection = std::max(m_point, m_mark);
+    add_edit_action(EditAction::delete_text(start_selection, m_text.substring(start_selection, end_selection - start_selection)));
     erase(start_selection, end_selection - start_selection);
     move_point(start_selection);
     update_internals(false);
@@ -476,75 +414,53 @@ void Document::paste_from_clipboard()
         insert(clipboard);
 }
 
-int Document::find_line_number(int cursor) const
+DocumentPosition Document::position(size_t cursor) const
 {
-    if (line_count() == 0) {
-        return 0;
-    }
-    int line_min = 0;
-    int line_max = line_count() - 1;
-    while (true) {
-        int line = line_min + (line_max - line_min) / 2;
-        if ((line < line_count() - 1 && m_lines[line].index() <= cursor && cursor < m_lines[line + 1].index()) || (line == line_count() - 1 && m_lines[line].index() <= cursor)) {
-            return line;
-        } else {
-            if (m_lines[line].index() > cursor) {
-                line_max = line;
-            } else {
-                line_min = line + 1;
-            }
-        }
-    }
-}
-
-DocumentPosition Document::position(int cursor) const
-{
-    auto line = find_line_number(cursor);
+    auto line = m_text.find_line_number(cursor);
     if (line < line_count())
-        return { line, cursor - static_cast<int>(m_lines[line].index()) };
+        return { line, cursor - m_text.index_of(line) };
     else
         return { line_count(), 0 };
 }
 
-int Document::position_to_cursor(DocumentPosition position) {
+size_t Document::position_to_cursor(DocumentPosition position) {
     if (line_count() == 0) {
         return 0;
     }
-    position.line = clamp(position.line, 0, line_count() - 1);
-    position.column = clamp(position.column, 0, line_length(position.line));
-    return m_lines[position.line].index() + position.column;
+    position.line = clamp(position.line, 0ul, line_count() - 1);
+    position.column = clamp(position.column, 0ul, line_length(position.line));
+    return m_text.index_of(position.line) + position.column;
 }
 
-int Document::point_line() const
+size_t Document::point_line() const
 {
-    return find_line_number(m_point);
+    return m_text.find_line_number(m_point);
 }
 
-int Document::point_column() const
+size_t Document::point_column() const
 {
     auto pos = position(m_point);
     return pos.column;
 }
 
-int Document::mark_line() const
+size_t Document::mark_line() const
 {
-    return find_line_number(m_mark);
+    return m_text.find_line_number(m_mark);
 }
 
-int Document::mark_column() const
+size_t Document::mark_column() const
 {
     auto pos = position(m_mark);
     return pos.column;
 }
 
-void Document::set_point_and_mark(int point, int mark)
+void Document::set_point_and_mark(size_t point, std::optional<size_t> mark)
 {
-    if (mark < 0)
-        mark = point;
+    auto m = mark.value_or(point);
     m_point = point;
-    m_mark = mark;
-    auto line = find_line_number(m_point);
-    int column = m_point - m_lines[line].index();
+    m_mark = m;
+    auto line = m_text.find_line_number(m_point);
+    auto column = m_point - m_text.index_of(line);
     if (m_screen_top > line || m_screen_top + rows() < line)
         m_screen_top = line - rows() / 2;
     if (m_screen_left > column || m_screen_left + columns() < column)
@@ -552,14 +468,14 @@ void Document::set_point_and_mark(int point, int mark)
     update_internals(mark != point, line);
 }
 
-void Document::move_to(int line, int column, bool select)
+void Document::move_to(size_t line, size_t column, bool select)
 {
     if (line_count() == 0) {
         line = 0;
         column = 0;
     } else {
-        line = clamp(line, 0, (int)line_count() - 1);
-        column = clamp(column, 0, (int)line_length(line));
+        line = clamp(line, 0ul, line_count() - 1);
+        column = clamp(column, 0ul, line_length(line));
     }
     move_point(position_to_cursor(DocumentPosition { line, column }));
     if (m_screen_top > line || m_screen_top + rows() < line)
@@ -569,7 +485,7 @@ void Document::move_to(int line, int column, bool select)
     update_internals(select, line);
 }
 
-void Document::update_internals(bool select, int line)
+void Document::update_internals(bool select, size_t line)
 {
     if (m_changed) {
         fill_lines();
@@ -578,13 +494,13 @@ void Document::update_internals(bool select, int line)
     auto pos = position(m_point);
     line = pos.line;
     auto column = pos.column;
-    m_screen_top = clamp(m_screen_top, std::max(0, line - editor()->rows() + 1), line);
-    m_screen_left = clamp(m_screen_left, std::max(0, column - editor()->columns() + 1), column);
+    m_screen_top = clamp(m_screen_top, better_max(0ul, line - editor()->rows() + 1), line);
+    m_screen_left = clamp(m_screen_left, better_max(0ul, column - editor()->columns() + 1), column);
     if (!select)
         m_mark = m_point;
 }
 
-void Document::move_point(int point)
+void Document::move_point(size_t point)
 {
     if (point == m_point)
         return;
@@ -595,39 +511,49 @@ void Document::move_point(int point)
 void Document::add_edit_action(EditAction action)
 {
     m_mode->on_change(action);
-    if (m_undo_pointer < static_cast<int>(m_edits.size()) - 1) {
-        m_edits.erase(m_edits.begin() + clamp(m_undo_pointer, 0, static_cast<int>(m_edits.size()) - 1), m_edits.end());
+    auto undo_pointer = m_undo_pointer.value_or(0ul);
+    if (undo_pointer < m_edits.size() - 1) {
+        m_edits.erase(
+            m_edits.begin() + static_cast<int>(clamp(undo_pointer, 0ul, m_edits.size() - 1)),
+            m_edits.end());
     }
     if (!m_edits.empty()) {
         if (auto merged = m_edits.back().merge(action); merged.has_value()) {
             m_edits.pop_back();
             m_edits.push_back(merged.value());
-            m_undo_pointer = static_cast<int>(m_edits.size() - 1);
+            m_undo_pointer = m_edits.size() - 1;
             return;
         }
     }
     m_edits.push_back(std::move(action));
-    m_undo_pointer = static_cast<int>(m_edits.size() - 1);
+    m_undo_pointer = m_edits.size() - 1;
 }
 
 void Document::undo()
 {
-    if (!m_edits.empty() && (m_undo_pointer >= 0) && (m_undo_pointer < static_cast<int>(m_edits.size()))) {
-        m_edits[m_undo_pointer--].undo(*this);
+    if (!m_edits.empty() && m_undo_pointer.has_value() && (m_undo_pointer.value() < m_edits.size())) {
+        auto undo_pointer = m_undo_pointer.value();
+        m_edits[undo_pointer].undo(*this);
+        if (undo_pointer > 0) {
+            m_undo_pointer = undo_pointer - 1;
+        } else {
+            m_undo_pointer.reset();
+        }
     }
 }
 
 void Document::redo()
 {
-    if (!m_edits.empty() && (m_undo_pointer >= 0) && (m_undo_pointer < static_cast<int>(m_edits.size()))) {
-        m_edits[m_undo_pointer++].undo(*this);
+    if (!m_edits.empty() && m_undo_pointer.has_value() && (m_undo_pointer.value() < m_edits.size())) {
+        m_edits[m_undo_pointer.value()].undo(*this);
+        m_undo_pointer = m_undo_pointer.value() + 1;
     }
 }
 
 void Document::up(bool select)
 {
-    int line = point_line();
-    int column = point_column();
+    size_t line = point_line();
+    size_t column = point_column();
     if (line > 0) {
         move_point(position_to_cursor(DocumentPosition { line - 1, column }));
         update_internals(select, line - 1);
@@ -636,8 +562,8 @@ void Document::up(bool select)
 
 void Document::down(bool select)
 {
-    int line = point_line();
-    int column = point_column();
+    size_t line = point_line();
+    size_t column = point_column();
     if (line < (line_count() - 1)) {
         move_point(position_to_cursor(DocumentPosition { line + 1, column }));
         update_internals(select, line + 1);
@@ -654,10 +580,10 @@ void Document::left(bool select)
 void Document::word_left(bool select)
 {
     auto point = m_point;
-    while (0 < point && !isalnum(m_text[point])) {
+    while (0 < point && !isalnum(m_text.char_at(point))) {
         --point;
     }
-    while (0 < point && isalnum(m_text[point])) {
+    while (0 < point && isalnum(m_text.char_at(point))) {
         --point;
     }
     move_point(point);
@@ -674,10 +600,10 @@ void Document::right(bool select)
 void Document::word_right(bool select)
 {
     auto point = m_point;
-    while (point < text_length() - 1 && !isalnum(m_text[point])) {
+    while (point < text_length() - 1 && !isalnum(m_text.char_at(point))) {
         ++point;
     }
-    while (point < text_length() - 1 && isalnum(m_text[point])) {
+    while (point < text_length() - 1 && isalnum(m_text.char_at(point))) {
         ++point;
     }
     move_point(point);
@@ -686,39 +612,37 @@ void Document::word_right(bool select)
 
 void Document::page_up(bool select)
 {
-    auto line = find_line_number(m_point);
-    int column = m_point - m_lines[line].index();
-    line = clamp(line - rows(), 0, line);
-    column = clamp(column, 0, line_length(line));
-    move_point(m_lines[line].index() + column);
+    auto line = m_text.find_line_number(m_point);
+    auto column = m_point - m_text[line].index();
+    line = clamp(line - rows(), 0ul, line);
+    column = clamp(column, 0ul, line_length(line));
+    move_point(m_text[line].index() + column);
     update_internals(select, line);
 }
 
 void Document::page_down(bool select)
 {
-    auto line = find_line_number(m_point);
-    int column = m_point - m_lines[line].index();
+    auto line = m_text.find_line_number(m_point);
+    size_t column = m_point - m_text[line].index();
     line = clamp(line + rows(), line, line_count() - 1);
-    column = clamp(column, 0, line_length(line));
-    move_point(m_lines[line].index() + column);
+    column = clamp(column, 0ul, line_length(line));
+    move_point(m_text[line].index() + column);
     update_internals(select, line);
 }
 
 void Document::home(bool select)
 {
-    auto point = m_point;
-    for (; point > 1 && m_text[point - 1] != '\n'; --point)
-        ;
-    move_point(point);
+    auto line = m_text.find_line_number(m_point);
+    auto home = m_text.index_of(line);
+    move_point(home);
     update_internals(select);
 }
 
 void Document::end(bool select)
 {
-    auto point { m_point };
-    for (; point < text_length() && m_text[point] != '\n'; ++point)
-        ;
-    move_point(point);
+    auto line = m_text.find_line_number(m_point);
+    auto end = m_text.index_of_end(line);
+    move_point(end);
     update_internals(select);
 }
 
@@ -749,9 +673,9 @@ bool Document::find_next()
         m_mark = m_point = 0;
     }
     auto where = m_text.find(m_find_term, m_point);
-    if (where != std::string::npos) {
-        m_mark = static_cast<int>(where);
-        move_point(m_mark + static_cast<int>(m_find_term.length()));
+    if (where.has_value()) {
+        m_mark = where.value();
+        move_point(m_mark + m_find_term.length());
         m_found = true;
         update_internals(true);
         return true;
@@ -765,12 +689,11 @@ bool Document::find_next()
 
 void Document::clear()
 {
-    add_edit_action(EditAction::move_cursor(m_point, 0));
-    add_edit_action(EditAction::delete_text(0, m_text));
+    m_text.remove_all();
     update_internals(false);
 }
 
-std::string Document::load(std::string const& file_name)
+std::optional<std::string> Document::load(std::string const& file_name)
 {
     m_path = fs::absolute(file_name);
     m_filetype = get_filetype(m_path);
@@ -779,30 +702,30 @@ std::string Document::load(std::string const& file_name)
     auto text_maybe = m_mode->open_file(m_path);
     if (text_maybe.is_error())
         return text_maybe.error().to_string();
-    m_text = text_maybe.value();
+    m_text.assign(text_maybe.value());
     m_mode->on_load();
     m_point = m_mark = 0;
     m_dirty = false;
     fill_lines();
     m_changed = false;
-    return "";
+    return {};
 }
 
-std::string Document::save()
+std::optional<std::string> Document::save()
 {
     if (!m_dirty)
-        return "";
+        return {};
     std::fstream s(m_path.string(), std::fstream::out);
     if (!s.is_open())
         return format("Error opening '{}'", m_path.string());
-    s << m_text;
+    s << m_text.text();
     if (s.fail() || s.bad())
         return format("Error saving '{}'", m_path.string());
     m_dirty = false;
-    return "";
+    return {};
 }
 
-std::string Document::save_as(std::string const& new_file_name)
+std::optional<std::string> Document::save_as(std::string const& new_file_name)
 {
     m_path = new_file_name;
     m_filetype = get_filetype(m_path);
@@ -812,33 +735,33 @@ std::string Document::save_as(std::string const& new_file_name)
 
 void Document::render()
 {
-    auto point_line = find_line_number(m_point);
-    auto point_column = (point_line < line_count()) ? m_point - m_lines[point_line].index() : 0;
+    auto point_line = m_text.find_line_number(m_point);
+    auto point_column = (point_line < line_count()) ? m_point - m_text[point_line].index() : 0;
     editor()->mark_current_line(point_line - m_screen_top);
 
     bool has_selection = m_point != m_mark;
-    int start_selection = std::min(m_point, m_mark);
-    int end_selection = std::max(m_point, m_mark);
-    for (auto ix = m_screen_top; ix < line_count() && ix < m_screen_top + editor()->rows(); ++ix) {
-        auto const& line = m_lines[ix];
+    size_t start_selection = std::min(m_point, m_mark);
+    size_t end_selection = std::max(m_point, m_mark);
+    for (auto ix = m_screen_top; ix < std::min(line_count(), m_screen_top + editor()->rows()); ++ix) {
+        auto const& line = m_text[ix];
         auto line_len = line_length(ix);
         auto line_end = line.index() + line_len;
         if (has_selection && (start_selection <= line_end) && (end_selection >= line.index())) {
-            int start_block = start_selection - line.index();
-            if (start_block < 0)
+            size_t start_block = start_selection - line.index();
+            if (line.index() > start_selection)
                 start_block = 0;
-            int end_block = end_selection - line.index();
+            size_t end_block = end_selection - line.index();
             if (end_block > line_len)
                 end_block = editor()->columns();
-            int block_width = end_block - start_block;
+            size_t block_width = end_block - start_block;
             if (block_width > 0) {
-                SDL_Rect r {
+                editor()->box(
                     start_block * App::instance().context()->character_width(),
                     editor()->line_top(ix - m_screen_top),
                     block_width * App::instance().context()->character_width(),
-                    editor()->line_height()
-                };
-                editor()->box(r, Eddy::eddy().color(PaletteIndex::Selection));
+                    editor()->line_height(),
+                    Eddy::eddy().color(PaletteIndex::Selection)
+                );
             }
         }
 
@@ -924,17 +847,17 @@ bool Document::dispatch(SDL_Keysym sym)
     return true;
 }
 
-void Document::mousedown(int line, int column)
+void Document::mousedown(Position mouse)
 {
-    move_to(m_screen_top + line, m_screen_left + column, false);
+    move_to(m_screen_top + mouse.line(), m_screen_left + mouse.column(), false);
 }
 
-void Document::motion(int line, int column)
+void Document::motion(Position mouse)
 {
-    move_to(m_screen_top + line, m_screen_left + column, true);
+    move_to(m_screen_top + mouse.line(), m_screen_left + mouse.column(), true);
 }
 
-void Document::click(int line, int column, int clicks)
+void Document::click(Position mouse, int clicks)
 {
     switch (clicks) {
     case 2:
@@ -950,7 +873,10 @@ void Document::click(int line, int column, int clicks)
 
 void Document::wheel(int lines)
 {
-    m_screen_top = clamp(m_screen_top + lines, 0, line_count() - 1);
+    if (lines >= 0)
+        m_screen_top = clamp(m_screen_top + lines, 0ul, line_count() - 1);
+    else
+        m_screen_top = clamp(static_cast<int>(m_screen_top) + lines, 0ul, line_count() - 1);
 }
 
 void Document::handle_text_input()
@@ -973,7 +899,7 @@ std::vector<ScheduledCommand> Document::commands() const
 {
     auto ret = Widget::commands();
     if (m_mode != nullptr) {
-        for (auto cmd : m_mode->commands())
+        for (auto const& cmd : m_mode->commands())
             ret.push_back({ const_cast<Document&>(*this), cmd });
     }
     return ret;

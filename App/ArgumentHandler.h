@@ -99,8 +99,8 @@ public:
 
     void render() override
     {
-        box(SDL_Rect { 0, 0, 0, 0 }, SDL_Color { 0x2c, 0x2c, 0x2c, 0xff });
-        rectangle(SDL_Rect { 2, 2, width() - 4, height() - 4 }, { 0xff, 0xff, 0xff, 0xff });
+        box(0, 0, 0, 0, SDL_Color { 0x2c, 0x2c, 0x2c, 0xff });
+        rectangle(2, 2, width() - 4, height() - 4, SDL_Color { 0xff, 0xff, 0xff, 0xff });
         render_fixed(8, 8, m_parameter.prompt);
         auto y = App::instance().context()->character_height() + 10;
         auto count = 0;
@@ -113,14 +113,8 @@ public:
                 break;
             }
             if (count == m_current) {
-                SDL_Rect r {
-                    4,
-                    y - 1,
-                    -4,
-                    App::instance().context()->character_height() + 1
-                };
-                box(r, Eddy::eddy().color(PaletteIndex::CurrentLineFill));
-                rectangle(r, Eddy::eddy().color(PaletteIndex::CurrentLineEdge));
+                box(4, y - 1, -4, App::instance().context()->character_height() + 1, Eddy::eddy().color(PaletteIndex::CurrentLineFill));
+                rectangle(4, y - 1, -4, App::instance().context()->character_height() + 1, Eddy::eddy().color(PaletteIndex::CurrentLineEdge));
             }
             render_fixed(10, y, match.text);
             y += App::instance().context()->character_height() + 2;

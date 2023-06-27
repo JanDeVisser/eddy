@@ -8,13 +8,13 @@
 
 namespace eddy {
 
-Frame::Frame(FrameStyle frame_style, int margin, WindowedWidget* contents, SizePolicy policy, int size)
+Frame::Frame(FrameStyle frame_style, size_t margin, WindowedWidget* contents, SizePolicy policy, size_t size)
     : WindowedWidget(policy, size)
     , m_frame_style(frame_style)
     , m_margin(margin)
     , m_contents(contents)
 {
-    clamp(m_margin, 3, 255);
+    m_margin = clamp(m_margin, 3ul, 255ul);
 }
 
 void Frame::render()
@@ -22,12 +22,12 @@ void Frame::render()
     auto half_margin = m_clamped_margin / 2;
     switch (m_frame_style) {
     case FrameStyle::Rectangle:
-        rectangle(SDL_Rect { half_margin, half_margin,
-            width() - m_clamped_margin, height() - m_clamped_margin }, { 0xff, 0xff, 0xff, 0xff });
+        rectangle(half_margin, half_margin,
+            width() - m_clamped_margin, height() - m_clamped_margin, { 0xff, 0xff, 0xff, 0xff });
         break;
     case FrameStyle::Rounded:
         roundedRectangle(
-            { half_margin, half_margin, width() - m_clamped_margin, height() - m_clamped_margin },
+            half_margin, half_margin, width() - m_clamped_margin, height() - m_clamped_margin,
             half_margin,
             { 0xff, 0xff, 0xff, 0xff }
         );
@@ -58,12 +58,12 @@ void Frame::resize(Box const& outline)
     return m_contents.get();
 }
 
-[[nodiscard]] int Frame::margin() const
+[[nodiscard]] size_t Frame::margin() const
 {
     return m_margin;
 }
 
-[[nodiscard]] int Frame::clamped_margin() const
+[[nodiscard]] size_t Frame::clamped_margin() const
 {
     return m_clamped_margin;
 }

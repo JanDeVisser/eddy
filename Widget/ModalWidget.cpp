@@ -15,22 +15,22 @@ ModalWidget::ModalWidget(int w, int h)
 {
 }
 
-int ModalWidget::width() const
+size_t ModalWidget::width() const
 {
     return m_width;
 }
 
-int ModalWidget::height() const
+size_t ModalWidget::height() const
 {
     return m_height;
 }
 
-int ModalWidget::top() const
+size_t ModalWidget::top() const
 {
     return (App::instance().height() - height()) / 2;
 }
 
-int ModalWidget::left() const
+size_t ModalWidget::left() const
 {
     return (App::instance().width() - width()) / 2;
 }

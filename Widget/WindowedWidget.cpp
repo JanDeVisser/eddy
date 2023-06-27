@@ -11,7 +11,7 @@
 
 namespace eddy {
 
-WindowedWidget::WindowedWidget(SizePolicy policy, int size)
+WindowedWidget::WindowedWidget(SizePolicy policy, size_t size)
     : Widget()
     , m_policy(policy)
     , m_size(size)
@@ -30,7 +30,7 @@ SizePolicy WindowedWidget::policy() const
     return m_policy;
 }
 
-int WindowedWidget::policy_size() const
+size_t WindowedWidget::policy_size() const
 {
     return m_size;
 }
@@ -50,22 +50,22 @@ Size WindowedWidget::size() const
     return m_outline.size;
 }
 
-int WindowedWidget::top() const
+size_t WindowedWidget::top() const
 {
     return position().top();
 }
 
-int WindowedWidget::left() const
+size_t WindowedWidget::left() const
 {
     return position().left();
 }
 
-int WindowedWidget::height() const
+size_t WindowedWidget::height() const
 {
     return size().height();
 }
 
-int WindowedWidget::width() const
+size_t WindowedWidget::width() const
 {
     return size().width();
 }
@@ -169,18 +169,20 @@ void WindowedWidget::resize(Box const& outline)
     m_outline = outline;
 }
 
-int WindowedWidget::calculate_size()
+size_t WindowedWidget::calculate_size()
 {
     assert(m_policy == SizePolicy::Calculated && m_size_calculator != nullptr);
     return m_size_calculator(this);
 }
 
-SDL_Rect WindowedWidget::render_text(int x, int y, std::string const& text, SDL_Color const& color, TextAlignment alignment, SDLContext::SDLFontFamily family) const
+SDL_Rect WindowedWidget::_render_text(size_t x, size_t y, std::string const& text, SDL_Color const& color, TextAlignment alignment, SDLContext::SDLFontFamily family) const
 {
     SDL_Rect ret;
     switch (alignment) {
     case TextAlignment::Left:
-        ret = App::instance().context()->render_text(left() + x, top() + y,
+        ret = App::instance().context()->render_text(
+            left() + x,
+            top() + y,
             text, color, family);
         break;
     case TextAlignment::Right:
@@ -190,63 +192,42 @@ SDL_Rect WindowedWidget::render_text(int x, int y, std::string const& text, SDL_
         ret = App::instance().context()->render_text_centered(left() + width()/2, top() + y,
             text, color, family);
     }
-    ret.x -= left();
-    ret.y -= top();
+    ret.x -= static_cast<int>(left());
+    ret.y -= static_cast<int>(top());
     return ret;
 }
 
-SDL_Rect WindowedWidget::normalize(SDL_Rect const& rect) const
+void WindowedWidget::_box(SDL_Rect const& rect, SDL_Color color) const
 {
-    SDL_Rect r = rect;
-    if (r.x < 0)
-        r.x = width() + r.x;
-    if (r.y < 0)
-        r.y = height() + r.y;
-    if (r.w <= 0)
-        r.w = width() - r.x + r.w;
-    if (r.h <= 0)
-        r.h = height() - r.y + r.h;
-    r.x = clamp(r.x, 0, width());
-    r.y = clamp(r.y, 0, height());
-    r.w = clamp(r.w, 0, width() - r.x);
-    r.h = clamp(r.h, 0, height() - r.y);
-    return r;
-}
-
-void WindowedWidget::box(SDL_Rect const& rect, SDL_Color color) const
-{
-    auto r = normalize(rect);
     boxColor(
         App::instance().renderer(),
-        left() + r.x,
-        top() + r.y,
-        left() + r.x + r.w,
-        top() + r.y + r.h,
+        static_cast<int>(left()) + rect.x,
+        static_cast<int>(top()) + rect.y,
+        static_cast<int>(left()) + rect.x + rect.w,
+        static_cast<int>(top()) + rect.y + rect.h,
         *((uint32_t*)&color));
 }
 
-void WindowedWidget::rectangle(SDL_Rect const& rect, SDL_Color color) const
+void WindowedWidget::_rectangle(SDL_Rect const& rect, SDL_Color color) const
 {
-    auto r = normalize(rect);
     rectangleColor(
         App::instance().renderer(),
-        left() + r.x,
-        top() + r.y,
-        left() + r.x + r.w,
-        top() + r.y + r.h,
+        static_cast<Sint16>(left()) + rect.x,
+        static_cast<Sint16>(top()) + rect.y,
+        static_cast<Sint16>(left()) + rect.x + rect.w,
+        static_cast<Sint16>(top()) + rect.y + rect.h,
         *((uint32_t*)&color));
 }
 
-void WindowedWidget::roundedRectangle(SDL_Rect const& rect, int radius, SDL_Color color) const
+void WindowedWidget::_roundedRectangle(SDL_Rect const& rect, int radius, SDL_Color color) const
 {
-    auto r = normalize(rect);
     roundedRectangleColor(
         App::instance().renderer(),
-        left() + r.x,
-        top() + r.y,
-        left() + r.x + r.w,
-        top() + r.y + r.h,
-        radius,
+        static_cast<Sint16>(left()) + rect.x,
+        static_cast<Sint16>(top()) + rect.y,
+        static_cast<Sint16>(left()) + rect.x + rect.w,
+        static_cast<Sint16>(top()) + rect.y + rect.h,
+        static_cast<Sint16>(radius),
         *((uint32_t*)&color));
 }
 

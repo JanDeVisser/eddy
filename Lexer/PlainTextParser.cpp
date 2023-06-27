@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include "BasicParser.h"
+#include <Lexer/BasicParser.h>
 
 namespace Obelix {
 

@@ -63,22 +63,22 @@ public:
     [[nodiscard]] Document* document(fs::path const&) const;
 
     void new_file();
-    std::string open_file(fs::path const&);
-    std::string save_all() const;
+    std::optional<std::string> open_file(fs::path const&);
+    std::optional<std::string> save_all() const;
 
-    [[nodiscard]] int rows() const;
-    [[nodiscard]] int columns() const;
-    [[nodiscard]] int line_top(int line) const;
-    [[nodiscard]] int line_bottom(int line) const;
-    [[nodiscard]] static int column_left(int column);
-    [[nodiscard]] static int column_right(int column);
-    [[nodiscard]] int line_height() const;
-    [[nodiscard]] static int column_width();
+    [[nodiscard]] size_t rows() const;
+    [[nodiscard]] size_t columns() const;
+    [[nodiscard]] size_t line_top(size_t line) const;
+    [[nodiscard]] size_t line_bottom(size_t line) const;
+    [[nodiscard]] static size_t column_left(size_t column);
+    [[nodiscard]] static size_t column_right(size_t column);
+    [[nodiscard]] size_t line_height() const;
+    [[nodiscard]] static size_t column_width();
 
     void resize(Box const&) override;
     void render() override;
-    void text_cursor(int line, int column);
-    void mark_current_line(int line);
+    void text_cursor(size_t line, size_t column);
+    void mark_current_line(size_t line);
     bool dispatch(SDL_Keysym) override;
     void handle_mousedown(SDL_MouseButtonEvent const& event) override;
     void handle_motion(SDL_MouseMotionEvent const& event) override;
@@ -116,11 +116,11 @@ public:
 private:
     std::vector<std::unique_ptr<Buffer>> m_buffers {};
     Buffer* m_current_buffer { nullptr };
-    int m_line { 0 };
-    int m_column { 0 };
-    int m_rows { -1 };
-    int m_columns { -1 };
-    int m_line_height { 0 };
+    size_t m_line { 0 };
+    size_t m_column { 0 };
+    size_t m_rows { 0 };
+    size_t m_columns { 0 };
+    size_t m_line_height { 0 };
     std::optional<Position> m_mouse_down_at;
     static EditorCommands s_editor_commands;
 };
