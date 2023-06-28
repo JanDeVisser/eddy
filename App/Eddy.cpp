@@ -150,7 +150,7 @@ Eddy& Eddy::eddy()
  *    uint8_t r = c & 0xff;
  *    return { r, g, b, a };
  */
-SDL_Color Eddy::color(PaletteIndex color)
+Color Eddy::color(PaletteIndex color)
 {
     static unsigned s_ansicolors[] = {
         0xff000000, // ANSIBlack,
@@ -175,7 +175,7 @@ SDL_Color Eddy::color(PaletteIndex color)
         c = s_ansicolors[(size_t)color - (size_t)PaletteIndex::ANSIBlack];
     else
         c = m_palette[(size_t)color];
-    return *((SDL_Color*)&c);
+    return *((Color*)&c);
 }
 
 void Eddy::on_command(ScheduledCommand const& cmd)
@@ -194,7 +194,7 @@ void Eddy::run_app(int argc, char const** argv)
     app.add_component(main_area);
     app.add_component(app.m_status_bar = new StatusBar());
     app.add_status_bar_applet(7, [](WindowedWidget* applet) -> void {
-        applet->render_fixed(5, 2, App::instance().last_key().to_string(), SDL_Color { 0xff, 0xff, 0xff, 0xff });
+        applet->render_fixed(5, 2, App::instance().last_key().to_string(), Color { 0xff, 0xff, 0xff, 0xff });
     });
     app.add_status_bar_applet(5, [](WindowedWidget* applet) -> void {
         PaletteIndex box_color;
@@ -207,7 +207,7 @@ void Eddy::run_app(int argc, char const** argv)
             box_color = PaletteIndex::ANSIBrightRed;
         }
         applet->box(0, 0, 0, 0, Eddy::eddy().color(box_color));
-        applet->render_fixed_centered(2, "fps", SDL_Color { 0xff, 0xff, 0xff, 0xff });
+        applet->render_fixed_centered(2, "fps", { 0xff, 0xff, 0xff, 0xff });
     });
     main_area->add_component(app.m_gutter = new Gutter());
     main_area->add_component(app.m_editor = new Editor());

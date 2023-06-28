@@ -17,6 +17,7 @@
 #include <Mode/PlainText.h>
 //#include <Mode/Scribble.h>
 #include <Widget/App.h>
+#include <Widget/SDLContext.h>
 
 using namespace Obelix;
 

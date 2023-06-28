@@ -136,11 +136,11 @@ void SDLContext::SDLFont::set_font(std::string const& font_name)
     set_size(size);
 }
 
-SDL_Rect SDLContext::SDLFont::render(size_t x, size_t y, std::string const& text, SDL_Color color) const
+Box SDLContext::SDLFont::render(size_t x, size_t y, std::string const& text, SDL_Color color) const
 {
     auto rect = make_SDL_Rect(x, y, 0, 0);
     if (text.empty()) {
-        return rect;
+        return Box(rect);
     }
 
     SDL_Surface* surface = TTF_RenderUTF8_Blended(font, text.c_str(), color);
@@ -151,14 +151,14 @@ SDL_Rect SDLContext::SDLFont::render(size_t x, size_t y, std::string const& text
     SDL_QueryTexture(texture, nullptr, nullptr, &rect.w, &rect.h);
     SDL_RenderCopy(renderer, texture, nullptr, &rect);
     SDL_DestroyTexture(texture);
-    return rect;
+    return Box(rect);
 }
 
-SDL_Rect SDLContext::SDLFont::render_right_aligned(size_t x, size_t y, std::string const& text, SDL_Color color) const
+Box SDLContext::SDLFont::render_right_aligned(size_t x, size_t y, std::string const& text, SDL_Color color) const
 {
     SDL_Rect rect = make_SDL_Rect(x, y, 0, 0);
     if (text.empty()) {
-        return rect;
+        return Box(rect);
     }
 
     SDL_Surface* surface = TTF_RenderUTF8_Blended(font, text.c_str(), color);
@@ -170,14 +170,14 @@ SDL_Rect SDLContext::SDLFont::render_right_aligned(size_t x, size_t y, std::stri
     rect.x -= rect.w;
     SDL_RenderCopy(renderer, texture, nullptr, &rect);
     SDL_DestroyTexture(texture);
-    return rect;
+    return Box(rect);
 }
 
-SDL_Rect SDLContext::SDLFont::render_centered(size_t x, size_t y, std::string const& text, SDL_Color color) const
+Box SDLContext::SDLFont::render_centered(size_t x, size_t y, std::string const& text, SDL_Color color) const
 {
     SDL_Rect rect = make_SDL_Rect(x, y, 0, 0);
     if (text.empty()) {
-        return rect;
+        return Box(rect);
     }
 
     SDL_Surface* surface = TTF_RenderUTF8_Blended(font, text.c_str(), color);
@@ -189,7 +189,7 @@ SDL_Rect SDLContext::SDLFont::render_centered(size_t x, size_t y, std::string co
     rect.x -= rect.w / 2;
     SDL_RenderCopy(renderer, texture, nullptr, &rect);
     SDL_DestroyTexture(texture);
-    return rect;
+    return Box(rect);
 }
 
 size_t SDLContext::SDLFont::text_width(std::string const& text) const
@@ -216,74 +216,87 @@ SDLContext::SDLCursor::~SDLCursor()
 }
 
 SDLContext::SDLContext(size_t width, size_t height)
-    : m_width(width)
-    , m_height(height)
+    : GraphicsContext(width, height)
 {
-    if (!TTF_FontFaceIsFixedWidth(m_fonts[(size_t)SDLFontFamily::Fixed].font))
-        fatal("Font '{}' is proportional", m_fonts[(size_t)SDLFontFamily::Fixed].name);
+    if (!TTF_FontFaceIsFixedWidth(m_fonts[(size_t)FontFamily::Fixed].font))
+        fatal("Font '{}' is proportional", m_fonts[(size_t)FontFamily::Fixed].name);
     SDL_ShowCursor(1);
-}
-
-void SDLContext::resize(size_t width, size_t height)
-{
-    m_width = width;
-    m_height = height;
 }
 
 size_t SDLContext::character_width() const
 {
-    return m_fonts[(size_t)SDLFontFamily::Fixed].character_width;
+    return m_fonts[(size_t)FontFamily::Fixed].character_width;
 }
 
 size_t SDLContext::character_height() const
 {
-    return m_fonts[(size_t)SDLFontFamily::Fixed].character_height;
+    return m_fonts[(size_t)FontFamily::Fixed].character_height;
 }
 
-void SDLContext::enlarge_font(SDLFontFamily family)
+void SDLContext::enlarge_font(FontFamily family)
 {
     set_font_size(static_cast<size_t>(
                       static_cast<double>(m_fonts[(size_t)family].size) * 1.2), family);
 }
 
-void SDLContext::shrink_font(SDLFontFamily family)
+void SDLContext::shrink_font(FontFamily family)
 {
     set_font_size(static_cast<size_t>(static_cast<double>(m_fonts[(size_t)family].size) / 1.2), family);
 }
 
-void SDLContext::reset_font(SDLFontFamily family)
+void SDLContext::reset_font(FontFamily family)
 {
     set_font_size(m_fonts[(size_t)family].initial_size, family);
 }
 
-void SDLContext::set_font(std::string const& name, SDLFontFamily family)
+void SDLContext::set_font(std::string const& name, FontFamily family)
 {
     m_fonts[(size_t)family].set_font(name);
 }
 
-void SDLContext::set_font_size(size_t points, SDLFontFamily family)
+void SDLContext::set_font_size(size_t points, FontFamily family)
 {
     m_fonts[(size_t)family].set_size(points);
 }
 
-SDL_Rect SDLContext::render_text(size_t x, size_t y, std::string const& text, SDL_Color const& color, SDLFontFamily family) const
+Box SDLContext::render_text(size_t x, size_t y, std::string const& text, Color const& color, FontFamily family) const
 {
-    return m_fonts[(size_t)family].render(x, y, text, color);
+    return m_fonts[(size_t)family].render(x, y, text, SDL_Color(color));
 }
 
-SDL_Rect SDLContext::render_text_right_aligned(size_t x, size_t y, std::string const& text, SDL_Color const& color, SDLFontFamily family) const
+Box SDLContext::render_text_right_aligned(size_t x, size_t y, std::string const& text, Color const& color, FontFamily family) const
 {
-    return m_fonts[(size_t)family].render_right_aligned(x, y, text, color);
+    return m_fonts[(size_t)family].render_right_aligned(x, y, text, SDL_Color(color));
 }
 
-SDL_Rect SDLContext::render_text_centered(size_t x, size_t y, std::string const& text, SDL_Color const& color, SDLFontFamily family) const
+Box SDLContext::render_text_centered(size_t x, size_t y, std::string const& text, Color const& color, FontFamily family) const
 {
-    return m_fonts[(size_t)family].render_centered(x, y, text, color);
+    return m_fonts[(size_t)family].render_centered(x, y, text, SDL_Color(color));
 }
 
-size_t SDLContext::text_width(std::string const& text, SDLFontFamily family) const
+size_t SDLContext::text_width(std::string const& text, FontFamily family) const
 {
     return m_fonts[(size_t)family].text_width(text);
+}
+
+void SDLContext::box(Box const& rect, Color const& color)
+{
+    boxColor(renderer(), rect.left(), rect.top(), rect.left() + rect.width(), rect.top() + rect.height(), *((uint32_t*)&color));
+}
+
+void SDLContext::roundedBox(Box const& rect, int radius, Color const& color)
+{
+    roundedBoxColor(renderer(), rect.left(), rect.top(), rect.left() + rect.width(), rect.top() + rect.height(), radius, *((uint32_t*)&color));
+}
+
+void SDLContext::rectangle(Box const& rect, Color const& color)
+{
+    rectangleColor(renderer(), rect.left(), rect.top(), rect.left() + rect.width(), rect.top() + rect.height(), *((uint32_t*)&color));
+}
+
+void SDLContext::roundedRectangle(Box const& rect, int radius, Color const& color)
+{
+    roundedRectangleColor(renderer(), rect.left(), rect.top(), rect.left() + rect.width(), rect.top() + rect.height(), radius, *((uint32_t*)&color));
 }
 
 }

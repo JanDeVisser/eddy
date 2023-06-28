@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: MIT
  */
 
+#include "SDLContext.h"
 #include <Widget/App.h>
 #include <Widget/Widget.h>
 

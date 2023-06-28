@@ -44,7 +44,7 @@ public:
     [[nodiscard]] static StatusBar* status_bar();
     static void add_status_bar_applet(int, Renderer);
     static Eddy& eddy();
-    SDL_Color color(PaletteIndex color);
+    Color color(PaletteIndex color);
 
     class EddyCommands : public Commands {
     public:

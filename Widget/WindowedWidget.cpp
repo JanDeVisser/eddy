@@ -6,6 +6,7 @@
 
 #include <SDL2_gfxPrimitives.h>
 
+#include "SDLContext.h"
 #include <Widget/App.h>
 #include <Widget/Widget.h>
 
@@ -175,9 +176,9 @@ size_t WindowedWidget::calculate_size()
     return m_size_calculator(this);
 }
 
-SDL_Rect WindowedWidget::_render_text(size_t x, size_t y, std::string const& text, SDL_Color const& color, TextAlignment alignment, SDLContext::SDLFontFamily family) const
+Box WindowedWidget::_render_text(size_t x, size_t y, std::string const& text, Color const& color, TextAlignment alignment, SDLContext::FontFamily family) const
 {
-    SDL_Rect ret;
+    Box ret;
     switch (alignment) {
     case TextAlignment::Left:
         ret = App::instance().context()->render_text(
@@ -192,43 +193,27 @@ SDL_Rect WindowedWidget::_render_text(size_t x, size_t y, std::string const& tex
         ret = App::instance().context()->render_text_centered(left() + width()/2, top() + y,
             text, color, family);
     }
-    ret.x -= static_cast<int>(left());
-    ret.y -= static_cast<int>(top());
-    return ret;
+    return { ret + offset() };
 }
 
-void WindowedWidget::_box(SDL_Rect const& rect, SDL_Color color) const
+void WindowedWidget::_box(Box const& rect, Color color) const
 {
-    boxColor(
-        App::instance().renderer(),
-        static_cast<int>(left()) + rect.x,
-        static_cast<int>(top()) + rect.y,
-        static_cast<int>(left()) + rect.x + rect.w,
-        static_cast<int>(top()) + rect.y + rect.h,
-        *((uint32_t*)&color));
+    App::instance().context()->box(rect + offset(), color);
 }
 
-void WindowedWidget::_rectangle(SDL_Rect const& rect, SDL_Color color) const
+void WindowedWidget::_roundedBox(Box const& rect, int radius, Color color) const
 {
-    rectangleColor(
-        App::instance().renderer(),
-        static_cast<Sint16>(left()) + rect.x,
-        static_cast<Sint16>(top()) + rect.y,
-        static_cast<Sint16>(left()) + rect.x + rect.w,
-        static_cast<Sint16>(top()) + rect.y + rect.h,
-        *((uint32_t*)&color));
+    App::instance().context()->roundedBox(rect + offset(), radius, color);
 }
 
-void WindowedWidget::_roundedRectangle(SDL_Rect const& rect, int radius, SDL_Color color) const
+void WindowedWidget::_rectangle(Box const& rect, Color color) const
 {
-    roundedRectangleColor(
-        App::instance().renderer(),
-        static_cast<Sint16>(left()) + rect.x,
-        static_cast<Sint16>(top()) + rect.y,
-        static_cast<Sint16>(left()) + rect.x + rect.w,
-        static_cast<Sint16>(top()) + rect.y + rect.h,
-        static_cast<Sint16>(radius),
-        *((uint32_t*)&color));
+    App::instance().context()->rectangle(rect + offset(), color);
+}
+
+void WindowedWidget::_roundedRectangle(Box const& rect, int radius, Color color) const
+{
+    App::instance().context()->roundedRectangle(rect + offset(), radius, color);
 }
 
 }

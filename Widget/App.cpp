@@ -10,6 +10,7 @@
 
 #include <SDL2_gfxPrimitives.h>
 
+#include "SDLContext.h"
 #include <Widget/App.h>
 #include <Widget/SDLContext.h>
 #include <Widget/Text.h>
@@ -72,25 +73,25 @@ SDL_Renderer* App::renderer()
 
 void App::enlarge_font()
 {
-    context()->enlarge_font(SDLContext::SDLFontFamily::Fixed);
+    context()->enlarge_font(SDLContext::FontFamily::Fixed);
     container().resize({ 0, 0, m_width, m_height });
 }
 
 void App::shrink_font()
 {
-    context()->shrink_font(SDLContext::SDLFontFamily::Fixed);
+    context()->shrink_font(SDLContext::FontFamily::Fixed);
     container().resize({ 0, 0, m_width, m_height });
 }
 
 void App::reset_font()
 {
-    context()->reset_font(SDLContext::SDLFontFamily::Fixed);
+    context()->reset_font(SDLContext::FontFamily::Fixed);
     container().resize({ 0, 0, m_width, m_height });
 }
 
 void App::set_font(std::string const& name)
 {
-    context()->set_font(name, SDLContext::SDLFontFamily::Fixed);
+    context()->set_font(name, SDLContext::FontFamily::Fixed);
     container().resize({ 0, 0, m_width, m_height });
 }
 

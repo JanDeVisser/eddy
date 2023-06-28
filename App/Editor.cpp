@@ -60,10 +60,10 @@ Editor::Editor()
     : WindowedWidget()
 {
     Eddy::status_bar()->add_applet(20, [this](WindowedWidget* applet) -> void {
-        applet->render_fixed_centered(2, buffer()->status(), SDL_Color { 0xff, 0xff, 0xff, 0xff });
+        applet->render_fixed_centered(2, buffer()->status(), { 0xff, 0xff, 0xff, 0xff });
     });
     Eddy::status_bar()->add_applet(20, [this](WindowedWidget* applet) -> void {
-        applet->render_fixed(10, 2, buffer()->short_title(), SDL_Color { 0xff, 0xff, 0xff, 0xff });
+        applet->render_fixed(10, 2, buffer()->short_title(), { 0xff, 0xff, 0xff, 0xff });
     });
     m_commands = &s_editor_commands;
 }
@@ -118,7 +118,7 @@ void Editor::resize(const Box& outline)
 
 void Editor::render()
 {
-    box(0, 0, 0, 0, SDL_Color { 0x2c, 0x2c, 0x2c, 0xff });
+    box(0, 0, 0, 0, { 0x2c, 0x2c, 0x2c, 0xff });
     m_line = 0;
     m_column = 0;
     buffer()->render();

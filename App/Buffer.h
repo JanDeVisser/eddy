@@ -12,6 +12,8 @@
 #include <Lexer/Token.h>
 #include <Widget/Widget.h>
 
+using namespace Obelix;
+
 namespace eddy {
 
 struct DocumentPosition {

@@ -11,6 +11,8 @@
 #include <cstdint>
 #include <valarray>
 
+#include <SDL.h>
+
 #include <Core/Logging.h>
 
 namespace eddy {
@@ -91,6 +93,17 @@ SDL_Rect make_SDL_Rect(L left, T top, W width, H height)
         static_cast<int>(height)
     };
 }
+
+struct Color {
+    uint8_t red;
+    uint8_t green;
+    uint8_t blue;
+    uint8_t alpha;
+
+    explicit operator SDL_Color() const {
+        return SDL_Color { red, green, blue, alpha };
+    }
+};
 
 
 template <typename T, size_t Dim=2>
@@ -182,12 +195,17 @@ struct Position : public Tuple {
     {
     }
 
+    Position(Position const&) = default;
     Position() = default;
 
     [[nodiscard]] size_t left() const { return coordinates[0]; }
     [[nodiscard]] size_t top() const { return coordinates[1]; }
     [[nodiscard]] size_t column() const { return coordinates[0]; }
     [[nodiscard]] size_t line() const { return coordinates[1]; }
+
+    const Position operator + (Tuple const& other) const {
+        return { x() + other.x(), y() + other.y() };
+    }
 };
 
 struct Size : public Tuple {
@@ -196,6 +214,7 @@ struct Size : public Tuple {
         : Tuple(width, height)
     {
     }
+    Size(Size const&) = default;
     Size() = default;
 
     [[nodiscard]] size_t width() const { return coordinates[0]; }
@@ -210,11 +229,18 @@ struct Box {
         , size(width, height)
     {
     }
+
     Box(Position p, Size s)
         : position(p)
         , size(s)
     {
     }
+
+    explicit Box(SDL_Rect const& rect)
+        : Box(rect.x, rect.y, rect.w, rect.h)
+    {
+    }
+
     Box() = default;
 
     Position position;
@@ -240,6 +266,11 @@ struct Box {
     [[nodiscard]] std::string to_string() const
     {
         return Obelix::format("{}+{}", position, size);
+    }
+
+    Box operator + (Position const& offset) const
+    {
+        return { this->position + offset, this->size };
     }
 
     explicit operator SDL_Rect() const

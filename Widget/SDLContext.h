@@ -15,7 +15,7 @@
 
 #include <Core/Logging.h>
 
-#include <Widget/Geometry.h>
+#include <Widget/GraphicsContext.h>
 
 using namespace Obelix;
 
@@ -23,37 +23,33 @@ namespace eddy {
 
 extern_logging_category(eddy);
 
-class SDLContext {
+class SDLContext : public GraphicsContext {
 public:
-    enum class SDLFontFamily {
-        Fixed,
-        Proportional,
-        Max
-    };
-
     SDLContext(size_t width, size_t height);
     ~SDLContext() = default;
 
-    [[nodiscard]] size_t width() const { return m_width; }
-    [[nodiscard]] size_t height() const { return m_height; }
-    void resize(size_t, size_t);
     SDL_Window* window() { return m_window; }
     SDL_Renderer* renderer() { return m_renderer; }
     SDL_Cursor* arrow() { return m_arrow; }
     SDL_Cursor* input() { return m_arrow; }
-    [[nodiscard]] size_t character_width() const;
-    [[nodiscard]] size_t character_height() const;
-    void enlarge_font(SDLFontFamily = SDLFontFamily::Fixed);
-    void shrink_font(SDLFontFamily = SDLFontFamily::Fixed);
-    void reset_font(SDLFontFamily = SDLFontFamily::Fixed);
-    void set_font(std::string const&, SDLFontFamily = SDLFontFamily::Fixed);
-    void set_font_size(size_t, SDLFontFamily = SDLFontFamily::Fixed);
 
-    SDL_Rect render_text(size_t x, size_t y, std::string const& text, SDL_Color const& color, SDLFontFamily = SDLFontFamily::Fixed) const;
-    SDL_Rect render_text_right_aligned(size_t x, size_t y, std::string const& text, SDL_Color const& color, SDLFontFamily = SDLFontFamily::Fixed) const;
-    SDL_Rect render_text_centered(size_t x, size_t y, std::string const& text, SDL_Color const& color, SDLFontFamily = SDLFontFamily::Fixed) const;
-    size_t text_width(std::string const&, SDLFontFamily = SDLFontFamily::Fixed) const;
+    [[nodiscard]] size_t character_width() const override;
+    [[nodiscard]] size_t character_height() const override;
+    void enlarge_font(FontFamily) override;
+    void shrink_font(FontFamily) override;
+    void reset_font(FontFamily) override;
+    void set_font(std::string const&, FontFamily) override;
+    void set_font_size(size_t, FontFamily) override;
 
+    Box render_text(size_t x, size_t y, std::string const& text, Color const& color, FontFamily) const override;
+    Box render_text_right_aligned(size_t x, size_t y, std::string const& text, Color const& color, FontFamily) const override;
+    Box render_text_centered(size_t x, size_t y, std::string const& text, Color const& color, FontFamily) const override;
+    size_t text_width(std::string const&, FontFamily) const override;
+
+    void box(Box const& rect, Color const& color) override;
+    void roundedBox(Box const& rect, int radius, Color const& color) override;
+    void rectangle(Box const& rect, Color const& color) override;
+    void roundedRectangle(Box const& rect, int radius, Color const& color) override;
 private:
     struct SDLInit {
         SDLInit();
@@ -96,11 +92,11 @@ private:
         void set_size(size_t);
         void set_font(std::string const&);
         [[nodiscard]] std::string to_string() const { return name; }
-        operator TTF_Font*() const { return font; }
-        SDL_Rect render(size_t, size_t, std::string const& text, SDL_Color color) const;
-        SDL_Rect render_right_aligned(size_t, size_t, std::string const& text, SDL_Color color) const;
-        SDL_Rect render_centered(size_t, size_t, std::string const& text, SDL_Color color) const;
-        size_t text_width(std::string const&) const;
+        explicit operator TTF_Font*() const { return font; }
+        [[nodiscard]] Box render(size_t, size_t, std::string const& text, SDL_Color color) const;
+        [[nodiscard]] Box render_right_aligned(size_t, size_t, std::string const& text, SDL_Color color) const;
+        [[nodiscard]] Box render_centered(size_t, size_t, std::string const& text, SDL_Color color) const;
+        [[nodiscard]] size_t text_width(std::string const&) const;
 
         SDLRenderer& renderer;
         TTF_Font *font;
@@ -120,14 +116,12 @@ private:
         SDL_Cursor* cursor;
     };
 
-    size_t m_width { 0 };
-    size_t m_height { 0 };
     SDLInit m_sdl {};
     SDLTTF m_ttf {};
-    SDLWindow m_window { m_width, m_height };
+    SDLWindow m_window { width(), height() };
     SDLRenderer m_renderer { m_window };
     SDLIMG m_img {};
-    std::array<SDLFont, (size_t) SDLFontFamily::Max> m_fonts {
+    std::array<SDLFont, (size_t)FontFamily::Max> m_fonts {
         SDLFont { m_renderer, "JetBrainsMono", 18 },
         SDLFont { m_renderer, "Swansea-q3pd", 15 }
     };

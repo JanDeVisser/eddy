@@ -5,6 +5,7 @@
  */
 
 #include <App/ArgumentHandler.h>
+#include <Widget/GraphicsContext.h>
 
 namespace eddy {
 
@@ -19,7 +20,7 @@ DefaultArgumentHandler::DefaultArgumentHandler(CommandHandler* handler, CommandP
 
 void DefaultArgumentHandler::render()
 {
-    box(0, 0, 0, 0, SDL_Color { 0x2c, 0x2c, 0x2c, 0xff });
+    box(0, 0, 0, 0, { 0x2c, 0x2c, 0x2c, 0xff });
     rectangle(2, 2, width() - 4, height() - 4, { 0xff, 0xff, 0xff, 0xff });
     render_fixed(8, 4, m_parameter.prompt);
     render_fixed(8, App::instance().context()->character_height() + 12, m_value);

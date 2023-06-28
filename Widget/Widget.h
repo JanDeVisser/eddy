@@ -8,12 +8,10 @@
 
 #include <functional>
 
-#include <SDL.h>
-
 #include <App/Forward.h>
 #include <Widget/Command.h>
 #include <Widget/Geometry.h>
-#include <Widget/SDLContext.h>
+#include <Widget/GraphicsContext.h>
 
 namespace eddy {
 
@@ -71,6 +69,7 @@ public:
     [[nodiscard]] virtual size_t width() const;
     [[nodiscard]] virtual size_t top() const;
     [[nodiscard]] virtual size_t left() const;
+    [[nodiscard]] Position offset() const { return { left(), top() }; }
     [[nodiscard]] bool empty() const;
     [[nodiscard]] SizePolicy policy() const;
     [[nodiscard]] size_t policy_size() const;
@@ -98,10 +97,10 @@ public:
     size_t calculate_size();
 
     template <std::integral X, std::integral Y, class Str>
-    SDL_Rect render_text(X x, Y y, Str text,
-        SDL_Color const& color = SDL_Color { 255, 255, 255, 255 },
+    Box render_text(X x, Y y, Str text,
+        Color const& color = Color { 255, 255, 255, 255 },
         TextAlignment alignment = TextAlignment::Left,
-        SDLContext::SDLFontFamily family = SDLContext::SDLFontFamily::Fixed) const
+        GraphicsContext::FontFamily family = GraphicsContext::FontFamily::Fixed) const
     {
         return _render_text(
             clamp(x, 0, width()),
@@ -114,7 +113,7 @@ public:
     }
 
     template <std::integral X, std::integral Y, class Str>
-    SDL_Rect render_fixed(X x, Y y, Str text, SDL_Color const& color = SDL_Color { 255, 255, 255, 255 }) const
+    Box render_fixed(X x, Y y, Str text, Color const& color = Color { 255, 255, 255, 255 }) const
     {
         return _render_text(
             clamp(x, 0, width()),
@@ -122,12 +121,12 @@ public:
             std::string(text),
             color,
             TextAlignment::Left,
-            SDLContext::SDLFontFamily::Fixed
+            GraphicsContext::FontFamily::Fixed
         );
     }
 
     template <std::integral X, std::integral Y, class Str>
-    SDL_Rect render_fixed_right_aligned(X x, Y y, Str text, SDL_Color const& color = SDL_Color { 255, 255, 255, 255 }) const
+    Box render_fixed_right_aligned(X x, Y y, Str text, Color const& color = Color { 255, 255, 255, 255 }) const
     {
         return _render_text(
             clamp(x, 0, width()),
@@ -135,12 +134,12 @@ public:
             std::string(text),
             color,
             TextAlignment::Right,
-            SDLContext::SDLFontFamily::Fixed
+            GraphicsContext::FontFamily::Fixed
         );
     }
 
     template <std::integral Y, class Str>
-    SDL_Rect render_fixed_centered(Y y, Str text, SDL_Color const& color = SDL_Color { 255, 255, 255, 255 }) const
+    Box render_fixed_centered(Y y, Str text, Color const& color = Color { 255, 255, 255, 255 }) const
     {
         return _render_text(
             0,
@@ -148,12 +147,12 @@ public:
             std::string(text),
             color,
             TextAlignment::Center,
-            SDLContext::SDLFontFamily::Fixed
+            GraphicsContext::FontFamily::Fixed
         );
     }
 
     template <std::floating_point Y, class Str>
-    SDL_Rect render_fixed_centered(Y y, Str text, SDL_Color const& color = SDL_Color { 255, 255, 255, 255 }) const
+    Box render_fixed_centered(Y y, Str text, Color const& color = Color { 255, 255, 255, 255 }) const
     {
         return _render_text(
             0,
@@ -161,12 +160,12 @@ public:
             std::string(text),
             color,
             TextAlignment::Center,
-            SDLContext::SDLFontFamily::Fixed
+            GraphicsContext::FontFamily::Fixed
         );
     }
 
     template <std::integral L, std::integral T, std::integral W, std::integral H>
-    SDL_Rect normalize(L l, T t, W w, H h) const
+    Box normalize(L l, T t, W w, H h) const
     {
         if constexpr (std::is_signed_v<L>) {
             if (l < 0)
@@ -186,23 +185,23 @@ public:
         }
         l = clamp(l, 0, width());
         t = clamp(t, 0, height());
-        return make_SDL_Rect(l, t, clamp(w, 0, width() - l), clamp(h, 0, height() - t));
+        return Box(l, t, clamp(w, 0, width() - l), clamp(h, 0, height() - t));
     }
 
     template <std::integral L, std::integral T, std::integral W, std::integral H>
-    void box(L l, T t, W w, H h, SDL_Color color) const
+    void box(L l, T t, W w, H h, Color color) const
     {
         _box(normalize(l, t, w, h), color);
     }
 
     template <std::integral L, std::integral T, std::integral W, std::integral H>
-    void rectangle(L l, T t, W w, H h, SDL_Color color) const
+    void rectangle(L l, T t, W w, H h, Color color) const
     {
         _rectangle(normalize(l, t, w, h), color);
     }
 
     template <std::integral L, std::integral T, std::integral W, std::integral H, std::integral R>
-    void roundedRectangle(L l, T t, W w, H h, R radius, SDL_Color color) const
+    void roundedRectangle(L l, T t, W w, H h, R radius, Color color) const
     {
         _roundedRectangle(normalize(l, t, w, h), static_cast<int>(radius), color);
     }
@@ -211,13 +210,14 @@ protected:
 private:
     friend class WidgetContainer;
     void set_parent(WidgetContainer *parent) { m_parent = parent; }
-    SDL_Rect _render_text(size_t x, size_t y, std::string const& text,
-        SDL_Color const& color = SDL_Color { 255, 255, 255, 255 },
+    Box _render_text(size_t x, size_t y, std::string const& text,
+        Color const& color = Color { 255, 255, 255, 255 },
         TextAlignment = TextAlignment::Left,
-        SDLContext::SDLFontFamily = SDLContext::SDLFontFamily::Fixed) const;
-    void _box(SDL_Rect const& rect, SDL_Color color) const;
-    void _rectangle(SDL_Rect const&, SDL_Color) const;
-    void _roundedRectangle(SDL_Rect const&, int, SDL_Color) const;
+        GraphicsContext::FontFamily = GraphicsContext::FontFamily::Fixed) const;
+    void _box(Box const& rect, Color color) const;
+    void _roundedBox(Box const& rect, int radius, Color color) const;
+    void _rectangle(Box const& rect, Color color) const;
+    void _roundedRectangle(Box const& rect, int radius, Color color) const;
 
     SizePolicy m_policy { SizePolicy::Absolute };
     size_t m_size { 0 };

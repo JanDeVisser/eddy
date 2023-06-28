@@ -63,7 +63,7 @@ add_library(
         Widget/Widget.cpp
         Widget/WindowedWidget.cpp
         Widget/WidgetContainer.cpp
-)
+        Widget/GraphicsContext.cpp Widget/GraphicsContext.h)
 
 target_link_libraries(
         Widget

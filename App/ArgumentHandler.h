@@ -11,6 +11,7 @@
 #include <App/CommandHandler.h>
 #include <App/Eddy.h>
 #include <Widget/Command.h>
+#include <Widget/SDLContext.h>
 
 namespace eddy {
 
@@ -99,8 +100,8 @@ public:
 
     void render() override
     {
-        box(0, 0, 0, 0, SDL_Color { 0x2c, 0x2c, 0x2c, 0xff });
-        rectangle(2, 2, width() - 4, height() - 4, SDL_Color { 0xff, 0xff, 0xff, 0xff });
+        box(0, 0, 0, 0, { 0x2c, 0x2c, 0x2c, 0xff });
+        rectangle(2, 2, width() - 4, height() - 4, { 0xff, 0xff, 0xff, 0xff });
         render_fixed(8, 8, m_parameter.prompt);
         auto y = App::instance().context()->character_height() + 10;
         auto count = 0;
