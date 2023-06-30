@@ -107,6 +107,7 @@ public:
             return;
         parser.assign(std::string_view(m_text));
         clear();
+        m_offset = 0;
         emplace_back(*this, 0);
         for (Token token = parser.lex(); token.code() != TokenCode::EndOfFile; token = parser.lex()) {
             size_t length = token.length();

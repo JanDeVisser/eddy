@@ -304,6 +304,7 @@ void Document::insert_text(std::string const& str, std::optional<size_t> point)
     auto p = (point.has_value()) ? point.value() : m_point;
     m_text.insert(p, str);
     m_changed = true;
+    m_dirty = true;
     m_point += static_cast<size_t>(str.length());
 }
 
@@ -373,6 +374,8 @@ void Document::erase(size_t point, size_t len)
 {
     m_text.remove(point, len);
     m_mark = m_point = point;
+    m_changed = true;
+    m_dirty = true;
 }
 
 void Document::erase_selection()
