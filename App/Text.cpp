@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include <App/Buffer.h>
+#include <App/Text.h>
 
 namespace eddy {
 

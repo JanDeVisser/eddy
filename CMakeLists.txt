@@ -129,15 +129,12 @@ add_library(
         App/Palette.h
         App/Eddy.cpp
         App/StatusBar.cpp
-#        Parser/CPlusPlus.cpp
-#        Parser/PlainText.cpp
-#        Parser/EddyParser.cpp
-#        Parser/Scribble.cpp
-#        Mode/CPlusPlus.cpp
-        Mode/Mode.cpp
-        Mode/PlainText.cpp
         App/Text.cpp
         App/Theme.cpp
+        Mode/Mode.cpp
+        Mode/CPlusPlus.cpp
+        Mode/PlainText.cpp
+        Parser/CPlusPlus.cpp
 )
 
 add_executable(

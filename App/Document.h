@@ -12,6 +12,7 @@
 #include <SDL.h>
 
 #include <App/Buffer.h>
+#include <App/Text.h>
 #include <Widget/Command.h>
 #include <Widget/Widget.h>
 

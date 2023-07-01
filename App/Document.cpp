@@ -12,7 +12,7 @@
 #include <App/Document.h>
 #include <App/Eddy.h>
 #include <App/Editor.h>
-//#include <Mode/CPlusPlus.h>
+#include <Mode/CPlusPlus.h>
 #include <Mode/Mode.h>
 #include <Mode/PlainText.h>
 //#include <Mode/Scribble.h>
@@ -28,10 +28,10 @@ FileType s_filetypes[] = {
     { { ".txt" }, "text/plain", [](Document& doc) -> Mode* {
          return new PlainText(doc);
      } },
-    /*
     { { ".cpp", ".h", ".hpp" }, "text/x-cpp", [](Document& doc) -> Mode* {
          return new CPlusPlus(doc);
      } },
+    /*
     { { ".eddy" }, "text/x-eddy", []() -> EddyParser* {
          return new class ScribbleParser();
      } },
@@ -209,8 +209,7 @@ Line const& Document::line(size_t line_no)
 
 void Document::fill_lines()
 {
-    PlainTextParser parser;
-    m_text.parse(parser);
+    m_mode->parse(m_text);
 }
 
 fs::path const& Document::path() const
