@@ -14,8 +14,8 @@ add_executable(
 target_link_libraries(
         LexerTest
         gtest_main
-        oblcore
-        obllexer
+        Lexer
+        Core
         dl
 )
 

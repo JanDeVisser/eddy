@@ -75,7 +75,7 @@ private:
 
 class CPlusPlus : public Mode {
 public:
-    CPlusPlus(Document&);
+    explicit CPlusPlus(Document&);
 };
 
 }

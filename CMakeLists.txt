@@ -89,32 +89,6 @@ target_link_libraries(
 )
 
 add_library(
-        Scribble
-        SHARED
-        Scribble/Interp/CommandAdapter.cpp
-        Scribble/Interp/ExpressionResult.cpp
-        Scribble/Interp/Function.cpp
-        Scribble/Interp/Interpreter.cpp
-        Scribble/Interp/Value.cpp
-        Scribble/Parser.cpp
-        Scribble/Processor.cpp
-        Scribble/Scribble.cpp
-        Scribble/Syntax/ControlFlow.cpp
-        Scribble/Syntax/Expression.cpp
-        Scribble/Syntax/Function.cpp
-        Scribble/Syntax/Literal.cpp
-        Scribble/Syntax/Statement.cpp
-        Scribble/Syntax/Syntax.cpp
-        Scribble/Syntax/Variable.cpp
-)
-
-target_link_libraries(
-        Scribble
-        Core
-        Lexer
-)
-
-add_library(
         Eddy
         App/ArgumentHandler.cpp
         App/Buffer.cpp
@@ -134,7 +108,6 @@ add_library(
         Mode/Mode.cpp
         Mode/CPlusPlus.cpp
         Mode/PlainText.cpp
-        Parser/CPlusPlus.cpp
 )
 
 add_executable(
@@ -145,7 +118,6 @@ add_executable(
 target_link_libraries(
         eddy
         Eddy
-        Scribble
         Widget
         Core
         Lexer
@@ -155,22 +127,6 @@ target_compile_features(eddy PUBLIC cxx_std_20)
 
 enable_testing()
 include(GoogleTest)
-
-add_executable(
-        ScribbleTest
-        Test/ScribbleTest.cpp
-)
-
-target_link_libraries(
-        ScribbleTest
-        Eddy
-        Scribble
-        Widget
-        gtest_main
-)
-
-add_test(NAME ScribbleTest COMMAND ScribbleTest)
-gtest_discover_tests(ScribbleTest)
 
 add_executable(
         LSPTest

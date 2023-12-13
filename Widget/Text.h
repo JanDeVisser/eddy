@@ -10,8 +10,8 @@
 
 namespace eddy {
 
-using CodePoint=unsigned short;
-using Char=unsigned int;
+using CodePoint=char16_t;
+using Char=char8_t;
 
 bool isPrintable(int);
 int countUtf8BytesFromChar(unsigned int);

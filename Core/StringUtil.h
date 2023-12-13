@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <assert.h>
 #include <cxxabi.h>
 #include <map>
 #include <optional>

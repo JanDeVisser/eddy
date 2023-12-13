@@ -10,7 +10,7 @@
 #include <Core/Logging.h>
 
 #include <App/CommandHandler.h>
-#include <App/Console.h>
+//#include <App/Console.h>
 #include <App/Eddy.h>
 #include <Widget/SDLContext.h>
 

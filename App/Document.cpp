@@ -15,7 +15,6 @@
 #include <Mode/CPlusPlus.h>
 #include <Mode/Mode.h>
 #include <Mode/PlainText.h>
-//#include <Mode/Scribble.h>
 #include <Widget/App.h>
 #include <Widget/SDLContext.h>
 
@@ -31,11 +30,6 @@ FileType s_filetypes[] = {
     { { ".cpp", ".h", ".hpp" }, "text/x-cpp", [](Document& doc) -> Mode* {
          return new CPlusPlus(doc);
      } },
-    /*
-    { { ".eddy" }, "text/x-eddy", []() -> EddyParser* {
-         return new class ScribbleParser();
-     } },
-     */
 };
 
 FileType const& get_filetype(fs::path const& file)

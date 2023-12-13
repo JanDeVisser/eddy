@@ -8,7 +8,6 @@
 
 #include <App/Buffer.h>
 #include <App/Text.h>
-#include <Scribble/Interp/Interpreter.h>
 #include <Widget/Command.h>
 
 namespace eddy {

@@ -8,10 +8,12 @@
 
 namespace eddy {
 
-Line::Line(Text& text, size_t start_index)
+Line::Line(Text& text, size_t start_index, int start_level)
     : std::vector<LineToken>()
     , m_text(text)
     , m_start_index(start_index)
+    , m_start_level(start_level)
+    , m_end_level(start_level)
 {
 }
 
@@ -46,7 +48,7 @@ std::vector<DisplayToken> Line::tokens() const
 Text::Text()
     : std::vector<Line>()
 {
-    emplace_back(*this, 0);
+    emplace_back(*this, 0, 0);
 }
 
 std::string_view Text::text() const

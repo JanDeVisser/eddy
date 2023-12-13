@@ -58,17 +58,22 @@ private:
 
 class Line : public std::vector<LineToken> {
 public:
-    explicit Line(class Text& text, size_t start_index);
+    explicit Line(class Text& text, size_t start_index, int start_level);
     [[nodiscard]] size_t index() const;
     [[nodiscard]] size_t end_index() const;
     [[nodiscard]] size_t length() const;
     [[nodiscard]] std::string_view text() const;
     [[nodiscard]] std::vector<DisplayToken> tokens() const;
+    [[nodiscard]] int start_level() const { return m_start_level; }
+    [[nodiscard]] int end_level() const { return m_end_level; }
+    void set_end_level(int end_level) { m_end_level = end_level; }
 
 private:
     Text& m_text;
     size_t m_start_index { 0 };
     std::vector<LineToken> m_tokens {};
+    int m_start_level { 0 };
+    int m_end_level { 0 };
 };
 
 class Text : public std::vector<Line> {
@@ -107,18 +112,29 @@ public:
         parser.assign(std::string_view(m_text));
         clear();
         m_offset = 0;
-        emplace_back(*this, 0);
+        emplace_back(*this, 0, 0);
+        int level = 0;
         for (Token token = parser.lex(); token.code() != TokenCode::EndOfFile; token = parser.lex()) {
-            size_t length = token.length();
             switch (token.code()) {
             case TokenCode::NewLine:
-                m_offset += length;
-                emplace_back(*this, m_offset);
+                m_offset += token.length();
+                back().set_end_level(level);
+                emplace_back(*this, m_offset, level);
+                break;
+            case TokenCode::OpenParen:
+            case TokenCode::OpenBrace:
+            case TokenCode::OpenBracket:
+                level++;
+                append_token(mode, token);
+                break;
+            case TokenCode::CloseParen:
+            case TokenCode::CloseBrace:
+            case TokenCode::CloseBracket:
+                level--;
+                append_token(mode, token);
                 break;
             default:
-                PaletteIndex color = mode.color_for(token.code());
-                back().emplace_back(m_offset, std::string_view(m_text).substr(m_offset, length), color);
-                m_offset += length;
+                append_token(mode, token);
                 break;
             }
         }
@@ -126,6 +142,16 @@ public:
     }
 
 private:
+
+    template <class Mode>
+    void append_token(Mode const& mode, Token const& token)
+    {
+        size_t length = token.length();
+        PaletteIndex color = mode.color_for(token.code());
+        back().emplace_back(m_offset, std::string_view(m_text).substr(m_offset, length), color);
+        m_offset += length;
+    }
+
     friend class Line;
     std::string m_text;
     bool m_dirty { false };
